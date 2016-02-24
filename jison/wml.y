@@ -48,8 +48,9 @@ RegularExpressionFirstChar ([^\n\r\*\\\/\[])|{RegularExpressionBackslashSequence
 RegularExpressionChar ([^\n\r\\\/\[])|{RegularExpressionBackslashSequence}|{RegularExpressionClass}
 RegularExpressionBody {RegularExpressionFirstChar}{RegularExpressionChar}*
 RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
-
 TagName [a-zA-Z_:][-a-zA-Z0-9_:]*
+Import 'import'
+From   'from'
 
 %options flex
 %x CHARDATA
@@ -58,11 +59,14 @@ TagName [a-zA-Z_:][-a-zA-Z0-9_:]*
 /* Lexer rules */
 
 \s+                             return 'WHITESPACE'
+{Import}                        return 'IMPORT';
+{From}                          return 'FROM';
 <*>'</'                         this.begin('INITIAL'); return '</';
 <*>'<'                          this.begin('INITIAL'); return '<';
 '/>'                            this.begin('CHARDATA'); return '/>';
 '>'                             this.begin('CHARDATA'); return '>';
 '='                             return '=';
+';'                             return ';'
 {TagName}                       return 'NAME';
 {StringLiteral}                 return 'STRING_LITERAL';
 <*><<EOF>>                      return 'EOF';
@@ -76,10 +80,38 @@ TagName [a-zA-Z_:][-a-zA-Z0-9_:]*
 
 /* All wml files must export a single root object */
 root
-          : tag EOF {return $1;};
+          : tag EOF {$$=
+            {
+            type:'root',
+            tree:$1
+            }; return $$;}
+          
+          | imports tag EOF {$$=
+            {
+            type:'root',
+            imports:$1,
+            tree:$2,
+            }; return $$;}
+          ;
+
+imports
+          : import          {$$ =  [$1];         }
+          | imports import  {$$ = $1.concat($2); }
+          ;
+
+import    
+          : IMPORT WHITESPACE NAME WHITESPACE FROM WHITESPACE STRING_LITERAL ';' WHITESPACE?
+            {$$ = {
+              type:'import',
+              id: $3,
+              src: $7,
+              location: {
+               line:@$.first_line,
+               column:@$.first_column
+            }};}
+          ;
 
 tag
-          
           : tag_start children tag_end 
             {
             $1.children = $1.children.concat($2);

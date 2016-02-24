@@ -72,30 +72,58 @@
   }
 */
 var parser = (function(){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,5],$V1=[10,14],$V2=[1,10],$V3=[5,10,14,26],$V4=[13,15],$V5=[2,15],$V6=[1,16],$V7=[13,15,16];
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,8],$V1=[1,7],$V2=[19,22],$V3=[1,15],$V4=[5,19,22,33],$V5=[8,19],$V6=[21,23],$V7=[2,21],$V8=[1,23],$V9=[9,21,23];
 var parser = {trace: function trace() { },
 yy: {},
-symbols_: {"error":2,"root":3,"tag":4,"EOF":5,"tag_start":6,"children":7,"tag_end":8,"empty_tag":9,"<":10,"NAME":11,"attributes":12,">":13,"</":14,"/>":15,"WHITESPACE":16,"attribute":17,"attributes_option0":18,"attribute_name":19,"=":20,"attribute_value":21,"string_literal":22,"children_option0":23,"children_repetition0":24,"chardata":25,"CDATA":26,"STRING_LITERAL":27,"children_repetition0_option0":28,"$accept":0,"$end":1},
-terminals_: {2:"error",5:"EOF",10:"<",11:"NAME",13:">",14:"</",15:"/>",16:"WHITESPACE",20:"=",26:"CDATA",27:"STRING_LITERAL"},
-productions_: [0,[3,2],[4,3],[4,1],[6,4],[8,3],[9,4],[12,3],[12,1],[17,3],[19,1],[21,1],[7,2],[25,1],[22,1],[18,0],[18,1],[23,0],[23,1],[28,0],[28,1],[24,0],[24,3]],
+symbols_: {"error":2,"root":3,"tag":4,"EOF":5,"imports":6,"import":7,"IMPORT":8,"WHITESPACE":9,"NAME":10,"FROM":11,"STRING_LITERAL":12,";":13,"import_option0":14,"tag_start":15,"children":16,"tag_end":17,"empty_tag":18,"<":19,"attributes":20,">":21,"</":22,"/>":23,"attribute":24,"attributes_option0":25,"attribute_name":26,"=":27,"attribute_value":28,"string_literal":29,"children_option0":30,"children_repetition0":31,"chardata":32,"CDATA":33,"children_repetition0_option0":34,"$accept":0,"$end":1},
+terminals_: {2:"error",5:"EOF",8:"IMPORT",9:"WHITESPACE",10:"NAME",11:"FROM",12:"STRING_LITERAL",13:";",19:"<",21:">",22:"</",23:"/>",27:"=",33:"CDATA"},
+productions_: [0,[3,2],[3,3],[6,1],[6,2],[7,9],[4,3],[4,1],[15,4],[17,3],[18,4],[20,3],[20,1],[24,3],[26,1],[28,1],[16,2],[32,1],[29,1],[14,0],[14,1],[25,0],[25,1],[30,0],[30,1],[34,0],[34,1],[31,0],[31,3]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
 var $0 = $$.length - 1;
 switch (yystate) {
 case 1:
-return $$[$0-1];
+this.$=
+            {
+            type:'root',
+            tree:$$[$0-1]
+            }; return this.$;
 break;
 case 2:
+this.$=
+            {
+            type:'root',
+            imports:$$[$0-2],
+            tree:$$[$0-1],
+            }; return this.$;
+break;
+case 3:
+this.$ =  [$$[$0]];         
+break;
+case 4:
+this.$ = $$[$0-1].concat($$[$0]); 
+break;
+case 5:
+this.$ = {
+              type:'import',
+              id: $$[$0-6],
+              src: $$[$0-2],
+              location: {
+               line:this._$.first_line,
+               column:this._$.first_column
+            }};
+break;
+case 6:
 
             $$[$0-2].children = $$[$0-2].children.concat($$[$0-1]);
             this.$ = $$[$0-2];
             
 break;
-case 3: case 10: case 11:
+case 7: case 14: case 15:
 this.$ = $$[$0];
 break;
-case 4:
+case 8:
 this.$ = {
              type: 'tag',
              name: $$[$0-2],
@@ -106,10 +134,10 @@ this.$ = {
              column:this._$.first_column
             }}
 break;
-case 5:
+case 9:
 this.$ = $$[$0-1];
 break;
-case 6:
+case 10:
 this.$ = {
               type:'tag',
               name:$$[$0-2],
@@ -120,13 +148,13 @@ this.$ = {
               column:this._$.first_column
             }}
 break;
-case 7:
+case 11:
 this.$ = $$[$0].concat($$[$0-1]);
 break;
-case 8: case 21:
+case 12: case 27:
 this.$ = [];
 break;
-case 9:
+case 13:
 this.$ = {
             type: 'attribute',
             name: $$[$0-2],
@@ -136,7 +164,7 @@ this.$ = {
             column:this._$.first_column
             }}
 break;
-case 12:
+case 16:
 
             var childs = [];
             $$[$0-1] && childs.push($$[$0-1]);
@@ -144,7 +172,7 @@ case 12:
             this.$ = childs;
           
 break;
-case 13:
+case 17:
 this.$ = {
               type:'text',
               value: $$[$0],
@@ -153,16 +181,16 @@ this.$ = {
               column:this._$.first_column
             }};
 break;
-case 14:
+case 18:
 this.$ = $$[$0].substring(1, $$[$0].length -1);
 break;
-case 22:
+case 28:
 $$[$0-2].push($$[$0-1]);
 break;
 }
 },
-table: [{3:1,4:2,6:3,9:4,10:$V0},{1:[3]},{5:[1,6]},o($V1,[2,17],{7:7,23:8,25:9,26:$V2}),o($V3,[2,3]),{11:[1,11]},{1:[2,1]},{8:12,14:[1,13]},o($V1,[2,21],{24:14}),o($V1,[2,18]),o($V1,[2,13]),o($V4,$V5,{12:15,18:17,16:$V6}),o($V3,[2,2]),{11:[1,18]},{4:19,6:3,9:4,10:$V0,14:[2,12]},{13:[1,20],15:[1,21]},o($V4,[2,16],{17:22,19:23,11:[1,24]}),o($V4,[2,8]),{13:[1,25]},o($V1,[2,19],{28:26,25:27,26:$V2}),o([10,14,26],[2,4]),o($V3,[2,6]),o($V4,$V5,{18:17,12:28,16:$V6}),{20:[1,29]},{20:[2,10]},o($V3,[2,5]),o($V1,[2,22]),o($V1,[2,20]),o($V4,[2,7]),{21:30,22:31,27:[1,32]},o($V7,[2,9]),o($V7,[2,11]),o($V7,[2,14])],
-defaultActions: {6:[2,1],24:[2,10]},
+table: [{3:1,4:2,6:3,7:6,8:$V0,15:4,18:5,19:$V1},{1:[3]},{5:[1,9]},{4:10,7:11,8:$V0,15:4,18:5,19:$V1},o($V2,[2,23],{16:12,30:13,32:14,33:$V3}),o($V4,[2,7]),o($V5,[2,3]),{10:[1,16]},{9:[1,17]},{1:[2,1]},{5:[1,18]},o($V5,[2,4]),{17:19,22:[1,20]},o($V2,[2,27],{31:21}),o($V2,[2,24]),o($V2,[2,17]),o($V6,$V7,{20:22,25:24,9:$V8}),{10:[1,25]},{1:[2,2]},o($V4,[2,6]),{10:[1,26]},{4:27,15:4,18:5,19:$V1,22:[2,16]},{21:[1,28],23:[1,29]},o($V6,[2,22],{24:30,26:31,10:[1,32]}),o($V6,[2,12]),{9:[1,33]},{21:[1,34]},o($V2,[2,25],{34:35,32:36,33:$V3}),o([19,22,33],[2,8]),o($V4,[2,10]),o($V6,$V7,{25:24,20:37,9:$V8}),{27:[1,38]},{27:[2,14]},{11:[1,39]},o($V4,[2,9]),o($V2,[2,28]),o($V2,[2,26]),o($V6,[2,11]),{12:[1,42],28:40,29:41},{9:[1,43]},o($V9,[2,13]),o($V9,[2,15]),o($V9,[2,18]),{12:[1,44]},{13:[1,45]},o($V5,[2,19],{14:46,9:[1,47]}),o($V5,[2,5]),o($V5,[2,20])],
+defaultActions: {9:[2,1],18:[2,2],32:[2,14]},
 parseError: function parseError(str, hash) {
     if (hash.recoverable) {
         this.trace(str);
@@ -641,32 +669,38 @@ options: {"flex":true},
 performAction: function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
 var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
-case 0:return 16
+case 0:return 9
 break;
-case 1:this.begin('INITIAL'); return 14;
+case 1:return 8;
 break;
-case 2:this.begin('INITIAL'); return 10;
+case 2:return 11;
 break;
-case 3:this.begin('CHARDATA'); return 15;
+case 3:this.begin('INITIAL'); return 22;
 break;
-case 4:this.begin('CHARDATA'); return 13;
+case 4:this.begin('INITIAL'); return 19;
 break;
-case 5:return 20;
+case 5:this.begin('CHARDATA'); return 23;
 break;
-case 6:return 11;
+case 6:this.begin('CHARDATA'); return 21;
 break;
 case 7:return 27;
 break;
-case 8:return 5;
+case 8:return 13
 break;
-case 9:this.begin('INITIAL'); return 26;                     
+case 9:return 10;
 break;
-case 10:console.log(yy_.yytext);
+case 10:return 12;
+break;
+case 11:return 5;
+break;
+case 12:this.begin('INITIAL'); return 33;                     
+break;
+case 13:console.log(yy_.yytext);
 break;
 }
 },
-rules: [/^(?:\s+)/,/^(?:<\/)/,/^(?:<)/,/^(?:\/>)/,/^(?:>)/,/^(?:=)/,/^(?:([a-zA-Z_:][-a-zA-Z0-9_:]*))/,/^(?:(("(([^\"\\\n\r]+)|(\\((([\'\"\\bfnrtv])|([^\'\"\\bfnrtv0-9xu]))|((?:[1-7][0-7]{0,2}|[0-7]{2,3}))|([x]([0-9a-fA-F]){2})|([u]([0-9a-fA-F]){4})))|(\\(\r\n|\r|\n)))*")|('(([^\'\\\n\r]+)|(\\((([\'\"\\bfnrtv])|([^\'\"\\bfnrtv0-9xu]))|((?:[1-7][0-7]{0,2}|[0-7]{2,3}))|([x]([0-9a-fA-F]){2})|([u]([0-9a-fA-F]){4})))|(\\(\r\n|\r|\n)))*')))/,/^(?:$)/,/^(?:[^&"'<>]+)/,/^(?:.)/],
-conditions: {"CHARDATA":{"rules":[1,2,8,9],"inclusive":false},"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,10],"inclusive":true}}
+rules: [/^(?:\s+)/,/^(?:(import\b))/,/^(?:(from))/,/^(?:<\/)/,/^(?:<)/,/^(?:\/>)/,/^(?:>)/,/^(?:=)/,/^(?:;)/,/^(?:([a-zA-Z_:][-a-zA-Z0-9_:]*))/,/^(?:(("(([^\"\\\n\r]+)|(\\((([\'\"\\bfnrtv])|([^\'\"\\bfnrtv0-9xu]))|((?:[1-7][0-7]{0,2}|[0-7]{2,3}))|([x]([0-9a-fA-F]){2})|([u]([0-9a-fA-F]){4})))|(\\(\r\n|\r|\n)))*")|('(([^\'\\\n\r]+)|(\\((([\'\"\\bfnrtv])|([^\'\"\\bfnrtv0-9xu]))|((?:[1-7][0-7]{0,2}|[0-7]{2,3}))|([x]([0-9a-fA-F]){2})|([u]([0-9a-fA-F]){4})))|(\\(\r\n|\r|\n)))*')))/,/^(?:$)/,/^(?:[^&"'<>]+)/,/^(?:.)/],
+conditions: {"CHARDATA":{"rules":[3,4,11,12],"inclusive":false},"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,13],"inclusive":true}}
 });
 return lexer;
 })();

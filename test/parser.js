@@ -22,19 +22,42 @@ describe('Parser', function() {
 
     describe('parse()', function() {
 
+        it('should parse imports', function() {
+
+            input = `import lib from 'path/to/libs';
+            <tag/>`;
+
+            parse();
+
+            must(result).eql(
+
+ {"type":"root","imports":[{"type":"import","id":"lib","src":"'path/to/libs'","location":{"line":1,"column":0}}],"tree":{"type":"tag","name":"tag","attributes":[],"children":[],"location":{"line":2,"column":12}}}
+
+
+
+              );
+
+
+
+        });
+
+
         it('should parse a self closing tag', function() {
 
             input = '<simple/>';
             parse();
 
             must(result).eql({
-                type: 'tag',
-                name: 'simple',
-                children: [],
-                attributes: [],
-                location: {
-                    line: 1,
-                    column: 0,
+                type: 'root',
+                tree: {
+                    type: 'tag',
+                    name: 'simple',
+                    children: [],
+                    attributes: [],
+                    location: {
+                        line: 1,
+                        column: 0,
+                    }
                 }
             });
         });
@@ -45,28 +68,33 @@ describe('Parser', function() {
             parse();
 
             must(result).eql({
-                type: 'tag',
-                name: 'user',
-                children: [],
-                location: {
-                    line: 1,
-                    column: 0,
-                },
-                attributes: [{
-                    type: 'attribute',
-                    name: 'name',
-                    value: 'xyaa aaz',
+                type: 'root',
+                tree: {
+                    type: 'tag',
+                    name: 'user',
+                    children: [],
                     location: {
                         line: 1,
-                        column: 6
-                    }
-                }]
+                        column: 0,
+                    },
+                    attributes: [{
+                        type: 'attribute',
+                        name: 'name',
+                        value: 'xyaa aaz',
+                        location: {
+                            line: 1,
+                            column: 6
+                        }
+                    }]
+                }
             });
 
             input = '<user name="xyaa aaz" id="24" />';
             parse();
 
             must(result).eql({
+                type: 'root',
+                tree: {
                     'type': 'tag',
                     'name': 'user',
                     'attributes': [{
@@ -92,9 +120,7 @@ describe('Parser', function() {
                         'column': 0
                     }
                 }
-
-
-            );
+            });
 
             input = '<user name="xyaa aaz" id="24" align="left"/>';
             parse();
@@ -102,42 +128,42 @@ describe('Parser', function() {
             must(result).eql(
 
                 {
-                    'type': 'tag',
-                    'name': 'user',
-                    'attributes': [{
-                        'type': 'attribute',
-                        'name': 'align',
-                        'value': 'left',
+                    type: 'root',
+                    tree: {
+                        'type': 'tag',
+                        'name': 'user',
+                        'attributes': [{
+                            'type': 'attribute',
+                            'name': 'align',
+                            'value': 'left',
+                            'location': {
+                                'line': 1,
+                                'column': 30
+                            }
+                        }, {
+                            'type': 'attribute',
+                            'name': 'id',
+                            'value': '24',
+                            'location': {
+                                'line': 1,
+                                'column': 22
+                            }
+                        }, {
+                            'type': 'attribute',
+                            'name': 'name',
+                            'value': 'xyaa aaz',
+                            'location': {
+                                'line': 1,
+                                'column': 6
+                            }
+                        }],
+                        'children': [],
                         'location': {
                             'line': 1,
-                            'column': 30
+                            'column': 0
                         }
-                    }, {
-                        'type': 'attribute',
-                        'name': 'id',
-                        'value': '24',
-                        'location': {
-                            'line': 1,
-                            'column': 22
-                        }
-                    }, {
-                        'type': 'attribute',
-                        'name': 'name',
-                        'value': 'xyaa aaz',
-                        'location': {
-                            'line': 1,
-                            'column': 6
-                        }
-                    }],
-                    'children': [],
-                    'location': {
-                        'line': 1,
-                        'column': 0
                     }
-                }
-
-            );
-
+                });
         });
 
         it('should parse a parent tag', function() {
@@ -146,20 +172,23 @@ describe('Parser', function() {
             parse();
 
             must(result).eql({
-                type: 'tag',
-                name: 'panel',
-                attributes: [],
-                children: [{
+                type: 'root',
+                tree: {
+                    type: 'tag',
+                    name: 'panel',
+                    attributes: [],
+                    children: [{
+                        location: {
+                            column: 7,
+                            line: 1
+                        },
+                        type: 'text',
+                        value: ' '
+                    }],
                     location: {
-                        column: 7,
-                        line: 1
-                    },
-                    type: 'text',
-                    value: ' '
-                }],
-                location: {
-                    line: 1,
-                    column: 0
+                        line: 1,
+                        column: 0
+                    }
                 }
             });
 
@@ -173,51 +202,49 @@ describe('Parser', function() {
             must(result).eql(
 
                 {
-                    'type': 'tag',
-                    'name': 'panel',
-                    'attributes': [{
-                        'type': 'attribute',
-                        'name': 'align',
-                        'value': 'left',
+                    type: 'root',
+                    tree: {
+                        'type': 'tag',
+                        'name': 'panel',
+                        'attributes': [{
+                            'type': 'attribute',
+                            'name': 'align',
+                            'value': 'left',
+                            'location': {
+                                'line': 1,
+                                'column': 32
+                            }
+                        }, {
+                            'type': 'attribute',
+                            'name': 'size',
+                            'value': '40',
+                            'location': {
+                                'line': 1,
+                                'column': 22
+                            }
+                        }, {
+                            'type': 'attribute',
+                            'name': 'type',
+                            'value': 'default',
+                            'location': {
+                                'line': 1,
+                                'column': 7
+                            }
+                        }],
+                        'children': [{
+                            'type': 'text',
+                            'value': ' ',
+                            'location': {
+                                'line': 1,
+                                'column': 45
+                            }
+                        }],
                         'location': {
                             'line': 1,
-                            'column': 32
+                            'column': 0
                         }
-                    }, {
-                        'type': 'attribute',
-                        'name': 'size',
-                        'value': '40',
-                        'location': {
-                            'line': 1,
-                            'column': 22
-                        }
-                    }, {
-                        'type': 'attribute',
-                        'name': 'type',
-                        'value': 'default',
-                        'location': {
-                            'line': 1,
-                            'column': 7
-                        }
-                    }],
-                    'children': [{
-                        'type': 'text',
-                        'value': ' ',
-                        'location': {
-                            'line': 1,
-                            'column': 45
-                        }
-                    }],
-                    'location': {
-                        'line': 1,
-                        'column': 0
                     }
-                }
-
-
-
-
-            );
+                });
         });
 
         it('should parse parent tags with children', function() {
@@ -226,26 +253,28 @@ describe('Parser', function() {
             parse();
 
             must(result).eql({
+                type: 'root',
+                tree: {
+                    type: 'tag',
+                    name: 'panel',
+                    attributes: [],
+                    children: [{
+                            type: 'text',
+                            location: {
+                                column: 7,
+                                line: 1
+                            },
+                            value: 'This is my offsprings.'
 
-                type: 'tag',
-                name: 'panel',
-                attributes: [],
-                children: [{
-                        type: 'text',
-                        location: {
-                            column: 7,
-                            line: 1
-                        },
-                        value: 'This is my offsprings.'
+                        }
 
+                    ],
+                    location: {
+                        line: 1,
+                        column: 0
                     }
 
-                ],
-                location: {
-                    line: 1,
-                    column: 0
                 }
-
             });
 
         });
@@ -256,22 +285,25 @@ describe('Parser', function() {
             parse();
 
             must(result).eql({
-                    "type": "tag",
-                    "name": "panel",
-                    "attributes": [],
-                    "children": [{
+                    type: 'root',
+                    tree: {
                         "type": "tag",
-                        "name": "a",
+                        "name": "panel",
                         "attributes": [],
-                        "children": [],
+                        "children": [{
+                            "type": "tag",
+                            "name": "a",
+                            "attributes": [],
+                            "children": [],
+                            "location": {
+                                "line": 1,
+                                "column": 7
+                            }
+                        }],
                         "location": {
                             "line": 1,
-                            "column": 7
+                            "column": 0
                         }
-                    }],
-                    "location": {
-                        "line": 1,
-                        "column": 0
                     }
                 }
 
@@ -289,6 +321,63 @@ describe('Parser', function() {
             must(result).eql(
 
                 {
+                    type: 'root',
+                    tree: {
+                        "type": "tag",
+                        "name": "panel",
+                        "attributes": [],
+                        "children": [{
+                            "type": "tag",
+                            "name": "a",
+                            "attributes": [{
+                                "type": "attribute",
+                                "name": "href",
+                                "value": "link",
+                                "location": {
+                                    "line": 1,
+                                    "column": 10
+                                }
+                            }],
+                            "children": [{
+                                "type": "text",
+                                "value": "Click Here",
+                                "location": {
+                                    "line": 1,
+                                    "column": 22
+                                }
+                            }],
+                            "location": {
+                                "line": 1,
+                                "column": 7
+                            }
+                        }, {
+                            "type": "tag",
+                            "name": "table",
+                            "attributes": [],
+                            "children": [],
+                            "location": {
+                                "line": 1,
+                                "column": 36
+                            }
+                        }],
+                        "location": {
+                            "line": 1,
+                            "column": 0
+                        }
+                    }
+                });
+
+
+        });
+
+        it('should parse parent tags with tag children (L3)', function() {
+
+            input = '<panel><a href="link">Click Here</a><table/><panel c="22"></panel></panel>';
+            parse();
+
+            must(result).eql({
+                type: 'root',
+                tree: {
                     "type": "tag",
                     "name": "panel",
                     "attributes": [],
@@ -325,82 +414,30 @@ describe('Parser', function() {
                             "line": 1,
                             "column": 36
                         }
+                    }, {
+                        "type": "tag",
+                        "name": "panel",
+                        "attributes": [{
+                            "type": "attribute",
+                            "name": "c",
+                            "value": "22",
+                            "location": {
+                                "line": 1,
+                                "column": 51
+                            }
+                        }],
+                        "children": [],
+                        "location": {
+                            "line": 1,
+                            "column": 44
+                        }
                     }],
                     "location": {
                         "line": 1,
                         "column": 0
                     }
-                });
-
-
-        });
-
-        it('should parse parent tags with tag children (L3)', function() {
-
-            input = '<panel><a href="link">Click Here</a><table/><panel c="22"></panel></panel>';
-            parse();
-
-            must(result).eql({
-                "type": "tag",
-                "name": "panel",
-                "attributes": [],
-                "children": [{
-                    "type": "tag",
-                    "name": "a",
-                    "attributes": [{
-                        "type": "attribute",
-                        "name": "href",
-                        "value": "link",
-                        "location": {
-                            "line": 1,
-                            "column": 10
-                        }
-                    }],
-                    "children": [{
-                        "type": "text",
-                        "value": "Click Here",
-                        "location": {
-                            "line": 1,
-                            "column": 22
-                        }
-                    }],
-                    "location": {
-                        "line": 1,
-                        "column": 7
-                    }
-                }, {
-                    "type": "tag",
-                    "name": "table",
-                    "attributes": [],
-                    "children": [],
-                    "location": {
-                        "line": 1,
-                        "column": 36
-                    }
-                }, {
-                    "type": "tag",
-                    "name": "panel",
-                    "attributes": [{
-                        "type": "attribute",
-                        "name": "c",
-                        "value": "22",
-                        "location": {
-                            "line": 1,
-                            "column": 51
-                        }
-                    }],
-                    "children": [],
-                    "location": {
-                        "line": 1,
-                        "column": 44
-                    }
-                }],
-                "location": {
-                    "line": 1,
-                    "column": 0
                 }
             });
-
 
         });
 
@@ -418,7 +455,141 @@ describe('Parser', function() {
                     </modal>`;
 
             parse();
-            console.log(JSON.stringify(result));
+
+            must(result).eql({
+                type: 'root',
+                tree: {
+                    'type': 'tag',
+                    'name': 'modal',
+                    'attributes': [{
+                        'type': 'attribute',
+                        'name': 'y',
+                        'value': '2',
+                        'location': {
+                            'line': 1,
+                            'column': 29
+                        }
+                    }, {
+                        'type': 'attribute',
+                        'name': 'x',
+                        'value': '1',
+                        'location': {
+                            'line': 1,
+                            'column': 22
+                        }
+                    }, {
+                        'type': 'attribute',
+                        'name': 'name',
+                        'value': 'mymodal',
+                        'location': {
+                            'line': 1,
+                            'column': 7
+                        }
+                    }],
+                    'children': [{
+                        'type': 'text',
+                        'value': '\n                        ',
+                        'location': {
+                            'line': 1,
+                            'column': 35
+                        }
+                    }, {
+                        'type': 'tag',
+                        'name': 'modal-header',
+                        'attributes': [],
+                        'children': [{
+                            'type': 'text',
+                            'value': 'My Modal',
+                            'location': {
+                                'line': 2,
+                                'column': 38
+                            }
+                        }],
+                        'location': {
+                            'line': 2,
+                            'column': 24
+                        }
+                    }, {
+                        'type': 'tag',
+                        'name': 'modal-body',
+                        'attributes': [],
+                        'children': [{
+                            'type': 'text',
+                            'value': '\n                         Creativity is inhibited by greed and corruption.\n                         ',
+                            'location': {
+                                'line': 3,
+                                'column': 36
+                            }
+                        }, {
+                            'type': 'tag',
+                            'name': 'vote-button',
+                            'attributes': [],
+                            'children': [],
+                            'location': {
+                                'line': 5,
+                                'column': 25
+                            }
+                        }, {
+                            'type': 'tag',
+                            'name': 'vote-count',
+                            'attributes': [{
+                                'type': 'attribute',
+                                'name': 'source',
+                                'value': '@this',
+                                'location': {
+                                    'line': 6,
+                                    'column': 37
+                                }
+                            }],
+                            'children': [],
+                            'location': {
+                                'line': 6,
+                                'column': 25
+                            }
+                        }, {
+                            'type': 'tag',
+                            'name': 'textarea',
+                            'attributes': [{
+                                'type': 'attribute',
+                                'name': 'onchange',
+                                'value': '@this.setText',
+                                'location': {
+                                    'line': 7,
+                                    'column': 45
+                                }
+                            }, {
+                                'type': 'attribute',
+                                'name': 'size',
+                                'value': '32',
+                                'location': {
+                                    'line': 7,
+                                    'column': 35
+                                }
+                            }],
+                            'children': [{
+                                'type': 'text',
+                                'value': '\n                           Various text\n                         ',
+                                'location': {
+                                    'line': 7,
+                                    'column': 70
+                                }
+                            }],
+                            'location': {
+                                'line': 7,
+                                'column': 25
+                            }
+                        }],
+                        'location': {
+                            'line': 3,
+                            'column': 24
+                        }
+                    }],
+                    'location': {
+                        'line': 1,
+                        'column': 0
+                    }
+                }
+            });
 
         });
 
