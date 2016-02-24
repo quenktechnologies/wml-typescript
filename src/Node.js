@@ -5,11 +5,9 @@
 class Node {
 
     /**
-     * render this node
-     * @param {WMLTree} w 
+     * toDOMNode turns this node into a DOM node
      */
-    render(w) {
-    }
+    toDOMNode() {}
 
 }
 

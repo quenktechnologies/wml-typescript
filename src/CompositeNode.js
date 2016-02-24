@@ -2,45 +2,54 @@ import TextNode from './TextNode';
 
 /**
  * CompositeNode represents a node that can have children.
- * @param {array} nodeData 
+ * @param {string|function} cons 
+ * @param {object} attrs 
+ * @param {array} children 
+ * @param {WMLTree} tree 
  * @implements {Node}
  */
 class CompositeNode {
 
-    constructor(nodeData) {
-        this.nodeData = nodeData
+    constructor(cons, attrs, children, tree) {
+        this._cons = cons;
+        this._attrs = attrs;
+        this._children = children;
+        this.tree = tree;
     }
 
-    render(w) {
+    toDOMNode() {
 
-        var cons = this.nodeData[0];
-        var attrs = this.nodeData[1];
-        var childs = this.nodeData[2];
         var children;
         var el;
 
-        children = childs.map(c => (Array.isArray(c)) ?
-            new CompositeNode(c) : new TextNode(c));
+        children = this._children.map(c => (Array.isArray(c)) ?
+            new CompositeNode(c[0], c[1], c[2], this._tree) :
+            new TextNode(c));
 
-        if (typeof cons === 'string') {
+        if (typeof this._cons === 'string') {
 
-            el = document.createElement(cons);
-            Object.keys(attrs).forEach(k => el.setAttribute(k, attrs[k]));
-            children.forEach(c => el.appendChild(c.render(w)));
+            el = document.createElement(this._cons);
+
+            Object.keys(this._attrs).
+              forEach(k => (typeof this._attrs[k] === 'function') ?
+                el[k] = this._attrs[k] : el.setAttribute(k, this._attrs[k]));
+
+            children.forEach(c => el.appendChild(c.toDOMNode()));
+
             return el;
 
-        } else if (typeof cons === 'function') {
+        } else if (typeof this._cons === 'function') {
 
-            el = cons.create(attrs);
+            el = this._cons.create(this._attrs);
 
-            if (attrs['data-wml-id'])
-                w.register(attrs['data-wml-id'], el);
+            if (this._attrs['data-wml-id'])
+                this._tree.register(this._attrs['data-wml-id'], el);
 
-            return el.onDOM(attrs, children);
+            return el.onDOM(this._attrs, children);
 
         }
 
-        throw new Error(`Widgets must be string or function not '${typeof cons}'`);
+        throw new Error(`Widgets must be string or function not '${typeof this._cons}'`);
 
     }
 

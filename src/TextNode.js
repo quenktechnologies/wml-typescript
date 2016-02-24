@@ -9,7 +9,7 @@ class TextNode {
         this.data = data;
     }
 
-    render(w) {
+    toDOMNode() {
 
         return document.createTextNode(this.data);
 

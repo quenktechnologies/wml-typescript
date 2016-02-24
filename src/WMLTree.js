@@ -15,7 +15,7 @@ import CompositeNode from './CompositeNode';
 class WMLTree {
 
     constructor(tree) {
-        this.root = new CompositeNode(tree);
+        this.root = new CompositeNode(tree[0], tree[1], tree[2], this);
         this._ids = Object.create(null);
     }
 
@@ -52,7 +52,7 @@ class WMLTree {
      */
     render(target) {
 
-        target.appendChild(this.root.render(this));
+        target.appendChild(this.root.toDOMNode());
 
     }
 
