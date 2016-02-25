@@ -27,7 +27,9 @@ DecimalIntegerLiteral [0]|({NonZeroDigit}{DecimalDigits}*)
 ExponentPart {ExponentIndicator}{SignedInteger}
 OctalIntegerLiteral [0]{OctalDigit}+
 HexIntegerLiteral [0][xX]{HexDigit}+
+
 DecimalLiteral ({DecimalIntegerLiteral}\.{DecimalDigits}*{ExponentPart}?)|(\.{DecimalDigits}{ExponentPart}?)|({DecimalIntegerLiteral}{ExponentPart}?)
+
 LineContinuation \\(\r\n|\r|\n)
 OctalEscapeSequence (?:[1-7][0-7]{0,2}|[0-7]{2,3})
 HexEscapeSequence [x]{HexDigit}{2}
@@ -53,7 +55,7 @@ Import 'import'
 From   'from'
 
 %options flex
-%x CHARDATA
+%x CHARDATA JSEXPR
 %%
 
 /* Lexer rules */
@@ -61,16 +63,18 @@ From   'from'
 \s+                             return 'WHITESPACE'
 {Import}                        return 'IMPORT';
 {From}                          return 'FROM';
-<*>'</'                         this.begin('INITIAL'); return '</';
-<*>'<'                          this.begin('INITIAL'); return '<';
-'/>'                            this.begin('CHARDATA'); return '/>';
-'>'                             this.begin('CHARDATA'); return '>';
+<*>'</'                         this.begin('INITIAL');    return '</';
+<*>'<'                          this.begin('INITIAL');    return '<';
+'/>'                            this.begin('CHARDATA');   return '/>';
+'>'                             this.begin('CHARDATA');   return '>';
+'{'                             this.begin('JSEXPR');     return '{';
 '='                             return '=';
 ';'                             return ';'
 {TagName}                       return 'NAME';
 {StringLiteral}                 return 'STRING_LITERAL';
 <*><<EOF>>                      return 'EOF';
-<CHARDATA>[^&"'<>]+             this.begin('INITIAL'); return 'CDATA';                     
+<CHARDATA>[^&"'<>]+             this.begin('INITIAL'); return 'CDATA';                 
+<JSEXPR>[^\{\}]+                this.begin('INITIAL'); return 'EXPRESSION';
 
 /lex
 %ebnf
@@ -156,9 +160,19 @@ attributes
           ;
 
 attribute 
-          : attribute_name '=' attribute_value
+          : attribute_name '=' string_literal
             {$$ = {
             type: 'attribute',
+            name: $1,
+            value: $3,
+            location: {
+            line:@$.first_line,
+            column:@$.first_column
+            }}}
+
+          | attribute_name '=' expression
+            {$$ = {
+            type: 'attribute-expression',
             name: $1,
             value: $3,
             location: {
@@ -171,8 +185,12 @@ attribute_name
           : NAME {$$ = $1;}
           ;
 
-attribute_value
-          : string_literal {$$ = $1;}
+string_literal
+          : STRING_LITERAL {$$ = $1.substring(1, $1.length -1);}
+          ;
+
+expression
+          : '{' EXPRESSION {$$ = $2;}
           ;
 
 children   
@@ -193,8 +211,4 @@ chardata
               line:@$.first_line,
               column:@$.first_column
             }};}
-          ;
-
-string_literal
-          : STRING_LITERAL {$$ = $1.substring(1, $1.length -1);}
           ;

@@ -29,13 +29,32 @@ describe('Parser', function() {
 
             parse();
 
-            must(result).eql(
+            must(result).eql({
+                    "type": "root",
+                    "imports": [{
+                        "type": "import",
+                        "id": "lib",
+                        "src": "'path/to/libs'",
+                        "location": {
+                            "line": 1,
+                            "column": 0
+                        }
+                    }],
+                    "tree": {
+                        "type": "tag",
+                        "name": "tag",
+                        "attributes": [],
+                        "children": [],
+                        "location": {
+                            "line": 2,
+                            "column": 12
+                        }
+                    }
+                }
 
- {"type":"root","imports":[{"type":"import","id":"lib","src":"'path/to/libs'","location":{"line":1,"column":0}}],"tree":{"type":"tag","name":"tag","attributes":[],"children":[],"location":{"line":2,"column":12}}}
 
 
-
-              );
+            );
 
 
 
@@ -64,30 +83,41 @@ describe('Parser', function() {
 
         it('should parse a self closing tag with attributes', function() {
 
-            input = '<user name="xyaa aaz"/>';
+            input = '<user name="xyaa aaz" position={4}/>';
             parse();
 
             must(result).eql({
-                type: 'root',
-                tree: {
-                    type: 'tag',
-                    name: 'user',
-                    children: [],
-                    location: {
-                        line: 1,
-                        column: 0,
-                    },
-                    attributes: [{
-                        type: 'attribute',
-                        name: 'name',
-                        value: 'xyaa aaz',
-                        location: {
-                            line: 1,
-                            column: 6
+                    'type': 'root',
+                    'tree': {
+                        'type': 'tag',
+                        'name': 'user',
+                        'attributes': [{
+                            'type': 'attribute-expression',
+                            'name': 'position',
+                            'value': '4',
+                            'location': {
+                                'line': 1,
+                                'column': 22
+                            }
+                        }, {
+                            'type': 'attribute',
+                            'name': 'name',
+                            'value': 'xyaa aaz',
+                            'location': {
+                                'line': 1,
+                                'column': 6
+                            }
+                        }],
+                        'children': [],
+                        'location': {
+                            'line': 1,
+                            'column': 0
                         }
-                    }]
+                    }
                 }
-            });
+
+
+            );
 
             input = '<user name="xyaa aaz" id="24" />';
             parse();
@@ -315,57 +345,77 @@ describe('Parser', function() {
 
         it('should parse parent tags with tag children (L2)', function() {
 
-            input = '<panel><a href="link">Click Here</a><table/></panel>';
+            input = '<panel><a href="link" onclick={this.someting.invoke()}>' +
+                'Click Here</a><table/></panel>';
             parse();
 
-            must(result).eql(
+            must(result).eql({
+  'type': 'root',
+  'tree': {
+    'type': 'tag',
+    'name': 'panel',
+    'attributes': [
+    ],
+    'children': [
+      {
+        'type': 'tag',
+        'name': 'a',
+        'attributes': [
+          {
+            'type': 'attribute-expression',
+            'name': 'onclick',
+            'value': 'this.someting.invoke()',
+            'location': {
+              'line': 1,
+              'column': 22
+            }
+          },
+          {
+            'type': 'attribute',
+            'name': 'href',
+            'value': 'link',
+            'location': {
+              'line': 1,
+              'column': 10
+            }
+          }
+        ],
+        'children': [
+          {
+            'type': 'text',
+            'value': 'Click Here',
+            'location': {
+              'line': 1,
+              'column': 55
+            }
+          }
+        ],
+        'location': {
+          'line': 1,
+          'column': 7
+        }
+      },
+      {
+        'type': 'tag',
+        'name': 'table',
+        'attributes': [
+        ],
+        'children': [
+        ],
+        'location': {
+          'line': 1,
+          'column': 69
+        }
+      }
+    ],
+    'location': {
+      'line': 1,
+      'column': 0
+    }
+  }
+}
 
-                {
-                    type: 'root',
-                    tree: {
-                        "type": "tag",
-                        "name": "panel",
-                        "attributes": [],
-                        "children": [{
-                            "type": "tag",
-                            "name": "a",
-                            "attributes": [{
-                                "type": "attribute",
-                                "name": "href",
-                                "value": "link",
-                                "location": {
-                                    "line": 1,
-                                    "column": 10
-                                }
-                            }],
-                            "children": [{
-                                "type": "text",
-                                "value": "Click Here",
-                                "location": {
-                                    "line": 1,
-                                    "column": 22
-                                }
-                            }],
-                            "location": {
-                                "line": 1,
-                                "column": 7
-                            }
-                        }, {
-                            "type": "tag",
-                            "name": "table",
-                            "attributes": [],
-                            "children": [],
-                            "location": {
-                                "line": 1,
-                                "column": 36
-                            }
-                        }],
-                        "location": {
-                            "line": 1,
-                            "column": 0
-                        }
-                    }
-                });
+                );
 
 
         });
@@ -592,7 +642,6 @@ describe('Parser', function() {
             });
 
         });
-
 
     });
 
