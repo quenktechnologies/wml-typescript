@@ -194,12 +194,22 @@ expression
           ;
 
 children   
-          : chardata? (tag chardata?)* {
+          : expression children {
             var childs = [];
-            $1 && childs.push($1);
-            childs = ($2)? childs.concat($2) : childs;
-            $$ = childs;
+            childs.push($1);
+            $$ = childs.concat($2);
           }
+          | chardata children {
+            var childs = [];
+            childs.push($1);
+            $$ = childs.concat($2);
+            }
+          | tag children {
+            var childs = [];
+            childs.push($1);
+            $$ = childs.concat($2);
+            }
+          | {$$ = [];}
           ;
 
 chardata  
