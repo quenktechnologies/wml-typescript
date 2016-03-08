@@ -79,18 +79,16 @@ From   'from'
 /lex
 %ebnf
 %start root
-/* Section for raw js code */
 %%
 
-/* All wml files must export a single root object */
 root
-          : tag EOF {$$=
+          : tag chardata? EOF {$$=
             {
             type:'root',
             tree:$1
             }; return $$;}
           
-          | imports tag EOF {$$=
+          | imports tag chardata? EOF {$$=
             {
             type:'root',
             imports:$1,
@@ -194,12 +192,7 @@ expression
           ;
 
 children   
-          : expression children {
-            var childs = [];
-            childs.push($1);
-            $$ = childs.concat($2);
-          }
-          | chardata children {
+          : chardata children {
             var childs = [];
             childs.push($1);
             $$ = childs.concat($2);
