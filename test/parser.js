@@ -75,52 +75,51 @@ describe('Parser', function() {
 
         it('should parse a self closing tag with attributes', function() {
 
-            input = '<user name="xyaa aaz" position={4} name:space="test"/>';
+            input = '<user name="xyaa aaz" position={{4}} name:space="test"/>';
             parse();
 
-            must(result).eql(
-              {
-                'type': 'root',
-                'tree': {
-                    'type': 'tag',
-                    'name': 'user',
-                    'attributes': [{
-                        'type': 'attribute-expression',
-                        'namespace': '',
-                        'name': 'position',
-                        'value': '4',
+            must(result).eql({
+                    'type': 'root',
+                    'tree': {
+                        'type': 'tag',
+                        'name': 'user',
+                        'attributes': [{
+                            'type': 'attribute',
+                            'namespace': 'name',
+                            'name': 'space',
+                            'value': 'test',
+                            'location': {
+                                'line': 1,
+                                'column': 37
+                            }
+                        }, {
+                            'type': 'attribute-expression',
+                            'namespace': '',
+                            'name': 'position',
+                            'value': '4',
+                            'location': {
+                                'line': 1,
+                                'column': 22
+                            }
+                        }, {
+                            'type': 'attribute',
+                            'namespace': '',
+                            'name': 'name',
+                            'value': 'xyaa aaz',
+                            'location': {
+                                'line': 1,
+                                'column': 6
+                            }
+                        }],
+                        'children': [],
                         'location': {
                             'line': 1,
-                            'column': 22
+                            'column': 0
                         }
-                    }, {
-                        'type': 'attribute',
-                        'namespace': '',
-                        'name': 'name',
-                        'value': 'xyaa aaz',
-                        'location': {
-                            'line': 1,
-                            'column': 6
-                        }
-                    },{
-                        'type': 'attribute',
-                        'namespace': 'name',
-                        'name': 'space',
-                        'value': 'test',
-                        'location': {
-                            'line': 1,
-                            'column': 35
-                        }
-                    }],
-                    'children': [],
-                    'location': {
-                        'line': 1,
-                        'column': 0
                     }
                 }
-            }
-              
-              );
+
+            );
 
             input = '<user name="xyaa aaz" id="24" />';
             parse();
@@ -376,7 +375,7 @@ describe('Parser', function() {
 
         it('should parse parent tags with tag children (L2)', function() {
 
-            input = '<panel><a href="link" onclick={this.someting.invoke()}>' +
+            input = '<panel><a href="link" onclick={{this.someting.invoke()}}>' +
                 'Click Here</a><table/></panel>';
             parse();
 
@@ -413,7 +412,7 @@ describe('Parser', function() {
                                 'value': 'Click Here',
                                 'location': {
                                     'line': 1,
-                                    'column': 55
+                                    'column': 57
                                 }
                             }],
                             'location': {
@@ -427,7 +426,7 @@ describe('Parser', function() {
                             'children': [],
                             'location': {
                                 'line': 1,
-                                'column': 69
+                                'column': 71
                             }
                         }],
                         'location': {
@@ -522,7 +521,7 @@ describe('Parser', function() {
                          Creativity is inhibited by greed and corruption.
                          <vote-button/>
                          <vote-count source="@this"/> Votes
-                         <textarea size="32" onchange={this.setText}>
+                         <textarea size="32" onchange={{this.setText}}>
                            Various text
                          </textarea>
                         </modal-body>
@@ -672,7 +671,7 @@ describe('Parser', function() {
                                 'value': '\n                           Various text\n                         ',
                                 'location': {
                                     'line': 7,
-                                    'column': 69
+                                    'column': 71
                                 }
                             }],
                             'location': {

@@ -43,14 +43,14 @@ From   'from'
 <*>'<'                          this.begin('INITIAL');    return '<';
 '/>'                            this.begin('CHARDATA');   return '/>';
 '>'                             this.begin('CHARDATA');   return '>';
-'{'                             this.begin('JSEXPR');     return '{';
-<JSEXPR>'}'                     this.begin('INITIAL');    return '}';
+'{{'                            this.begin('JSEXPR');     return '{{';
+<JSEXPR>'}}'                    this.begin('INITIAL');    return '}}';
 '='                             return '=';
 ';'                             return ';'
 {TagName}                       return 'NAME';
 {StringLiteral}                 return 'STRING_LITERAL';
 <*><<EOF>>                      return 'EOF';
-<CHARDATA>[^&"'<>]+             this.begin('INITIAL'); return 'CDATA';                 
+<CHARDATA>[^&"'<>]+             this.begin('INITIAL'); return 'CDATA';
 <JSEXPR>[^\{\}]+                return 'EXPRESSION';
 
 /lex
@@ -179,7 +179,7 @@ string_literal
           ;
 
 expression
-          : '{' EXPRESSION '}' {$$ = $2;}
+          : '{{' EXPRESSION '}}' {$$ = $2;}
           ;
 
 children   
