@@ -23,21 +23,23 @@ class TagWriter {
 
         tag.attributes.forEach((a, k) => {
 
-            if (a.type === 'attribute')
-                attr.writeValue(a.name, `'${a.value}'`);
+            if (a.type === 'attribute') {
+                if (a.namespace) {
+                    attr.writeSubObject(a.namespace, a.name, `'${a.value}'`);
+                } else {
+                    attr.writeValue(a.name, `'${a.value}'`);
+                }
+            }
 
             if (a.type === 'attribute-expression')
                 attr.writeValue(a.name, a.value);
-
-            if (k + 1 !== tag.attributes.length)
-                attr.write(',');
 
         });
 
         tag.children.forEach((c, k) => {
 
             if (c.type === 'text')
-                childs.write(`'${c.value.trim()}'`);
+                childs.write(`\`${c.value.trim()}\``);
 
             if (c.type === 'tag')
                 childs.write((new TagWriter(c)).write());

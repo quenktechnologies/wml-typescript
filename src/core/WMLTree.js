@@ -15,7 +15,8 @@ import CompositeNode from './CompositeNode';
 class WMLTree {
 
     constructor(tree) {
-        this.root = new CompositeNode(tree[0], tree[1], tree[2], this);
+        this.root = null;
+        this._tree = tree;
         this._ids = Object.create(null);
     }
 
@@ -28,7 +29,7 @@ class WMLTree {
      */
     findById(id) {
 
-        return (this._ids[ids]) ? this._ids[id] : null;
+        return (this._ids[id]) ? this._ids[id] : null;
 
     }
 
@@ -47,12 +48,32 @@ class WMLTree {
     }
 
     /**
+     * toDOMNode returns the DOM representation of this tree.
+     * @param {object} $this 
+     * @return {HTMLElement}
+     */
+    toDOMNode($this) {
+
+        var tree;
+
+        if (this.root === null) {
+
+            tree = this._tree.call($this || null);
+            this.root = new CompositeNode(tree[0], tree[1], tree[2], this);
+
+        }
+
+        return this.root.toDOMNode($this);
+    }
+
+    /**
      * render this tree into the DOM
      * @param {HTMLElement} target 
+     * @param {object} [$this]
      */
-    render(target) {
+    render(target, $this) {
 
-        target.appendChild(this.root.toDOMNode());
+        target.appendChild(this.toDOMNode($this));
 
     }
 

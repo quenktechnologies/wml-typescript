@@ -14,7 +14,7 @@ class CompositeNode {
         this._cons = cons;
         this._attrs = attrs;
         this._children = children;
-        this.tree = tree;
+        this._tree = tree;
     }
 
     toDOMNode() {
@@ -41,7 +41,6 @@ class CompositeNode {
         } else if (typeof this._cons === 'function') {
 
             el = this._cons.create(this._attrs);
-
             if (this._attrs['data-wml-id'])
                 this._tree.register(this._attrs['data-wml-id'], el);
 

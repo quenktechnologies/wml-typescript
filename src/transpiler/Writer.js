@@ -16,7 +16,8 @@ class Writer {
      */
     write(text) {
 
-        this.buf = this.buf + text;
+        if (text !== '``')
+            this.buf = this.buf + text;
         return this;
 
     }

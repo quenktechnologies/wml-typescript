@@ -23,7 +23,10 @@ function transform(file) {
             throw e;
         }
 
-        this.queue(babel.transform(js,{sourceMaps:'inline'}).code);
+        this.queue(babel.transform(js, {
+            sourceMaps: true
+        }).code);
+
         this.queue(null);
 
     }

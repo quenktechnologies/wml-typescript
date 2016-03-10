@@ -11,25 +11,9 @@
 
 /* Definitions */
 
-
-/* Source https://github.com/cjihrig/jsparser */
-DecimalDigit [0-9]
-DecimalDigits [0-9]+
-NonZeroDigit [1-9]
-OctalDigit [0-7]
-HexDigit [0-9a-fA-F]
 IdentifierStart [$_a-zA-Z]|("\\"[u]{HexDigit}{4})
 IdentifierPart {IdentifierStart}|[0-9]
 Identifier [a-zA-Z$0-9_][a-zA-Z$0-9.]+
-ExponentIndicator [eE]
-SignedInteger [+-]?[0-9]+
-DecimalIntegerLiteral [0]|({NonZeroDigit}{DecimalDigits}*)
-ExponentPart {ExponentIndicator}{SignedInteger}
-OctalIntegerLiteral [0]{OctalDigit}+
-HexIntegerLiteral [0][xX]{HexDigit}+
-
-DecimalLiteral ({DecimalIntegerLiteral}\.{DecimalDigits}*{ExponentPart}?)|(\.{DecimalDigits}{ExponentPart}?)|({DecimalIntegerLiteral}{ExponentPart}?)
-
 LineContinuation \\(\r\n|\r|\n)
 OctalEscapeSequence (?:[1-7][0-7]{0,2}|[0-7]{2,3})
 HexEscapeSequence [x]{HexDigit}{2}
@@ -41,16 +25,7 @@ EscapeSequence {CharacterEscapeSequence}|{OctalEscapeSequence}|{HexEscapeSequenc
 DoubleStringCharacter ([^\"\\\n\r]+)|(\\{EscapeSequence})|{LineContinuation}
 SingleStringCharacter ([^\'\\\n\r]+)|(\\{EscapeSequence})|{LineContinuation}
 StringLiteral (\"{DoubleStringCharacter}*\")|(\'{SingleStringCharacter}*\')
-RegularExpressionNonTerminator [^\n\r]
-RegularExpressionBackslashSequence \\{RegularExpressionNonTerminator}
-RegularExpressionClassChar [^\n\r\]\\]|{RegularExpressionBackslashSequence}
-RegularExpressionClass \[{RegularExpressionClassChar}*\]
-RegularExpressionFlags {IdentifierPart}*
-RegularExpressionFirstChar ([^\n\r\*\\\/\[])|{RegularExpressionBackslashSequence}|{RegularExpressionClass}
-RegularExpressionChar ([^\n\r\\\/\[])|{RegularExpressionBackslashSequence}|{RegularExpressionClass}
-RegularExpressionBody {RegularExpressionFirstChar}{RegularExpressionChar}*
-RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
-TagName [a-zA-Z_:][-a-zA-Z0-9_:]*
+TagName [a-zA-Z_][-a-zA-Z0-9_.]*
 Import 'import'
 From   'from'
 
@@ -63,18 +38,20 @@ From   'from'
 \s+                             return 'WHITESPACE'
 {Import}                        return 'IMPORT';
 {From}                          return 'FROM';
+':'                             return ':';
 <*>'</'                         this.begin('INITIAL');    return '</';
 <*>'<'                          this.begin('INITIAL');    return '<';
 '/>'                            this.begin('CHARDATA');   return '/>';
 '>'                             this.begin('CHARDATA');   return '>';
 '{'                             this.begin('JSEXPR');     return '{';
+<JSEXPR>'}'                     this.begin('INITIAL');    return '}';
 '='                             return '=';
 ';'                             return ';'
 {TagName}                       return 'NAME';
 {StringLiteral}                 return 'STRING_LITERAL';
 <*><<EOF>>                      return 'EOF';
 <CHARDATA>[^&"'<>]+             this.begin('INITIAL'); return 'CDATA';                 
-<JSEXPR>[^\{\}]+                this.begin('INITIAL'); return 'EXPRESSION';
+<JSEXPR>[^\{\}]+                return 'EXPRESSION';
 
 /lex
 %ebnf
@@ -161,7 +138,8 @@ attribute
           : attribute_name '=' string_literal
             {$$ = {
             type: 'attribute',
-            name: $1,
+            namespace: $1.namespace,
+            name: $1.name,  
             value: $3,
             location: {
             line:@$.first_line,
@@ -171,8 +149,20 @@ attribute
           | attribute_name '=' expression
             {$$ = {
             type: 'attribute-expression',
-            name: $1,
+            namespace: $1.namespace,
+            name: $1.name,
             value: $3,
+            location: {
+            line:@$.first_line,
+            column:@$.first_column
+            }}}
+
+          | attribute_name
+            {$$ = {
+            type: 'attribute-expression',
+            namespace: $1.namespace,
+            name: $1.name,  
+            value: true,
             location: {
             line:@$.first_line,
             column:@$.first_column
@@ -180,7 +170,8 @@ attribute
           ;
 
 attribute_name
-          : NAME {$$ = $1;}
+          : NAME               {$$ = {namespace:'', name: $1};}
+          | NAME ':' NAME      {$$ = {namespace:$1, name: $3};}
           ;
 
 string_literal
@@ -188,7 +179,7 @@ string_literal
           ;
 
 expression
-          : '{' EXPRESSION {$$ = $2;}
+          : '{' EXPRESSION '}' {$$ = $2;}
           ;
 
 children   

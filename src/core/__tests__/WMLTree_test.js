@@ -59,7 +59,7 @@ describe('WMLTree', function() {
                 ]
             ];
 
-            view = ['div', {
+            view = () => ['div', {
                     class: 'panel panel-default'
                 },
                 [heading, body]
@@ -89,7 +89,7 @@ describe('WMLTree', function() {
                 ['Body']
             ];
 
-            view = ['div', {
+            view = () => ['div', {
                     class: 'panel panel-default'
                 },
                 [heading, body]
@@ -98,13 +98,11 @@ describe('WMLTree', function() {
             node = document.createElement('div');
             (new WMLTree(view)).render(node);
 
-             expect(node.innerHTML).toBe('<div class="panel panel-default">'+
-                 '<div type="div" class="panel-heading">HeaderHeading</div>'+
-                 '<div type="div" class="panel-body">HeaderBody</div></div>');
-
+            expect(node.innerHTML).toBe('<div class="panel panel-default">' +
+                '<div type="div" class="panel-heading">HeaderHeading</div>' +
+                '<div type="div" class="panel-body">HeaderBody</div></div>');
 
         });
-
 
     });
 
