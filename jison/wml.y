@@ -25,55 +25,65 @@ EscapeSequence {CharacterEscapeSequence}|{OctalEscapeSequence}|{HexEscapeSequenc
 DoubleStringCharacter ([^\"\\\n\r]+)|(\\{EscapeSequence})|{LineContinuation}
 SingleStringCharacter ([^\'\\\n\r]+)|(\\{EscapeSequence})|{LineContinuation}
 StringLiteral (\"{DoubleStringCharacter}*\")|(\'{SingleStringCharacter}*\')
-TagName [a-zA-Z_][-a-zA-Z0-9_.]*
+TagName [a-zA-Z_$][-a-zA-Z0-9_.]*
 Import 'import'
 From 'from'
 
 /* Lexer flags */
 %options flex
-%x CHARDATA JSEXPR CSTRUCT
+%x TAG CHILDISH JSEXPR CSTRUCT TEMPLATE
 %%
 
 /* Lexer rules */
 
-<INITIAL,CSTRUCT>\s+            return 'WS'
-{Import}                        return 'IMPORT';
-{From}                          return 'FROM';
-':'                             return ':';
-<*>'</'                         this.begin('INITIAL');    return '</';
-<*>'<'                          this.begin('INITIAL');    return '<';
+<*>\s+                                                    return 'WHITESPACE';
+{Import}                                                  return 'IMPORT';
+{From}                                                    return 'FROM';
+'{{'                            this.begin('JSEXPR');     return '{{';
+';'                                                       return ';'
 
-/* The following rules are meant to kick in 
-   only when we are parsing the children of a tag.
-   A tag's children can be one of:
-   * Another tag.
-   * A JS template string,
-   * Control statement
-   * JavaScript expression. */
-
-/* character data */
-'/>'                            this.begin('CHARDATA');   return '/>';
-'>'                             this.begin('CHARDATA');   return '>';
-<*>'{%'                         this.begin('CSTRUCT');    return '{%';
-<CHARDATA>[^<>%]+               this.begin('INITIAL');    return 'CDATA';
-
-/* control structures */
-<CSTRUCT>'for'                  return 'FOR';
-<CSTRUCT>'in'                   return 'IN';
-<CSTRUCT>'endfor'               return 'ENDFOR';
-<CSTRUCT>{Identifier}           return 'VAR_DEC';
-<CSTRUCT>'%}'                   this.popState();    return '%}';
+/* tag parsing */
+<INITIAL,CHILDISH>'<'          this.begin('TAG');         return '<';
+<CHILDISH>'</'                 this.begin('TAG');         return '</';
+<TAG>':'                                                  return ':';
+<TAG>'='                                                  return '=';
+<TAG,INITIAL>{TagName}                                    return 'NAME';
+<TAG,INITIAL>{StringLiteral}                              return 'STRING_LITERAL';
+<TAG>'/>'                       this.begin('CHILDISH');   return '/>';
+<TAG>'>'                        this.begin('CHILDISH');   return '>';
 
 /* js expressions */
-<*>'{{'                         this.begin('JSEXPR');     return '{{';
+<CHILDISH,TAG>'{{'              this.begin('JSEXPR');     return '{{';
 <JSEXPR>(.*)/'}}'               return 'EXPRESSION';
-<JSEXPR>'}}'                    this.popState();    return '}}';
+<JSEXPR>'}}'                    this.popState();          return '}}';
 
-'='                             return '=';
-';'                             return ';'
-{TagName}                       return 'NAME';
-{StringLiteral}                 return 'STRING_LITERAL';
-<*><<EOF>>                      return 'EOF';
+/* The following rules are meant to kick in a only when we are parsing the children of a tag.
+   A tag's children can be one of:
+   * Another tag. (handled above by <*>'>'
+   * A JS template string.
+   * A limited string (see rule).
+   * Control statement.
+   * JavaScript expression.
+*/
+
+<CHILDISH>'{%'                  this.begin('CSTRUCT');    return '{%';
+<CHILDISH>'`'                   this.begin('TEMPLATE');   return 'START_TICK';
+<CHILDISH>[^{%`<>]+                                       return 'RAW_STRING';
+
+/* foreach */
+<CSTRUCT>'for'                                            return 'FOR';
+<CSTRUCT>'in'                                             return 'IN';
+<CSTRUCT>'endfor'                                         return 'ENDFOR';
+<CSTRUCT>'{{'                   this.begin('JSEXPR');     return '{{';
+<CSTRUCT>{Identifier}                                     return 'VAR_DEC';
+<CSTRUCT>'%}'                   this.popState();          return '%}';
+
+/* template strings */
+
+<TEMPLATE>[^`]+                                           return 'TDATA';
+<TEMPLATE>'`'                   this.popState();          return 'END_TICK';
+
+<*><<EOF>>                                                return 'EOF';
 
 /lex
 %ebnf
@@ -81,13 +91,13 @@ From 'from'
 %%
 
 root
-          : tag chardata? EOF {$$=
+          : tag EOF {$$=
             {
             type:'root',
             tree:$1
             }; return $$;}
           
-          | imports tag chardata? EOF {$$=
+          | imports tag EOF {$$=
             {
             type:'root',
             imports:$1,
@@ -101,7 +111,7 @@ imports
           ;
 
 import    
-          : IMPORT WS NAME WS FROM WS STRING_LITERAL ';' WS?
+          : IMPORT WHITESPACE? NAME WHITESPACE? FROM WHITESPACE? STRING_LITERAL ';' WHITESPACE?
             {$$ = {
               type:'import',
               id: $3,
@@ -152,8 +162,8 @@ empty_tag
           ;
 
 attributes
-          : WS attribute attributes {$$ = $3.concat($2);}
-          | WS? {$$ = [];}
+          : WHITESPACE attribute attributes {$$ = $3.concat($2);}
+          | WHITESPACE? {$$ = [];}
           ;
 
 attribute 
@@ -204,8 +214,8 @@ expression
           : '{{' EXPRESSION '}}' {$$ = $2;}
           ;
 
-chardata  
-          : '`' CDATA '`'
+template  
+          : START_TICK TDATA END_TICK
             {$$ = {
               type:'text',
               value: $2,
@@ -215,9 +225,20 @@ chardata
             }};}
           ;
 
+chardata
+          : RAW_STRING
+            {$$ = {
+              type:'text',
+              value: $1,
+              location: {
+              line:@$.first_line,
+              column:@$.first_column
+            }};}
+          ;
+
 for_loop
-          : '{%' WS FOR WS VAR_DEC WS IN WS expression WS '%}'
-             tag '{%' WS ENDFOR WS '%}'
+          : '{%' WHITESPACE FOR WHITESPACE VAR_DEC WHITESPACE IN WHITESPACE expression WHITESPACE '%}'
+             WHITESPACE? tag WHITESPACE? '{%' WHITESPACE ENDFOR WHITESPACE '%}'
              {$$ = {
               type: 'for-loop',
               variable: $5,
@@ -236,10 +257,16 @@ children
             childs.push($1);
             $$ = childs.concat($2);
             }
-          | chardata children {
+          | template children {
             var childs = [];
             childs.push($1);
             $$ = childs.concat($2);
             }
+          | chardata children {
+            var childs = [];
+            childs.push($1);
+            $$ = childs.concat($2);
+            } 
+          | WHITESPACE children {$$ = [].concat($2);}
           | {$$ = [];}
           ;
