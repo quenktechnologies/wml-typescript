@@ -707,6 +707,49 @@ describe('Parser', function() {
 
         });
 
+        it('should parse for expressions', function() {
+
+            input = '<root>' +
+                '{% for item in {{list}} %}' +
+                '<stem>A Stem</stem>' +
+                '{% endfor %}' +
+                '</root>';
+            parse();
+
+            must(result).eql({
+                "type": "root",
+                "tree": {
+                    "type": "tag",
+                    "name": "root",
+                    "attributes": [],
+                    "children": [{
+                        "type": "for-loop",
+                        "variable": "item",
+                        "expression": "list"
+                    }],
+                    "location": {
+                        "line": 1,
+                        "column": 0
+                    }
+                }
+            });
+
+    input = '<root>' +
+                '{% for item in {{list}} %}' +
+                '{% for inner in {{list.inner}} %}' +
+                '<stem>${inner}</stem>'+
+                '{% endfor %}' +
+                '{% endfor %}' +
+                '</root>';
+            parse();
+
+            console.log(result);
+
+
+
+        });
+
+
     });
 
 });
