@@ -18,8 +18,8 @@ export default {
             "attributes": [],
             "children": [],
             "location": {
-                "line": 2,
-                "column": 12
+                "line": 1,
+                "column": 33
             }
         }
 
@@ -50,12 +50,19 @@ export default {
                 "value": "test",
                 "location": {
                     "line": 1,
-                    "column": 37
+                    "column": 44
                 }
             }, {
                 "type": "attribute-expression",
                 "namespace": "",
                 "name": "position",
+                "filters": [{
+
+                    "type": "filter",
+                    "arguments": [0],
+                    "name": "div"
+
+                }],
                 "value": "4",
                 "location": {
                     "line": 1,
@@ -288,6 +295,7 @@ export default {
                     'namespace': '',
                     'name': 'onclick',
                     'value': 'this.someting.invoke()',
+                    'filters': [],
                     'location': {
                         'line': 1,
                         'column': 22
@@ -588,6 +596,7 @@ export default {
                 'line': 1,
                 'column': 0
             }
-        }}
+        }
+    }
 
-    };
+};

@@ -10,10 +10,20 @@
 %lex
 
 /* Definitions */
-
-IdentifierStart [$_a-zA-Z]|("\\"[u]{HexDigit}{4})
-IdentifierPart {IdentifierStart}|[0-9]
-Identifier [a-zA-Z$0-9_][a-zA-Z$0-9.]+
+DecimalDigit [0-9]
+DecimalDigits [0-9]+
+NonZeroDigit [1-9]
+OctalDigit [0-7]
+HexDigit [0-9a-fA-F]
+ExponentIndicator [eE]
+SignedInteger [+-]?[0-9]+
+DecimalIntegerLiteral [0]|({NonZeroDigit}{DecimalDigits}*)
+ExponentPart {ExponentIndicator}{SignedInteger}
+OctalIntegerLiteral [0]{OctalDigit}+
+HexIntegerLiteral [0][xX]{HexDigit}+
+DecimalLiteral ({DecimalIntegerLiteral}\.{DecimalDigits}*{ExponentPart}?)|(\.{DecimalDigits}{ExponentPart}?)|({DecimalIntegerLiteral}{ExponentPart}?)
+NumberLiteral {DecimalLiteral}|{HexIntegerLiteral}|{OctalIntegerLiteral}
+Identifier [a-zA-Z$0-9_][a-zA-Z$0-9.]*
 LineContinuation \\(\r\n|\r|\n)
 OctalEscapeSequence (?:[1-7][0-7]{0,2}|[0-7]{2,3})
 HexEscapeSequence [x]{HexDigit}{2}
@@ -25,63 +35,72 @@ EscapeSequence {CharacterEscapeSequence}|{OctalEscapeSequence}|{HexEscapeSequenc
 DoubleStringCharacter ([^\"\\\n\r]+)|(\\{EscapeSequence})|{LineContinuation}
 SingleStringCharacter ([^\'\\\n\r]+)|(\\{EscapeSequence})|{LineContinuation}
 StringLiteral (\"{DoubleStringCharacter}*\")|(\'{SingleStringCharacter}*\')
+Literal {NumberLiteral}|{StringLiteral}
 TagName [a-zA-Z_$][-a-zA-Z0-9_.]*
-Import 'import'
-From 'from'
+PropertyAccess {Identifier}((\.{Identifier})|(\[\'{Identifier}\'\]))+ 
+ArgumentFragment ((','{Identifier}|{PropertyAccess}|{Literal})+)
+ArgumentList '('(({Identifier}|{PropertyAccess}|{Literal})({ArgumentFragment})?)?')'
+MethodCall {PropertyAccess}{ArgumentList}
+FunctionCall {Identifier}{ArgumentList}
+Expression {Identifier}|{MethodCall}|{FunctionCall}
+Filter {Identifier}(([,]{Identifier})+)?
 
 /* Lexer flags */
 %options flex
-%x TAG CHILDISH JSEXPR CSTRUCT TEMPLATE
+%x TAG CHILDREN EXPRESSION FILTER CONTROL FORLOOP
 %%
 
 /* Lexer rules */
 
-<*>\s+                                                    return 'WHITESPACE';
-{Import}                                                  return 'IMPORT';
-{From}                                                    return 'FROM';
-'{{'                            this.begin('JSEXPR');     return '{{';
-';'                                                       return ';'
+/* whitespaces */
+<*>\s+              return;
+
+/* Top Level, parses import statements and tags. */
+
+<INITIAL>'import'                                        return 'IMPORT';
+<INITIAL>'from'                                          return 'FROM';
+<INITIAL>';'                                             return ';'
+<INITIAL>'<'                         this.begin('TAG');  return '<';
+<INITIAL>{StringLiteral}                                 return 'MODULE';
+<INITIAL>{Identifier}                                    return 'DEFAULT_MEMBER';
 
 /* tag parsing */
-<INITIAL,CHILDISH>'<'          this.begin('TAG');         return '<';
-<CHILDISH>'</'                 this.begin('TAG');         return '</';
 <TAG>':'                                                  return ':';
-<TAG>'='                                                  return '=';
-<TAG,INITIAL>{TagName}                                    return 'NAME';
-<TAG,INITIAL>{StringLiteral}                              return 'STRING_LITERAL';
-<TAG>'/>'                       this.begin('CHILDISH');   return '/>';
-<TAG>'>'                        this.begin('CHILDISH');   return '>';
+<TAG>'='                                                  return '='
+<TAG>{TagName}                                            return 'NAME';
+<TAG>{StringLiteral}                                      return 'STRING_LITERAL';
+<TAG>'{{'                   this.begin('EXPRESSION');     return '{{';
+<TAG>'/>'                   this.begin('CHILDREN');       return '/>';
+<TAG>'>'                    this.begin('CHILDREN');       return '>';
 
-/* js expressions */
-<CHILDISH,TAG>'{{'              this.begin('JSEXPR');     return '{{';
-<JSEXPR>(.*)/'}}'               return 'EXPRESSION';
-<JSEXPR>'}}'                    this.popState();          return '}}';
+/* tag children parsing <tag>here</tag> */
+<CHILDREN>'{{'              this.begin('EXPRESSION');     return '{{';
+<CHILDREN>'{%'              this.begin('CONTROL');        return '{%';
+<CHILDREN>'<'               this.begin('TAG');            return '<';
+<CHILDREN>'</'              this.begin('TAG');            return '</';
+<CHILDREN>[^<>]+                                          return 'RAW_STRING';
 
-/* The following rules are meant to kick in a only when we are parsing the children of a tag.
-   A tag's children can be one of:
-   * Another tag. (handled above by <*>'>'
-   * A JS template string.
-   * A limited string (see rule).
-   * Control statement.
-   * JavaScript expression.
-*/
+/* expression parsing eg. {{this.something|filter}} */
+<EXPRESSION>{Expression}                                  return 'EXPRESSION';
+<EXPRESSION>'|'             this.begin('FILTER');         return '|';
+<EXPRESSION>'}}'            this.popState();              return '}}';
 
-<CHILDISH>'{%'                  this.begin('CSTRUCT');    return '{%';
-<CHILDISH>'`'                   this.begin('TEMPLATE');   return 'START_TICK';
-<CHILDISH>[^{%`<>]+                                       return 'RAW_STRING';
+<FILTER>{Identifier}                                      return 'FILTER';
+<FILTER>{ArgumentList}                                    return 'FILTER_ARGUMENTS';
+<FILTER>'}}'                this.popState(); this.popState();              return '}}';
 
-/* foreach */
-<CSTRUCT>'for'                                            return 'FOR';
-<CSTRUCT>'in'                                             return 'IN';
-<CSTRUCT>'endfor'                                         return 'ENDFOR';
-<CSTRUCT>'{{'                   this.begin('JSEXPR');     return '{{';
-<CSTRUCT>{Identifier}                                     return 'VAR_DEC';
-<CSTRUCT>'%}'                   this.popState();          return '%}';
 
-/* template strings */
+/* control stuctures */
+<CONTROL>'for'              this.begin('FORLOOP');        return 'FOR';
+<CONTROL>'%}'               this.popState();              return '%}';
 
-<TEMPLATE>[^`]+                                           return 'TDATA';
-<TEMPLATE>'`'                   this.popState();          return 'END_TICK';
+/* for loop */
+<FORLOOP>{Identifier}                                     return 'VAR';
+<FORLOOP>','                                              return ',';
+<FORLOOP>'in'                                             return 'IN';
+<FORLOOP>{ValueExpression}                                return 'VALUE';
+<FORLOOP>'endfor'                                         return 'ENDFOR';
+<FORLOOP>'%}'               this.popState();              return '%}';
 
 <*><<EOF>>                                                return 'EOF';
 
@@ -91,17 +110,17 @@ From 'from'
 %%
 
 root
-          : tag EOF {$$=
-            {
-            type:'root',
-            tree:$1
-            }; return $$;}
-          
-          | imports tag EOF {$$=
+          : imports tag EOF {$$=
             {
             type:'root',
             imports:$1,
             tree:$2,
+            }; return $$;}
+
+          | tag EOF {$$=
+            {
+            type:'root',
+            tree:$1
             }; return $$;}
           ;
 
@@ -111,11 +130,11 @@ imports
           ;
 
 import    
-          : IMPORT WHITESPACE? NAME WHITESPACE? FROM WHITESPACE? STRING_LITERAL ';' WHITESPACE?
+          : IMPORT DEFAULT_MEMBER FROM MODULE ';'
             {$$ = {
               type:'import',
-              id: $3,
-              src: $7,
+              id: $2,
+              src: $4,
               location: {
                line:@$.first_line,
                column:@$.first_column
@@ -162,8 +181,8 @@ empty_tag
           ;
 
 attributes
-          : WHITESPACE attribute attributes {$$ = $3.concat($2);}
-          | WHITESPACE? {$$ = [];}
+          : attribute attributes {$$ = $2.concat($1);}
+          | {$$ = [];}
           ;
 
 attribute 
@@ -183,7 +202,8 @@ attribute
             type: 'attribute-expression',
             namespace: $1.namespace,
             name: $1.name,
-            value: $3,
+            value: $3.expression,
+            filters:$3.filters,
             location: {
             line:@$.first_line,
             column:@$.first_column
@@ -211,18 +231,38 @@ string_literal
           ;
 
 expression
-          : '{{' EXPRESSION '}}' {$$ = $2;}
+          : '{{' EXPRESSION '}}' 
+            {$$ ={
+              expression:$2,
+              filters:[]
+              };}
+
+          | '{{' EXPRESSION '|' filters '}}' 
+            {$$ = {
+              expression:$2,
+              filters:$4
+            };}
           ;
 
-template  
-          : START_TICK TDATA END_TICK
+filters
+          : filter          {$$ =  [$1];         }
+          | filters filter  {$$ = $1.concat($2); }
+          ;
+
+filter
+          : FILTER 
             {$$ = {
-              type:'text',
-              value: $2,
-              location: {
-              line:@$.first_line,
-              column:@$.first_column
-            }};}
+              type: 'filter',
+              name: $1,
+              arguments: [],
+            };}
+
+          | FILTER FILTER_ARGUMENTS
+            {$$ = {
+              type: 'filter',
+              name:$1,
+              arguments:$2.substring(1, $2.length-1).split(',')
+            };}
           ;
 
 chardata
@@ -236,12 +276,11 @@ chardata
             }};}
           ;
 
-for_loop
-          : '{%' WHITESPACE FOR WHITESPACE VAR_DEC WHITESPACE IN WHITESPACE expression WHITESPACE '%}'
-             WHITESPACE? tag WHITESPACE? '{%' WHITESPACE ENDFOR WHITESPACE '%}'
+for
+          : '{%' W FOR W VAR_DEC ',' (VAR_DEC)? W IN W expression W '%}'
+             W? tag W? '{%' W ENDFOR W '%}'
              {$$ = {
-              type: 'for-loop',
-              variable: $5,
+              type: 'for',
               expression: $9
              };} 
           ;
@@ -267,6 +306,6 @@ children
             childs.push($1);
             $$ = childs.concat($2);
             } 
-          | WHITESPACE children {$$ = [].concat($2);}
+          | W children {$$ = [].concat($2);}
           | {$$ = [];}
           ;
