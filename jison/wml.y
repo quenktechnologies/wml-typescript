@@ -81,13 +81,10 @@ Filter {Identifier}(([,]{Identifier})+)?
 <CHILDREN>[^<>]+                                          return 'RAW_STRING';
 
 /* expression parsing eg. {{this.something|filter}} */
-<EXPRESSION>{Expression}                                  return 'EXPRESSION';
-<EXPRESSION>'|'             this.begin('FILTER');         return '|';
+<EXPRESSION>{NumberLiteral}                               return 'NUMBER_LITERAL';
+<EXPRESSION>'|'                    return '|';
 <EXPRESSION>'}}'            this.popState();              return '}}';
 
-<FILTER>{Identifier}                                      return 'FILTER';
-<FILTER>{ArgumentList}                                    return 'FILTER_ARGUMENTS';
-<FILTER>'}}'                this.popState(); this.popState();              return '}}';
 
 
 /* control stuctures */
@@ -101,27 +98,19 @@ Filter {Identifier}(([,]{Identifier})+)?
 <FORLOOP>{ValueExpression}                                return 'VALUE';
 <FORLOOP>'endfor'                                         return 'ENDFOR';
 <FORLOOP>'%}'               this.popState();              return '%}';
-
 <*><<EOF>>                                                return 'EOF';
 
 /lex
 %ebnf
-%start root
+%start template
 %%
 
-root
-          : imports tag EOF {$$=
-            {
-            type:'root',
-            imports:$1,
-            tree:$2,
-            }; return $$;}
+template
+          : imports tag EOF 
+            {$$ = new yy.ast.Template($1, $2, yy.help.location(@$, @1, @2)); return $$;}
 
-          | tag EOF {$$=
-            {
-            type:'root',
-            tree:$1
-            }; return $$;}
+          | tag EOF
+            {$$ = new yy.ast.Template([], $1, yy.help.location(@$, @1, @1)); return $$;}
           ;
 
 imports
@@ -130,54 +119,19 @@ imports
           ;
 
 import    
-          : IMPORT DEFAULT_MEMBER FROM MODULE ';'
-            {$$ = {
-              type:'import',
-              id: $2,
-              src: $4,
-              location: {
-               line:@$.first_line,
-               column:@$.first_column
-            }};}
+          : IMPORT DEFAULT_MEMBER FROM MODULE ';' 
+            {$$ = new yy.ast.Import($2, $4, yy.help.location(@$, @1, @5));}
           ;
 
 tag
-          : tag_start children tag_end 
-            {
-            $1.children = $1.children.concat($2);
-            $$ = $1;
-            }
-          | empty_tag {$$ = $1;}
-          ;
-
-tag_start 
-          : '<' NAME attributes '>'
-            {$$ = {
-             type: 'tag',
-             name: $2,
-             attributes:$3,
-             children:[],
-             location: {
-             line:@$.first_line,
-             column:@$.first_column
-            }}}
-          ;
-
-tag_end
-          : '</' NAME '>' {$$ = $2;}
-          ;
-
-empty_tag 
-          : '<' NAME attributes '/>' 
-            {$$ = {
-              type:'tag',
-              name:$2,
-              attributes: $3,
-              children: [],
-              location: {
-              line:@$.first_line,
-              column:@$.first_column
-            }}}
+          : '<' variable attributes '>' children '</' variable '>' 
+             {
+             yy.help.ensureTagsMatch($2, $8);
+             $$ = new yy.ast.Tag($2, $3, $5, yy.help.location(@$, @1, @8));
+             }
+             
+          | '<' variable attributes '/>' 
+            { $$ = new yy.ast.Tag($2, $3, [], yy.help.location(@$, @1, @4)); }
           ;
 
 attributes
@@ -186,62 +140,33 @@ attributes
           ;
 
 attribute 
-          : attribute_name '=' string_literal
-            {$$ = {
-            type: 'attribute',
-            namespace: $1.namespace,
-            name: $1.name,  
-            value: $3,
-            location: {
-            line:@$.first_line,
-            column:@$.first_column
-            }}}
-
-          | attribute_name '=' expression
-            {$$ = {
-            type: 'attribute-expression',
-            namespace: $1.namespace,
-            name: $1.name,
-            value: $3.expression,
-            filters:$3.filters,
-            location: {
-            line:@$.first_line,
-            column:@$.first_column
-            }}}
+          : attribute_name '=' attribute_value
+            {$$ = new yy.ast.Attribute($1, $3, yy.help.location(@$, @1, @3));} 
 
           | attribute_name
-            {$$ = {
-            type: 'attribute-expression',
-            namespace: $1.namespace,
-            name: $1.name,  
-            value: true,
-            location: {
-            line:@$.first_line,
-            column:@$.first_column
-            }}}
+            {$$ = new yy.ast.Attribute($1, 
+            new yy.ast.BooleanLiteral(true, yy.help.location(@$, @1, @1)),
+            yy.help.location(@$, @1, @1));} 
           ;
 
 attribute_name
-          : NAME               {$$ = {namespace:'', name: $1};}
-          | NAME ':' NAME      {$$ = {namespace:$1, name: $3};}
+          : variable
+            {$$ = new yy.ast.AttributeName($1, null, yy.help.location(@$, @1, @1));} 
+          | variable ':' variable
+            {$$ = new yy.ast.AttributeName($1, $3, yy.help.location(@$, @1, @3));} 
           ;
 
-string_literal
-          : STRING_LITERAL {$$ = $1.substring(1, $1.length -1);}
+attribute_value
+          : interpolation                             {$$ = $1;}
+          | (string_literal|number_literal)           {$$ = $1;} 
           ;
 
-expression
-          : '{{' EXPRESSION '}}' 
-            {$$ ={
-              expression:$2,
-              filters:[]
-              };}
+interpolation
+          : '{{' expression '}}' 
+            {$$ = new yy.ast.Interpolation($2, [], yy.help.location(@$, @1, @3));} 
 
-          | '{{' EXPRESSION '|' filters '}}' 
-            {$$ = {
-              expression:$2,
-              filters:$4
-            };}
+          | '{{' expression '|' filters '}}' 
+            {$$ = new yy.ast.Interpolation($2, $4, yy.help.location(@$, @1, @5));} 
           ;
 
 filters
@@ -250,62 +175,101 @@ filters
           ;
 
 filter
-          : FILTER 
-            {$$ = {
-              type: 'filter',
-              name: $1,
-              arguments: [],
-            };}
+          : variable 
+            {$$ = new yy.ast.Filter($1, [], yy.help.location(@$, @1, @1));} 
 
-          | FILTER FILTER_ARGUMENTS
-            {$$ = {
-              type: 'filter',
-              name:$1,
-              arguments:$2.substring(1, $2.length-1).split(',')
-            };}
+          | variable arguments 
+            {$$ = new yy.ast.Filter($1, $2, yy.help.location(@$, @1, @2));} 
           ;
 
-chardata
-          : RAW_STRING
-            {$$ = {
-              type:'text',
-              value: $1,
-              location: {
-              line:@$.first_line,
-              column:@$.first_column
-            }};}
+arguments
+          : '(' ')'               {$$ = [];}
+          | '(' argument_list ')' {$$ = $2;}
           ;
 
-for
-          : '{%' W FOR W VAR_DEC ',' (VAR_DEC)? W IN W expression W '%}'
-             W? tag W? '{%' W ENDFOR W '%}'
-             {$$ = {
-              type: 'for',
-              expression: $9
-             };} 
+argument_list
+          : expression  {$$ = [$1];} 
+          | argument_list ',' expression {$$ = $1.contact($2);}
+          ;
+
+expression
+          : variable
+          | literal
+          | function_expression
+          | property_expression
+          | method_expression
+          ;
+
+variable
+          : NAME {$$ = $1;}
+          ;
+
+literal
+    : (boolean_literal|number_literal|string_literal|array_literal) {$$ = $1;}
+    ;
+
+boolean_literal
+    : BOOLEAN  
+      {$$ = new yy.ast.BooleanLiteral(yy.help.parseBoolean($1), yy.help.location(@$, @1, @1));}
+    ;
+
+number_literal
+    : NUMBER_LITERAL 
+      {$$ = new yy.ast.NumberLiteral(yy.help.parseNumber($1), yy.help.location(@$, @1, @1)); }
+    ;
+
+string_literal
+    : STRING_LITERAL {$$ = new yy.ast.StringLiteral($1, yy.help.location(@$, @1, @1)); }
+    ;
+
+array_literal
+          : '[' ']' 
+            {$$ = new yy.ast.ArrayLiteral([], yy.help.location(@$, @1, @2)); }
+
+          | '[' argument_list ']'
+            {$$ = new yy.ast.ArrayLiteral($2, yy.help.location(@$, @1, @3)); }
+          ;
+
+function_expression
+          : variable arguments
+            {$$ = new yy.ast.FunctionExpression($1, $2, yy.help.location(@$, @1, @2));} 
+          ;
+
+property_expression
+          : variable '.' variable            {$$ = $1+'.'+$3;}
+          | variable '.' property_expression {$$ = $1+'.'+$3;} 
+          ;
+
+method_expression
+          : property_expression arguments
+            {$$ = new yy.ast.MethodExpression($1, $2, yy.help.location(@$, @1, @2));} 
           ;
 
 children   
-          : tag children {
+          : (tag|control|characters) children {
             var childs = [];
             childs.push($1);
             $$ = childs.concat($2);
             }
-          | for_loop children {
-            var childs = [];
-            childs.push($1);
-            $$ = childs.concat($2);
-            }
-          | template children {
-            var childs = [];
-            childs.push($1);
-            $$ = childs.concat($2);
-            }
-          | chardata children {
-            var childs = [];
-            childs.push($1);
-            $$ = childs.concat($2);
-            } 
-          | W children {$$ = [].concat($2);}
-          | {$$ = [];}
           ;
+
+control
+          : (for|if) {$$ = $1;}
+          ;
+for
+          : '{%' FOR variable (',' variable)? IN expression '%}' children '{%' 'endfor' '%}' 
+            {$$ = new yy.ast.ForLoop($3, ($4)? $4.substring(1, $4.length-1):'index', $6, $7,
+            yy.help.location(@$, @1, @12)); }
+          ;
+
+if
+          : '{%' IF (expression | binary_comparison) '%}' children '{%' 'endif' '%}'
+            {$$ = new yy.ast.IfCondition($3, $5, yy.help.location(@$, @1, @8)); }
+
+          ;
+characters
+          : CHARACTERS
+            {$$ = new yy.ast.Characters($1, yy.help.location(@$, @1, @1)); }
+          ;
+
+

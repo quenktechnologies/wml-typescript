@@ -1,40 +1,106 @@
 export default {
 
     'should parse imports': {
-
-        "type": "root",
-        "imports": [{
-            "type": "import",
-            "id": "lib",
-            "src": "'path/to/libs'",
-            "location": {
-                "line": 1,
-                "column": 0
+        'type': 'template',
+        'imports': [{
+            'type': 'import',
+            'member': 'lib',
+            'module': '"path/to/libs"',
+            'location': {
+                'match': {
+                    'first_line': 1,
+                    'last_line': 1,
+                    'first_column': 0,
+                    'last_column': 31
+                },
+                'start': {
+                    'line': 1,
+                    'column': 0
+                },
+                'end': {
+                    'line': 1,
+                    'column': 31
+                }
             }
         }],
-        "tree": {
-            "type": "tag",
-            "name": "tag",
-            "attributes": [],
-            "children": [],
-            "location": {
-                "line": 1,
-                "column": 33
+        'tag': {
+            'type': 'tag',
+            'name': 'tag',
+            'attributes': [],
+            'children': [],
+            'location': {
+                'match': {
+                    'first_line': 1,
+                    'last_line': 1,
+                    'first_column': 33,
+                    'last_column': 39
+                },
+                'start': {
+                    'line': 1,
+                    'column': 33
+                },
+                'end': {
+                    'line': 1,
+                    'column': 39
+                }
+            }
+        },
+        'location': {
+            'match': {
+                'first_line': 1,
+                'last_line': 1,
+                'first_column': 0,
+                'last_column': 39
+            },
+            'start': {
+                'line': 1,
+                'column': 0
+            },
+            'end': {
+                'line': 1,
+                'column': 39
             }
         }
-
-
     },
     'should parse a self closing tag': {
-        "type": "root",
-        "tree": {
-            "type": "tag",
-            "name": "simple",
-            "attributes": [],
-            "children": [],
-            "location": {
-                "line": 1,
-                "column": 0
+        'type': 'template',
+        'imports': [],
+        'tag': {
+            'type': 'tag',
+            'name': 'simple',
+            'attributes': [],
+            'children': [],
+            'location': {
+                'match': {
+                    'first_line': 1,
+                    'last_line': 1,
+                    'first_column': 0,
+                    'last_column': 9
+                },
+                'start': {
+                    'line': 1,
+                    'column': 0
+                },
+                'end': {
+                    'line': 1,
+                    'column': 9
+                }
+            }
+        },
+        'location': {
+            'match': {
+                'first_line': 1,
+                'last_line': 1,
+                'first_column': 0,
+                'last_column': 9
+            },
+            'start': {
+                'line': 1,
+                'column': 0
+            },
+            'end': {
+                'line': 1,
+                'column': 9
             }
         }
     },
