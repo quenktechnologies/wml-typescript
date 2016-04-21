@@ -215,6 +215,49 @@ class Expression extends Node {
 }
 
 /**
+ * UnaryExpression 
+ * @param {string} op 
+ * @param {Expression} expression 
+ * @param {Location} location 
+ */
+export class UnaryExpression extends Expression {
+
+    constructor(op, expression, location) {
+
+        super();
+        this.type = 'unary-expression';
+        this.op = op;
+        this.expression = expression;
+        this.location = location;
+
+    }
+
+}
+
+/**
+ * BinaryExpression 
+ * @param {Expression} left 
+ * @param {string} op 
+ * @param {Expression} right 
+ * @param {Location} location 
+ */
+export class BinaryExpression extends Expression {
+
+    constructor(left, op, right, location) {
+
+        super();
+        this.left = left;
+        this.op = op;
+        this.right = right;
+        this.location = location;
+
+    }
+
+}
+
+
+
+/**
  * FunctionExpression 
  * @param {string} name 
  * @param {array} args
@@ -266,6 +309,25 @@ export class ForLoop extends Node {
         this.indexName = indexName;
         this.target = target;
         this.children = children;
+        this.location = location;
+
+    }
+
+}
+
+/**
+ * IfCondition 
+ * @param {Expression} expression 
+ * @param {array} template 
+ * @param {Location} location 
+ */
+export class IfCondition extends Node {
+
+    constructor(expression, template, location) {
+
+        super();
+        this.expression = expression;
+        this.template = template;
         this.location = location;
 
     }

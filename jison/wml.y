@@ -58,7 +58,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 'elseif'                                        return 'ELSEIF';
 'in'                                            return 'IN';
 'true'|'false'                                  return 'BOOLEAN';
-'{{'                                            return '{{';
+'{{'                this.begin('INITIAL');      return '{{';
 '}}'                                            return '}}';
 '|'                                             return '|';
 '{%'                this.begin('INITIAL');      return '{%';
@@ -74,6 +74,16 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 ';'                                             return ';'
 ':'                                             return ':';
 '='                                             return '='
+'=='                                            return '==';
+'!='                                            return '!=';
+'>='                                            return '>=';
+'<='                                            return '<=';
+'+'                                             return '+';
+'-'                                             return '-';
+'*'                                             return '*';
+
+'/'                                             return '/';
+'!'                                             return '!';
 {NumberLiteral}                                 return 'NUMBER_LITERAL';
 {StringLiteral}                                 return 'STRING_LITERAL';
 {Identifier}                                    return 'NAME';
@@ -170,11 +180,34 @@ arguments
           ;
 
 expression
+          : unary_expression
+          | value_expression
+          ;
+
+unary_expression
+          : unary_operator value_expression 
+            {$$ = new yy.ast.UnaryExpression($1, $2, yy.help.location(@$, @1, @2));} 
+          ;
+
+unary_operator
+          : '!' {$$ = $1;}
+          ;
+
+value_expression
           : variable
           | literal
           | function_expression
           | property_expression
           | method_expression
+          ;
+
+binary_expression
+          : value_expression binary_operator value_expression 
+            {$$ = new yy.ast.BinaryExpression($1, $2, $3,  yy.help.location(@$, @1, @3));} 
+          ;
+
+binary_operator
+          : ('>'|'>='|'<'|'<='|'=='|'!='|'+'|'/'|'-') { $$ = $1;}
           ;
 
 variable
@@ -261,10 +294,11 @@ for
           ;
 
 if
-          : '{%' IF (expression | binary_comparison) '%}' children '{%' ENDIF '%}'
+          : '{%' IF (expression | binary_expression) '%}' children '{%' ENDIF '%}'
             {$$ = new yy.ast.IfCondition($3, $5, yy.help.location(@$, @1, @8)); }
 
           ;
+
 characters
           : (CHARACTERS|name)
             {$$ = new yy.ast.Characters($1, yy.help.location(@$, @1, @1)); }

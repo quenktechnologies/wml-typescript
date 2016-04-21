@@ -149,6 +149,21 @@ describe('Parser', function() {
 
         });
 
+        it('should parse if expressions', function() {
+
+            input =
+                '<div>' +
+                '{% if length(values()) >= 12 %}' +
+                'Your length is more than 11!' +
+                '<eye>Tiger</eye>' +
+                '{% endif%}' +
+                '</div>';
+            parse();
+            return print(result);
+            compare(result, expects[this.test.title]);
+
+        });
+
 
     });
 
