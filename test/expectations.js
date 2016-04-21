@@ -1,64 +1,83 @@
 export default {
 
     'should parse imports': {
-        'type': 'template',
-        'imports': [{
-            'type': 'import',
-            'member': 'lib',
-            'module': '"path/to/libs"',
-            'location': {
-                'match': {
-                    'first_line': 1,
-                    'last_line': 1,
-                    'first_column': 0,
-                    'last_column': 31
+        "type": "template",
+        "imports": [{
+            "type": "import",
+            "member": "lib",
+            "module": {
+                "type": "string",
+                "value": "\"path/to/libs\"",
+                "location": {
+                    "match": {
+                        "first_line": 1,
+                        "last_line": 1,
+                        "first_column": 16,
+                        "last_column": 30
+                    },
+                    "start": {
+                        "line": 1,
+                        "column": 16
+                    },
+                    "end": {
+                        "line": 1,
+                        "column": 30
+                    }
+                }
+            },
+            "location": {
+                "match": {
+                    "first_line": 1,
+                    "last_line": 1,
+                    "first_column": 0,
+                    "last_column": 31
                 },
-                'start': {
-                    'line': 1,
-                    'column': 0
+                "start": {
+                    "line": 1,
+                    "column": 0
                 },
-                'end': {
-                    'line': 1,
-                    'column': 31
+                "end": {
+                    "line": 1,
+                    "column": 31
                 }
             }
         }],
-        'tag': {
-            'type': 'tag',
-            'name': 'tag',
-            'attributes': [],
-            'children': [],
-            'location': {
-                'match': {
-                    'first_line': 1,
-                    'last_line': 1,
-                    'first_column': 33,
-                    'last_column': 39
+        "tag": {
+            "type": "tag",
+            "name": "tag",
+            "attributes": [],
+            "children": [],
+            "location": {
+                "match": {
+                    "first_line": 1,
+                    "last_line": 1,
+                    "first_column": 33,
+                    "last_column": 39
                 },
-                'start': {
-                    'line': 1,
-                    'column': 33
+                "start": {
+                    "line": 1,
+                    "column": 33
                 },
-                'end': {
-                    'line': 1,
-                    'column': 39
+                "end": {
+                    "line": 1,
+                    "column": 39
                 }
             }
         },
-        'location': {
-            'match': {
-                'first_line': 1,
-                'last_line': 1,
-                'first_column': 0,
-                'last_column': 39
+        "location": {
+            "match": {
+                "first_line": 1,
+                "last_line": 1,
+                "first_column": 0,
+                "last_column": 39
             },
-            'start': {
-                'line': 1,
-                'column': 0
+            "start": {
+                "line": 1,
+                "column": 0
             },
-            'end': {
-                'line': 1,
-                'column': 39
+            "end": {
+                "line": 1,
+                "column": 39
             }
         }
     },
@@ -105,209 +124,768 @@ export default {
         }
     },
     'should parse a self closing tag with attributes': [{
-        "type": "root",
-        "tree": {
-            "type": "tag",
-            "name": "user",
-            "attributes": [{
-                "type": "attribute",
-                "namespace": "name",
-                "name": "space",
-                "value": "test",
-                "location": {
-                    "line": 1,
-                    "column": 44
-                }
-            }, {
-                "type": "attribute-expression",
-                "namespace": "",
-                "name": "position",
-                "filters": [{
-
-                    "type": "filter",
-                    "arguments": [0],
-                    "name": "div"
-
+            'type': 'template',
+            'imports': [],
+            'tag': {
+                'type': 'tag',
+                'name': 'user',
+                'attributes': [{
+                    'type': 'attribute',
+                    'name': 'name',
+                    'namespace': null,
+                    'value': {
+                        'type': 'string',
+                        'value': '"xyaa aaz"',
+                        'location': {
+                            'match': {
+                                'first_line': 1,
+                                'last_line': 1,
+                                'first_column': 11,
+                                'last_column': 21
+                            },
+                            'start': {
+                                'line': 1,
+                                'column': 11
+                            },
+                            'end': {
+                                'line': 1,
+                                'column': 21
+                            }
+                        }
+                    },
+                    'location': {
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 6,
+                            'last_column': 21
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 6
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 21
+                        }
+                    }
+                }, {
+                    'type': 'attribute',
+                    'name': 'position',
+                    'namespace': null,
+                    'value': {
+                        'type': 'interpolation',
+                        'value': {
+                            'type': 'number',
+                            'value': '4',
+                            'location': {
+                                'match': {
+                                    'first_line': 1,
+                                    'last_line': 1,
+                                    'first_column': 33,
+                                    'last_column': 34
+                                },
+                                'start': {
+                                    'line': 1,
+                                    'column': 33
+                                },
+                                'end': {
+                                    'line': 1,
+                                    'column': 34
+                                }
+                            }
+                        },
+                        'filters': [{
+                            'type': 'filter',
+                            'name': 'x',
+                            'args': [{
+                                'type': 'number',
+                                'value': '20',
+                                'location': {
+                                    'match': {
+                                        'first_line': 1,
+                                        'last_line': 1,
+                                        'first_column': 37,
+                                        'last_column': 39
+                                    },
+                                    'start': {
+                                        'line': 1,
+                                        'column': 37
+                                    },
+                                    'end': {
+                                        'line': 1,
+                                        'column': 39
+                                    }
+                                }
+                            }]
+                        }],
+                        'location': {
+                            'match': {
+                                'first_line': 1,
+                                'last_line': 1,
+                                'first_column': 31,
+                                'last_column': 42
+                            },
+                            'start': {
+                                'line': 1,
+                                'column': 31
+                            },
+                            'end': {
+                                'line': 1,
+                                'column': 42
+                            }
+                        }
+                    },
+                    'location': {
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 22,
+                            'last_column': 42
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 22
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 42
+                        }
+                    }
+                }, {
+                    'type': 'attribute',
+                    'name': 'val',
+                    'namespace': 'wml',
+                    'value': {
+                        'type': 'string',
+                        'value': '"test"',
+                        'location': {
+                            'match': {
+                                'first_line': 1,
+                                'last_line': 1,
+                                'first_column': 51,
+                                'last_column': 57
+                            },
+                            'start': {
+                                'line': 1,
+                                'column': 51
+                            },
+                            'end': {
+                                'line': 1,
+                                'column': 57
+                            }
+                        }
+                    },
+                    'location': {
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 43,
+                            'last_column': 57
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 43
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 57
+                        }
+                    }
                 }],
-                "value": "4",
+                'children': [],
+                'location': {
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 0,
+                        'last_column': 59
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 0
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 59
+                    }
+                }
+            },
+            'location': {
+                'match': {
+                    'first_line': 1,
+                    'last_line': 1,
+                    'first_column': 0,
+                    'last_column': 59
+                },
+                'start': {
+                    'line': 1,
+                    'column': 0
+                },
+                'end': {
+                    'line': 1,
+                    'column': 59
+                }
+            }
+        }, {
+            "type": "template",
+            "imports": [],
+            "tag": {
+                "type": "tag",
+                "name": "user",
+                "attributes": [{
+                    "type": "attribute",
+                    "name": "enabled",
+                    "namespace": null,
+                    "value": {
+                        "type": "boolean",
+                        "value": true
+                    },
+                    "location": {
+                        "match": {
+                            "first_line": 1,
+                            "last_line": 1,
+                            "first_column": 6,
+                            "last_column": 13
+                        },
+                        "start": {
+                            "line": 1,
+                            "column": 6
+                        },
+                        "end": {
+                            "line": 1,
+                            "column": 13
+                        }
+                    }
+                }, {
+                    "type": "attribute",
+                    "name": "id",
+                    "namespace": null,
+                    "value": {
+                        "type": "number",
+                        "value": "24",
+                        "location": {
+                            "match": {
+                                "first_line": 1,
+                                "last_line": 1,
+                                "first_column": 17,
+                                "last_column": 19
+                            },
+                            "start": {
+                                "line": 1,
+                                "column": 17
+                            },
+                            "end": {
+                                "line": 1,
+                                "column": 19
+                            }
+                        }
+                    },
+                    "location": {
+                        "match": {
+                            "first_line": 1,
+                            "last_line": 1,
+                            "first_column": 14,
+                            "last_column": 19
+                        },
+                        "start": {
+                            "line": 1,
+                            "column": 14
+                        },
+                        "end": {
+                            "line": 1,
+                            "column": 19
+                        }
+                    }
+                }],
+                "children": [],
                 "location": {
+                    "match": {
+                        "first_line": 1,
+                        "last_line": 1,
+                        "first_column": 0,
+                        "last_column": 22
+                    },
+                    "start": {
+                        "line": 1,
+                        "column": 0
+                    },
+                    "end": {
+                        "line": 1,
+                        "column": 22
+                    }
+                }
+            },
+            "location": {
+                "match": {
+                    "first_line": 1,
+                    "last_line": 1,
+                    "first_column": 0,
+                    "last_column": 22
+                },
+                "start": {
+                    "line": 1,
+                    "column": 0
+                },
+                "end": {
                     "line": 1,
                     "column": 22
                 }
-            }, {
-                "type": "attribute",
-                "namespace": "",
-                "name": "name",
-                "value": "xyaa aaz",
-                "location": {
-                    "line": 1,
-                    "column": 6
+            }
+        }, {
+            'type': 'template',
+            'imports': [],
+            'tag': {
+                'type': 'tag',
+                'name': 'user',
+                'attributes': [{
+                    'type': 'attribute',
+                    'name': 'name',
+                    'namespace': null,
+                    'value': {
+                        'type': 'string',
+                        'value': '"xyaa aaz"',
+                        'location': {
+                            'match': {
+                                'first_line': 1,
+                                'last_line': 1,
+                                'first_column': 11,
+                                'last_column': 21
+                            },
+                            'start': {
+                                'line': 1,
+                                'column': 11
+                            },
+                            'end': {
+                                'line': 1,
+                                'column': 21
+                            }
+                        }
+                    },
+                    'location': {
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 6,
+                            'last_column': 21
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 6
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 21
+                        }
+                    }
+                }, {
+                    'type': 'attribute',
+                    'name': 'id',
+                    'namespace': null,
+                    'value': {
+                        'type': 'string',
+                        'value': '"24"',
+                        'location': {
+                            'match': {
+                                'first_line': 1,
+                                'last_line': 1,
+                                'first_column': 25,
+                                'last_column': 29
+                            },
+                            'start': {
+                                'line': 1,
+                                'column': 25
+                            },
+                            'end': {
+                                'line': 1,
+                                'column': 29
+                            }
+                        }
+                    },
+                    'location': {
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 22,
+                            'last_column': 29
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 22
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 29
+                        }
+                    }
+                }, {
+                    'type': 'attribute',
+                    'name': 'align',
+                    'namespace': null,
+                    'value': {
+                        'type': 'string',
+                        'value': '"left"',
+                        'location': {
+                            'match': {
+                                'first_line': 1,
+                                'last_line': 1,
+                                'first_column': 36,
+                                'last_column': 42
+                            },
+                            'start': {
+                                'line': 1,
+                                'column': 36
+                            },
+                            'end': {
+                                'line': 1,
+                                'column': 42
+                            }
+                        }
+                    },
+                    'location': {
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 30,
+                            'last_column': 42
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 30
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 42
+                        }
+                    }
+                }],
+                'children': [],
+                'location': {
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 0,
+                        'last_column': 44
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 0
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 44
+                    }
                 }
-            }],
-            "children": [],
-            "location": {
-                "line": 1,
-                "column": 0
+            },
+            'location': {
+                'match': {
+                    'first_line': 1,
+                    'last_line': 1,
+                    'first_column': 0,
+                    'last_column': 44
+                },
+                'start': {
+                    'line': 1,
+                    'column': 0
+                },
+                'end': {
+                    'line': 1,
+                    'column': 44
+                }
             }
         }
-    }, {
-        "type": "root",
-        "tree": {
-            "type": "tag",
-            "name": "user",
-            "attributes": [{
-                "type": "attribute",
-                "namespace": "",
-                "name": "id",
-                "value": "24",
-                "location": {
-                    "line": 1,
-                    "column": 22
-                }
-            }, {
-                "type": "attribute",
-                "namespace": "",
-                "name": "name",
-                "value": "xyaa aaz",
-                "location": {
-                    "line": 1,
-                    "column": 6
-                }
-            }],
-            "children": [],
-            "location": {
-                "line": 1,
-                "column": 0
-            }
-        }
-    }, {
-        type: 'root',
-        tree: {
+
+
+
+    ],
+    'should parse a parent tag': {
+        'type': 'template',
+        'imports': [],
+        'tag': {
             'type': 'tag',
-            'name': 'user',
-            'attributes': [{
-                'type': 'attribute',
-                'namespace': '',
-                'name': 'align',
-                'value': 'left',
-                'location': {
-                    'line': 1,
-                    'column': 30
-                }
-            }, {
-                'type': 'attribute',
-                'namespace': '',
-                'name': 'id',
-                'value': '24',
-                'location': {
-                    'line': 1,
-                    'column': 22
-                }
-            }, {
-                'type': 'attribute',
-                'namespace': '',
-                'name': 'name',
-                'value': 'xyaa aaz',
-                'location': {
-                    'line': 1,
-                    'column': 6
-                }
-            }],
+            'name': 'panel',
+            'attributes': [],
             'children': [],
             'location': {
+                'match': {
+                    'first_line': 1,
+                    'last_line': 10,
+                    'first_column': 0,
+                    'last_column': 10
+                },
+                'start': {
+                    'line': 1,
+                    'column': 0
+                },
+                'end': {
+                    'line': 10,
+                    'column': 10
+                }
+            }
+        },
+        'location': {
+            'match': {
+                'first_line': 1,
+                'last_line': 10,
+                'first_column': 0,
+                'last_column': 10
+            },
+            'start': {
                 'line': 1,
                 'column': 0
-            }
-        }
-    }],
-    'should parse a parent tag': {
-        type: 'root',
-        tree: {
-            type: 'tag',
-            name: 'panel',
-            attributes: [],
-            children: [],
-            location: {
-                line: 1,
-                column: 0
+            },
+            'end': {
+                'line': 10,
+                'column': 10
             }
         }
     },
     'should parse a parent tag with attributes': {
-        type: 'root',
-        tree: {
+        'type': 'template',
+        'imports': [],
+        'tag': {
             'type': 'tag',
             'name': 'panel',
             'attributes': [{
                 'type': 'attribute',
-                'namespace': '',
-                'name': 'align',
-                'value': 'left',
-                'location': {
-                    'line': 1,
-                    'column': 32
-                }
-            }, {
-                'type': 'attribute',
-                'namespace': '',
-                'name': 'size',
-                'value': '40',
-                'location': {
-                    'line': 1,
-                    'column': 22
-                }
-            }, {
-                'type': 'attribute',
-                'namespace': '',
                 'name': 'type',
-                'value': 'default',
+                'namespace': null,
+                'value': {
+                    'type': 'string',
+                    'value': '"default"',
+                    'location': {
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 12,
+                            'last_column': 21
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 12
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 21
+                        }
+                    }
+                },
                 'location': {
-                    'line': 1,
-                    'column': 7
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 7,
+                        'last_column': 21
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 7
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 21
+                    }
+                }
+            }, {
+                'type': 'attribute',
+                'name': 'size',
+                'namespace': null,
+                'value': {
+                    'type': 'string',
+                    'value': '"40"',
+                    'location': {
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 27,
+                            'last_column': 31
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 27
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 31
+                        }
+                    }
+                },
+                'location': {
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 22,
+                        'last_column': 31
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 22
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 31
+                    }
+                }
+            }, {
+                'type': 'attribute',
+                'name': 'align',
+                'namespace': null,
+                'value': {
+                    'type': 'string',
+                    'value': '"left"',
+                    'location': {
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 38,
+                            'last_column': 44
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 38
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 44
+                        }
+                    }
+                },
+                'location': {
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 32,
+                        'last_column': 44
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 32
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 44
+                    }
                 }
             }],
             'children': [],
             'location': {
+                'match': {
+                    'first_line': 1,
+                    'last_line': 1,
+                    'first_column': 0,
+                    'last_column': 54
+                },
+                'start': {
+                    'line': 1,
+                    'column': 0
+                },
+                'end': {
+                    'line': 1,
+                    'column': 54
+                }
+            }
+        },
+        'location': {
+            'match': {
+                'first_line': 1,
+                'last_line': 1,
+                'first_column': 0,
+                'last_column': 54
+            },
+            'start': {
                 'line': 1,
                 'column': 0
+            },
+            'end': {
+                'line': 1,
+                'column': 54
             }
         }
     },
     'should parse parent tags with mixed children': {
-        'type': 'root',
-        'tree': {
+        'type': 'template',
+        'imports': [],
+        'tag': {
             'type': 'tag',
             'name': 'panel',
             'attributes': [],
             'children': [{
-                'type': 'text',
+                'type': 'characters',
                 'value': 'This is my offsprings.',
                 'location': {
-                    'line': 1,
-                    'column': 7
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 7,
+                        'last_column': 29
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 7
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 29
+                    }
                 }
             }, {
                 'type': 'tag',
                 'name': 'a',
                 'attributes': [],
                 'children': [{
-                    'type': 'text',
+                    'type': 'characters',
                     'value': 'Link',
                     'location': {
-                        'line': 1,
-                        'column': 32
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 32,
+                            'last_column': 36
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 32
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 36
+                        }
                     }
                 }],
                 'location': {
-                    'line': 1,
-                    'column': 29
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 29,
+                        'last_column': 40
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 29
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 40
+                    }
                 }
             }, {
-                'type': 'text',
+                'type': 'characters',
                 'value': 'Hey now! ',
                 'location': {
-                    'line': 1,
-                    'column': 40
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 40,
+                        'last_column': 49
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 40
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 49
+                    }
                 }
             }, {
                 'type': 'tag',
@@ -315,41 +893,123 @@ export default {
                 'attributes': [],
                 'children': [],
                 'location': {
-                    'line': 1,
-                    'column': 49
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 49,
+                        'last_column': 57
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 49
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 57
+                    }
                 }
             }],
             'location': {
+                'match': {
+                    'first_line': 1,
+                    'last_line': 1,
+                    'first_column': 0,
+                    'last_column': 65
+                },
+                'start': {
+                    'line': 1,
+                    'column': 0
+                },
+                'end': {
+                    'line': 1,
+                    'column': 65
+                }
+            }
+        },
+        'location': {
+            'match': {
+                'first_line': 1,
+                'last_line': 1,
+                'first_column': 0,
+                'last_column': 65
+            },
+            'start': {
                 'line': 1,
                 'column': 0
+            },
+            'end': {
+                'line': 1,
+                'column': 65
             }
         }
     },
     'should parse parent tags with tag children (L1)': {
-        type: 'root',
-        tree: {
-            "type": "tag",
-            "name": "panel",
-            "attributes": [],
-            "children": [{
-                "type": "tag",
-                "name": "a",
-                "attributes": [],
-                "children": [],
-                "location": {
-                    "line": 1,
-                    "column": 7
+        'type': 'template',
+        'imports': [],
+        'tag': {
+            'type': 'tag',
+            'name': 'panel',
+            'attributes': [],
+            'children': [{
+                'type': 'tag',
+                'name': 'a',
+                'attributes': [],
+                'children': [],
+                'location': {
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 7,
+                        'last_column': 14
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 7
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 14
+                    }
                 }
             }],
-            "location": {
-                "line": 1,
-                "column": 0
+            'location': {
+                'match': {
+                    'first_line': 1,
+                    'last_line': 1,
+                    'first_column': 0,
+                    'last_column': 22
+                },
+                'start': {
+                    'line': 1,
+                    'column': 0
+                },
+                'end': {
+                    'line': 1,
+                    'column': 22
+                }
+            }
+        },
+        'location': {
+            'match': {
+                'first_line': 1,
+                'last_line': 1,
+                'first_column': 0,
+                'last_column': 22
+            },
+            'start': {
+                'line': 1,
+                'column': 0
+            },
+            'end': {
+                'line': 1,
+                'column': 22
             }
         }
     },
     'should parse parent tags with tag children (L2)': {
-        'type': 'root',
-        'tree': {
+        'type': 'template',
+        'imports': [],
+        'tag': {
             'type': 'tag',
             'name': 'panel',
             'attributes': [],
@@ -357,36 +1017,126 @@ export default {
                 'type': 'tag',
                 'name': 'a',
                 'attributes': [{
-                    'type': 'attribute-expression',
-                    'namespace': '',
-                    'name': 'onclick',
-                    'value': 'this.someting.invoke()',
-                    'filters': [],
+                    'type': 'attribute',
+                    'name': 'href',
+                    'namespace': null,
+                    'value': {
+                        'type': 'string',
+                        'value': '"link"',
+                        'location': {
+                            'match': {
+                                'first_line': 1,
+                                'last_line': 1,
+                                'first_column': 15,
+                                'last_column': 21
+                            },
+                            'start': {
+                                'line': 1,
+                                'column': 15
+                            },
+                            'end': {
+                                'line': 1,
+                                'column': 21
+                            }
+                        }
+                    },
                     'location': {
-                        'line': 1,
-                        'column': 22
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 10,
+                            'last_column': 21
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 10
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 21
+                        }
                     }
                 }, {
                     'type': 'attribute',
-                    'namespace': '',
-                    'name': 'href',
-                    'value': 'link',
+                    'name': 'onclick',
+                    'namespace': null,
+                    'value': {
+                        'type': 'interpolation',
+                        'value': {
+                            'type': 'function',
+                            'name': 'this.someting.invoke',
+                            'args': []
+                        },
+                        'filters': [],
+                        'location': {
+                            'match': {
+                                'first_line': 1,
+                                'last_line': 1,
+                                'first_column': 30,
+                                'last_column': 56
+                            },
+                            'start': {
+                                'line': 1,
+                                'column': 30
+                            },
+                            'end': {
+                                'line': 1,
+                                'column': 56
+                            }
+                        }
+                    },
                     'location': {
-                        'line': 1,
-                        'column': 10
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 22,
+                            'last_column': 56
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 22
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 56
+                        }
                     }
                 }],
                 'children': [{
-                    'type': 'text',
+                    'type': 'characters',
                     'value': 'Click Here',
                     'location': {
-                        'line': 1,
-                        'column': 57
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 57,
+                            'last_column': 67
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 57
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 67
+                        }
                     }
                 }],
                 'location': {
-                    'line': 1,
-                    'column': 7
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 7,
+                        'last_column': 71
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 7
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 71
+                    }
                 }
             }, {
                 'type': 'tag',
@@ -394,112 +1144,385 @@ export default {
                 'attributes': [],
                 'children': [],
                 'location': {
-                    'line': 1,
-                    'column': 71
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 71,
+                        'last_column': 79
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 71
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 79
+                    }
                 }
             }],
             'location': {
+                'match': {
+                    'first_line': 1,
+                    'last_line': 1,
+                    'first_column': 0,
+                    'last_column': 87
+                },
+                'start': {
+                    'line': 1,
+                    'column': 0
+                },
+                'end': {
+                    'line': 1,
+                    'column': 87
+                }
+            }
+        },
+        'location': {
+            'match': {
+                'first_line': 1,
+                'last_line': 1,
+                'first_column': 0,
+                'last_column': 87
+            },
+            'start': {
                 'line': 1,
                 'column': 0
+            },
+            'end': {
+                'line': 1,
+                'column': 87
             }
         }
     },
     'should parse parent tags with tag children (L3)': {
-        type: 'root',
-        tree: {
-            "type": "tag",
-            "name": "panel",
-            "attributes": [],
-            "children": [{
-                "type": "tag",
-                "name": "a",
-                "attributes": [{
-                    "type": "attribute",
-                    'namespace': '',
-                    "name": "href",
-                    "value": "link",
-                    "location": {
-                        "line": 1,
-                        "column": 10
+        'type': 'template',
+        'imports': [],
+        'tag': {
+            'type': 'tag',
+            'name': 'panel',
+            'attributes': [],
+            'children': [{
+                'type': 'tag',
+                'name': 'a',
+                'attributes': [{
+                    'type': 'attribute',
+                    'name': 'href',
+                    'namespace': null,
+                    'value': {
+                        'type': 'string',
+                        'value': '"link"',
+                        'location': {
+                            'match': {
+                                'first_line': 1,
+                                'last_line': 1,
+                                'first_column': 15,
+                                'last_column': 21
+                            },
+                            'start': {
+                                'line': 1,
+                                'column': 15
+                            },
+                            'end': {
+                                'line': 1,
+                                'column': 21
+                            }
+                        }
+                    },
+                    'location': {
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 10,
+                            'last_column': 21
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 10
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 21
+                        }
                     }
                 }],
-                "children": [{
-                    "type": "text",
-                    "value": "Click Here",
-                    "location": {
-                        "line": 1,
-                        "column": 22
+                'children': [{
+                    'type': 'characters',
+                    'value': 'Click Here',
+                    'location': {
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 22,
+                            'last_column': 32
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 22
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 32
+                        }
                     }
                 }],
-                "location": {
-                    "line": 1,
-                    "column": 7
+                'location': {
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 7,
+                        'last_column': 36
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 7
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 36
+                    }
                 }
             }, {
-                "type": "tag",
-                "name": "table",
-                "attributes": [],
-                "children": [],
-                "location": {
-                    "line": 1,
-                    "column": 36
+                'type': 'tag',
+                'name': 'table',
+                'attributes': [],
+                'children': [],
+                'location': {
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 36,
+                        'last_column': 44
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 36
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 44
+                    }
                 }
             }, {
-                "type": "tag",
-                "name": "panel",
-                "attributes": [{
-                    "type": "attribute",
-                    'namespace': '',
-                    "name": "c",
-                    "value": "22",
-                    "location": {
-                        "line": 1,
-                        "column": 51
+                'type': 'tag',
+                'name': 'panel',
+                'attributes': [{
+                    'type': 'attribute',
+                    'name': 'c',
+                    'namespace': null,
+                    'value': {
+                        'type': 'string',
+                        'value': '"22"',
+                        'location': {
+                            'match': {
+                                'first_line': 1,
+                                'last_line': 1,
+                                'first_column': 53,
+                                'last_column': 57
+                            },
+                            'start': {
+                                'line': 1,
+                                'column': 53
+                            },
+                            'end': {
+                                'line': 1,
+                                'column': 57
+                            }
+                        }
+                    },
+                    'location': {
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 51,
+                            'last_column': 57
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 51
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 57
+                        }
                     }
                 }],
-                "children": [],
-                "location": {
-                    "line": 1,
-                    "column": 44
+                'children': [],
+                'location': {
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 44,
+                        'last_column': 66
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 44
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 66
+                    }
                 }
             }],
-            "location": {
-                "line": 1,
-                "column": 0
+            'location': {
+                'match': {
+                    'first_line': 1,
+                    'last_line': 1,
+                    'first_column': 0,
+                    'last_column': 74
+                },
+                'start': {
+                    'line': 1,
+                    'column': 0
+                },
+                'end': {
+                    'line': 1,
+                    'column': 74
+                }
+            }
+        },
+        'location': {
+            'match': {
+                'first_line': 1,
+                'last_line': 1,
+                'first_column': 0,
+                'last_column': 74
+            },
+            'start': {
+                'line': 1,
+                'column': 0
+            },
+            'end': {
+                'line': 1,
+                'column': 74
             }
         }
     },
     'should do it all together now': {
-        'type': 'root',
-        'tree': {
+        'type': 'template',
+        'imports': [],
+        'tag': {
             'type': 'tag',
             'name': 'modal',
             'attributes': [{
                 'type': 'attribute',
-                'namespace': '',
-                'name': 'y',
-                'value': '2',
-                'location': {
-                    'line': 1,
-                    'column': 28
-                }
-            }, {
-                'type': 'attribute',
-                'namespace': '',
-                'name': 'x',
-                'value': '1',
-                'location': {
-                    'line': 1,
-                    'column': 22
-                }
-            }, {
-                'type': 'attribute',
-                'namespace': '',
                 'name': 'name',
-                'value': 'mymodal',
+                'namespace': null,
+                'value': {
+                    'type': 'string',
+                    'value': '"mymodal"',
+                    'location': {
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 12,
+                            'last_column': 21
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 12
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 21
+                        }
+                    }
+                },
                 'location': {
-                    'line': 1,
-                    'column': 7
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 7,
+                        'last_column': 21
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 7
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 21
+                    }
+                }
+            }, {
+                'type': 'attribute',
+                'name': 'x',
+                'namespace': null,
+                'value': {
+                    'type': 'string',
+                    'value': '"1"',
+                    'location': {
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 24,
+                            'last_column': 27
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 24
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 27
+                        }
+                    }
+                },
+                'location': {
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 22,
+                        'last_column': 27
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 22
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 27
+                    }
+                }
+            }, {
+                'type': 'attribute',
+                'name': 'y',
+                'namespace': null,
+                'value': {
+                    'type': 'string',
+                    'value': '"2"',
+                    'location': {
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 30,
+                            'last_column': 33
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 30
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 33
+                        }
+                    }
+                },
+                'location': {
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 28,
+                        'last_column': 33
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 28
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 33
+                    }
                 }
             }],
             'children': [{
@@ -507,27 +1530,63 @@ export default {
                 'name': 'modal-header',
                 'attributes': [],
                 'children': [{
-                    'type': 'text',
+                    'type': 'characters',
                     'value': 'My Modal',
                     'location': {
-                        'line': 2,
-                        'column': 38
+                        'match': {
+                            'first_line': 2,
+                            'last_line': 2,
+                            'first_column': 38,
+                            'last_column': 46
+                        },
+                        'start': {
+                            'line': 2,
+                            'column': 38
+                        },
+                        'end': {
+                            'line': 2,
+                            'column': 46
+                        }
                     }
                 }],
                 'location': {
-                    'line': 2,
-                    'column': 24
+                    'match': {
+                        'first_line': 2,
+                        'last_line': 2,
+                        'first_column': 24,
+                        'last_column': 61
+                    },
+                    'start': {
+                        'line': 2,
+                        'column': 24
+                    },
+                    'end': {
+                        'line': 2,
+                        'column': 61
+                    }
                 }
             }, {
                 'type': 'tag',
                 'name': 'modal-body',
                 'attributes': [],
                 'children': [{
-                    'type': 'text',
+                    'type': 'characters',
                     'value': '\n                         Creativity is inhibited by greed and corruption.\n                         ',
                     'location': {
-                        'line': 3,
-                        'column': 36
+                        'match': {
+                            'first_line': 3,
+                            'last_line': 5,
+                            'first_column': 36,
+                            'last_column': 25
+                        },
+                        'start': {
+                            'line': 3,
+                            'column': 36
+                        },
+                        'end': {
+                            'line': 5,
+                            'column': 25
+                        }
                     }
                 }, {
                     'type': 'tag',
@@ -535,134 +1594,453 @@ export default {
                     'attributes': [],
                     'children': [],
                     'location': {
-                        'line': 5,
-                        'column': 25
+                        'match': {
+                            'first_line': 5,
+                            'last_line': 5,
+                            'first_column': 25,
+                            'last_column': 39
+                        },
+                        'start': {
+                            'line': 5,
+                            'column': 25
+                        },
+                        'end': {
+                            'line': 5,
+                            'column': 39
+                        }
                     }
                 }, {
                     'type': 'tag',
                     'name': 'vote-count',
                     'attributes': [{
                         'type': 'attribute',
-                        'namespace': '',
                         'name': 'source',
-                        'value': '@this',
+                        'namespace': null,
+                        'value': {
+                            'type': 'interpolation',
+                            'value': 'this',
+                            'filters': [],
+                            'location': {
+                                'match': {
+                                    'first_line': 6,
+                                    'last_line': 6,
+                                    'first_column': 44,
+                                    'last_column': 52
+                                },
+                                'start': {
+                                    'line': 6,
+                                    'column': 44
+                                },
+                                'end': {
+                                    'line': 6,
+                                    'column': 52
+                                }
+                            }
+                        },
                         'location': {
-                            'line': 6,
-                            'column': 37
+                            'match': {
+                                'first_line': 6,
+                                'last_line': 6,
+                                'first_column': 37,
+                                'last_column': 52
+                            },
+                            'start': {
+                                'line': 6,
+                                'column': 37
+                            },
+                            'end': {
+                                'line': 6,
+                                'column': 52
+                            }
                         }
                     }],
                     'children': [],
                     'location': {
-                        'line': 6,
-                        'column': 25
+                        'match': {
+                            'first_line': 6,
+                            'last_line': 6,
+                            'first_column': 25,
+                            'last_column': 54
+                        },
+                        'start': {
+                            'line': 6,
+                            'column': 25
+                        },
+                        'end': {
+                            'line': 6,
+                            'column': 54
+                        }
                     }
                 }, {
-                    'type': 'text',
+                    'type': 'characters',
                     'value': ' Votes\n                         ',
                     'location': {
-                        'line': 6,
-                        'column': 53
+                        'match': {
+                            'first_line': 6,
+                            'last_line': 7,
+                            'first_column': 54,
+                            'last_column': 25
+                        },
+                        'start': {
+                            'line': 6,
+                            'column': 54
+                        },
+                        'end': {
+                            'line': 7,
+                            'column': 25
+                        }
                     }
                 }, {
                     'type': 'tag',
                     'name': 'textarea',
                     'attributes': [{
-                        'type': 'attribute-expression',
-                        'namespace': '',
-                        'name': 'onchange',
-                        'value': 'this.setText',
+                        'type': 'attribute',
+                        'name': 'id',
+                        'namespace': 'wml',
+                        'value': {
+                            'type': 'string',
+                            'value': '"ta"',
+                            'location': {
+                                'match': {
+                                    'first_line': 7,
+                                    'last_line': 7,
+                                    'first_column': 42,
+                                    'last_column': 46
+                                },
+                                'start': {
+                                    'line': 7,
+                                    'column': 42
+                                },
+                                'end': {
+                                    'line': 7,
+                                    'column': 46
+                                }
+                            }
+                        },
                         'location': {
-                            'line': 7,
-                            'column': 45
+                            'match': {
+                                'first_line': 7,
+                                'last_line': 7,
+                                'first_column': 35,
+                                'last_column': 46
+                            },
+                            'start': {
+                                'line': 7,
+                                'column': 35
+                            },
+                            'end': {
+                                'line': 7,
+                                'column': 46
+                            }
                         }
                     }, {
                         'type': 'attribute',
-                        'namespace': '',
-                        'name': 'size',
-                        'value': '32',
+                        'name': 'disabled',
+                        'namespace': null,
+                        'value': {
+                            'type': 'boolean',
+                            'value': true
+                        },
                         'location': {
-                            'line': 7,
-                            'column': 35
+                            'match': {
+                                'first_line': 7,
+                                'last_line': 7,
+                                'first_column': 47,
+                                'last_column': 55
+                            },
+                            'start': {
+                                'line': 7,
+                                'column': 47
+                            },
+                            'end': {
+                                'line': 7,
+                                'column': 55
+                            }
+                        }
+                    }, {
+                        'type': 'attribute',
+                        'name': 'size',
+                        'namespace': null,
+                        'value': {
+                            'type': 'number',
+                            'value': '32',
+                            'location': {
+                                'match': {
+                                    'first_line': 7,
+                                    'last_line': 7,
+                                    'first_column': 61,
+                                    'last_column': 63
+                                },
+                                'start': {
+                                    'line': 7,
+                                    'column': 61
+                                },
+                                'end': {
+                                    'line': 7,
+                                    'column': 63
+                                }
+                            }
+                        },
+                        'location': {
+                            'match': {
+                                'first_line': 7,
+                                'last_line': 7,
+                                'first_column': 56,
+                                'last_column': 63
+                            },
+                            'start': {
+                                'line': 7,
+                                'column': 56
+                            },
+                            'end': {
+                                'line': 7,
+                                'column': 63
+                            }
+                        }
+                    }, {
+                        'type': 'attribute',
+                        'name': 'onchange',
+                        'namespace': null,
+                        'value': {
+                            'type': 'interpolation',
+                            'value': 'this.setText',
+                            'filters': [],
+                            'location': {
+                                'match': {
+                                    'first_line': 7,
+                                    'last_line': 7,
+                                    'first_column': 73,
+                                    'last_column': 89
+                                },
+                                'start': {
+                                    'line': 7,
+                                    'column': 73
+                                },
+                                'end': {
+                                    'line': 7,
+                                    'column': 89
+                                }
+                            }
+                        },
+                        'location': {
+                            'match': {
+                                'first_line': 7,
+                                'last_line': 7,
+                                'first_column': 64,
+                                'last_column': 89
+                            },
+                            'start': {
+                                'line': 7,
+                                'column': 64
+                            },
+                            'end': {
+                                'line': 7,
+                                'column': 89
+                            }
                         }
                     }],
                     'children': [{
-                        'type': 'text',
+                        'type': 'characters',
                         'value': '\n                           Various text\n                         ',
                         'location': {
-                            'line': 7,
-                            'column': 71
+                            'match': {
+                                'first_line': 7,
+                                'last_line': 9,
+                                'first_column': 90,
+                                'last_column': 25
+                            },
+                            'start': {
+                                'line': 7,
+                                'column': 90
+                            },
+                            'end': {
+                                'line': 9,
+                                'column': 25
+                            }
                         }
                     }],
                     'location': {
-                        'line': 7,
-                        'column': 25
+                        'match': {
+                            'first_line': 7,
+                            'last_line': 9,
+                            'first_column': 25,
+                            'last_column': 36
+                        },
+                        'start': {
+                            'line': 7,
+                            'column': 25
+                        },
+                        'end': {
+                            'line': 9,
+                            'column': 36
+                        }
                     }
                 }],
                 'location': {
-                    'line': 3,
-                    'column': 24
-                }
-            }],
-            'location': {
-                'line': 1,
-                'column': 0
-            }
-        }
-    },
-    'should parse for expressions': {
-        "type": "root",
-        "tree": {
-            "type": "tag",
-            "name": "root",
-            "attributes": [],
-            "children": [{
-                "type": "for-loop",
-                "variable": "item",
-                "expression": "list"
-            }],
-            "location": {
-                "line": 1,
-                "column": 0
-            }
-        }
-    },
-    'should parse a template string': {
-        'type': 'root',
-        'tree': {
-            'type': 'tag',
-            'name': 'top',
-            'attributes': [],
-            'children': [{
-                'type': 'tag',
-                'name': 'tagness',
-                'attributes': [{
-                    'type': 'attribute-expression',
-                    'namespace': '',
-                    'name': 'id',
-                    'value': '22',
-                    'location': {
-                        'line': 1,
-                        'column': 14
-                    }
-                }],
-                'children': [{
-                    'type': 'text',
-                    'value': 'Template ${strings} here',
-                    'location': {
-                        'line': 1,
+                    'match': {
+                        'first_line': 3,
+                        'last_line': 10,
+                        'first_column': 24,
+                        'last_column': 37
+                    },
+                    'start': {
+                        'line': 3,
                         'column': 24
+                    },
+                    'end': {
+                        'line': 10,
+                        'column': 37
                     }
-                }],
-                'location': {
-                    'line': 1,
-                    'column': 5
                 }
             }],
             'location': {
+                'match': {
+                    'first_line': 1,
+                    'last_line': 11,
+                    'first_column': 0,
+                    'last_column': 28
+                },
+                'start': {
+                    'line': 1,
+                    'column': 0
+                },
+                'end': {
+                    'line': 11,
+                    'column': 28
+                }
+            }
+        },
+        'location': {
+            'match': {
+                'first_line': 1,
+                'last_line': 11,
+                'first_column': 0,
+                'last_column': 28
+            },
+            'start': {
                 'line': 1,
                 'column': 0
+            },
+            'end': {
+                'line': 11,
+                'column': 28
             }
         }
+    },
+    'should parse for expressions': 
+{
+  'type': 'template',
+  'imports': [
+  ],
+  'tag': {
+    'type': 'tag',
+    'name': 'root',
+    'attributes': [
+    ],
+    'children': [
+      {
+        'type': 'for',
+        'variable': 'item',
+        'indexName': 'index',
+        'target': 'list',
+        'children': [
+          {
+            'type': 'tag',
+            'name': 'stem',
+            'attributes': [
+            ],
+            'children': [
+              {
+                'type': 'characters',
+                'value': 'A Stem',
+                'location': {
+                  'match': {
+                    'first_line': 1,
+                    'last_line': 1,
+                    'first_column': 34,
+                    'last_column': 40
+                  },
+                  'start': {
+                    'line': 1,
+                    'column': 34
+                  },
+                  'end': {
+                    'line': 1,
+                    'column': 40
+                  }
+                }
+              }
+            ],
+            'location': {
+              'match': {
+                'first_line': 1,
+                'last_line': 1,
+                'first_column': 28,
+                'last_column': 47
+              },
+              'start': {
+                'line': 1,
+                'column': 28
+              },
+              'end': {
+                'line': 1,
+                'column': 47
+              }
+            }
+          }
+        ],
+        'location': {
+          'match': {
+            'first_line': 1,
+            'last_line': 1,
+            'first_column': 6,
+            'last_column': 59
+          },
+          'start': {
+            'line': 1,
+            'column': 6
+          },
+          'end': {
+            'line': 1,
+            'column': 59
+          }
+        }
+      }
+    ],
+    'location': {
+      'match': {
+        'first_line': 1,
+        'last_line': 1,
+        'first_column': 0,
+        'last_column': 66
+      },
+      'start': {
+        'line': 1,
+        'column': 0
+      },
+      'end': {
+        'line': 1,
+        'column': 66
+      }
     }
+  },
+  'location': {
+    'match': {
+      'first_line': 1,
+      'last_line': 1,
+      'first_column': 0,
+      'last_column': 66
+    },
+    'start': {
+      'line': 1,
+      'column': 0
+    },
+    'end': {
+      'line': 1,
+      'column': 66
+    }
+  }
+}
+
 
 };

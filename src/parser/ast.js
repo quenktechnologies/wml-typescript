@@ -69,36 +69,19 @@ export class Tag extends Node {
 
 /**
  * Attribute
- * @param {AttributeName} name 
+ * @param {string} name 
+ * @param {string} namespace 
  * @param {StringLiteral|NumberLiteral|BooleanLiteral} value
  * @param {Location} location 
  */
 export class Attribute extends Node {
 
-    constructor(name, value, location) {
+    constructor(name, namespace, value, location) {
         super();
         this.type = 'attribute';
         this.name = name;
-        this.value = value;
-        this.location = location;
-
-    }
-
-}
-
-/**
- * AttributeName 
- * @param {string} name 
- * @param {string} namespace 
- * @param {Location} location 
- */
-export class AttributeName extends Node {
-
-    constructor(name, namespace, location) {
-        super();
-        this.type = 'attribute-name';
-        this.name = name;
         this.namespace = namespace;
+        this.value = value;
         this.location = location;
 
     }

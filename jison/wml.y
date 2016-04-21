@@ -23,7 +23,7 @@ OctalIntegerLiteral [0]{OctalDigit}+
 HexIntegerLiteral [0][xX]{HexDigit}+
 DecimalLiteral ({DecimalIntegerLiteral}\.{DecimalDigits}*{ExponentPart}?)|(\.{DecimalDigits}{ExponentPart}?)|({DecimalIntegerLiteral}{ExponentPart}?)
 NumberLiteral {DecimalLiteral}|{HexIntegerLiteral}|{OctalIntegerLiteral}
-Identifier [a-zA-Z$0-9_][a-zA-Z$0-9.]*
+Identifier [a-zA-Z$0-9_][a-zA-Z$0-9.-]*
 LineContinuation \\(\r\n|\r|\n)
 OctalEscapeSequence (?:[1-7][0-7]{0,2}|[0-7]{2,3})
 HexEscapeSequence [x]{HexDigit}{2}
@@ -35,19 +35,11 @@ EscapeSequence {CharacterEscapeSequence}|{OctalEscapeSequence}|{HexEscapeSequenc
 DoubleStringCharacter ([^\"\\\n\r]+)|(\\{EscapeSequence})|{LineContinuation}
 SingleStringCharacter ([^\'\\\n\r]+)|(\\{EscapeSequence})|{LineContinuation}
 StringLiteral (\"{DoubleStringCharacter}*\")|(\'{SingleStringCharacter}*\')
-Literal {NumberLiteral}|{StringLiteral}
-TagName [a-zA-Z_$][-a-zA-Z0-9_.]*
-PropertyAccess {Identifier}((\.{Identifier})|(\[\'{Identifier}\'\]))+ 
-ArgumentFragment ((','{Identifier}|{PropertyAccess}|{Literal})+)
-ArgumentList '('(({Identifier}|{PropertyAccess}|{Literal})({ArgumentFragment})?)?')'
-MethodCall {PropertyAccess}{ArgumentList}
-FunctionCall {Identifier}{ArgumentList}
-Expression {Identifier}|{MethodCall}|{FunctionCall}
-Filter {Identifier}(([,]{Identifier})+)?
+Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 
 /* Lexer flags */
 %options flex
-%x TAG CHILDREN EXPRESSION FILTER CONTROL FORLOOP
+%s CHILDREN
 %%
 
 /* Lexer rules */
@@ -55,50 +47,38 @@ Filter {Identifier}(([,]{Identifier})+)?
 /* whitespaces */
 <*>\s+              return;
 
-/* Top Level, parses import statements and tags. */
-
-<INITIAL>'import'                                        return 'IMPORT';
-<INITIAL>'from'                                          return 'FROM';
-<INITIAL>';'                                             return ';'
-<INITIAL>'<'                         this.begin('TAG');  return '<';
-<INITIAL>{StringLiteral}                                 return 'MODULE';
-<INITIAL>{Identifier}                                    return 'DEFAULT_MEMBER';
-
-/* tag parsing */
-<TAG>':'                                                  return ':';
-<TAG>'='                                                  return '='
-<TAG>{TagName}                                            return 'NAME';
-<TAG>{StringLiteral}                                      return 'STRING_LITERAL';
-<TAG>'{{'                   this.begin('EXPRESSION');     return '{{';
-<TAG>'/>'                   this.begin('CHILDREN');       return '/>';
-<TAG>'>'                    this.begin('CHILDREN');       return '>';
-
-/* tag children parsing <tag>here</tag> */
-<CHILDREN>'{{'              this.begin('EXPRESSION');     return '{{';
-<CHILDREN>'{%'              this.begin('CONTROL');        return '{%';
-<CHILDREN>'<'               this.begin('TAG');            return '<';
-<CHILDREN>'</'              this.begin('TAG');            return '</';
-<CHILDREN>[^<>]+                                          return 'RAW_STRING';
-
-/* expression parsing eg. {{this.something|filter}} */
-<EXPRESSION>{NumberLiteral}                               return 'NUMBER_LITERAL';
-<EXPRESSION>'|'                    return '|';
-<EXPRESSION>'}}'            this.popState();              return '}}';
-
-
-
-/* control stuctures */
-<CONTROL>'for'              this.begin('FORLOOP');        return 'FOR';
-<CONTROL>'%}'               this.popState();              return '%}';
-
-/* for loop */
-<FORLOOP>{Identifier}                                     return 'VAR';
-<FORLOOP>','                                              return ',';
-<FORLOOP>'in'                                             return 'IN';
-<FORLOOP>{ValueExpression}                                return 'VALUE';
-<FORLOOP>'endfor'                                         return 'ENDFOR';
-<FORLOOP>'%}'               this.popState();              return '%}';
-<*><<EOF>>                                                return 'EOF';
+/* global lexer roles */
+'import'                                        return 'IMPORT';
+'from'                                          return 'FROM';
+'for'                                           return 'FOR';
+'endfor'                                        return 'ENDFOR';
+'if'                                            return 'IF';
+'endif'                                         return 'ENDIF';
+'else'                                          return 'ELSE';
+'elseif'                                        return 'ELSEIF';
+'in'                                            return 'IN';
+'true'|'false'                                  return 'BOOLEAN';
+'{{'                                            return '{{';
+'}}'                                            return '}}';
+'|'                                             return '|';
+'{%'                this.begin('INITIAL');      return '{%';
+'%}'                                            return '%}';
+'</'                                            return '</';
+'/>'                this.begin('CHILDREN');     return '/>';
+'>'                 this.begin('CHILDREN');     return '>';
+'<'                 this.begin('INITIAL');      return '<';
+'('                                             return '(';
+')'                                             return ')';
+'['                                             return '[';
+']'                                             return ']';
+';'                                             return ';'
+':'                                             return ':';
+'='                                             return '='
+{NumberLiteral}                                 return 'NUMBER_LITERAL';
+{StringLiteral}                                 return 'STRING_LITERAL';
+{Identifier}                                    return 'NAME';
+<CHILDREN>[^<>{%}]+    this.popState();            return 'CHARACTERS';
+<*><<EOF>>                                      return 'EOF';
 
 /lex
 %ebnf
@@ -119,41 +99,43 @@ imports
           ;
 
 import    
-          : IMPORT DEFAULT_MEMBER FROM MODULE ';' 
+          : IMPORT variable FROM string_literal ';' 
             {$$ = new yy.ast.Import($2, $4, yy.help.location(@$, @1, @5));}
           ;
 
 tag
-          : '<' variable attributes '>' children '</' variable '>' 
+          : '<' name attributes '>' children? '</' name '>' 
              {
              yy.help.ensureTagsMatch($2, $8);
-             $$ = new yy.ast.Tag($2, $3, $5, yy.help.location(@$, @1, @8));
+             $$ = new yy.ast.Tag($2, $3, $5?$5:[], yy.help.location(@$, @1, @8));
              }
              
-          | '<' variable attributes '/>' 
+          | '<' name attributes '/>' 
             { $$ = new yy.ast.Tag($2, $3, [], yy.help.location(@$, @1, @4)); }
           ;
 
+name
+          : (variable | property_expression) {$$ = $1;}
+          ;
+
 attributes
-          : attribute attributes {$$ = $2.concat($1);}
+          : attributes attribute {$$ = $1.concat($2);}
           | {$$ = [];}
           ;
 
 attribute 
           : attribute_name '=' attribute_value
-            {$$ = new yy.ast.Attribute($1, $3, yy.help.location(@$, @1, @3));} 
+            {$$ = new yy.ast.Attribute($1.name, $1.namespace, $3, yy.help.location(@$, @1, @3));} 
 
           | attribute_name
-            {$$ = new yy.ast.Attribute($1, 
+            {$$ = new yy.ast.Attribute($1.name, $1.namespace, 
             new yy.ast.BooleanLiteral(true, yy.help.location(@$, @1, @1)),
             yy.help.location(@$, @1, @1));} 
           ;
 
 attribute_name
-          : variable
-            {$$ = new yy.ast.AttributeName($1, null, yy.help.location(@$, @1, @1));} 
-          | variable ':' variable
-            {$$ = new yy.ast.AttributeName($1, $3, yy.help.location(@$, @1, @3));} 
+          : variable                {$$ = {namespace:null, name:$1};} 
+          | variable ':' variable   {$$ = {namespace:$1, name:$3};}
           ;
 
 attribute_value
@@ -175,21 +157,16 @@ filters
           ;
 
 filter
-          : variable 
+          : name 
             {$$ = new yy.ast.Filter($1, [], yy.help.location(@$, @1, @1));} 
 
-          | variable arguments 
-            {$$ = new yy.ast.Filter($1, $2, yy.help.location(@$, @1, @2));} 
+          | name '(' arguments ')' 
+            {$$ = new yy.ast.Filter($1, $3, yy.help.location(@$, @1, @4));} 
           ;
 
 arguments
-          : '(' ')'               {$$ = [];}
-          | '(' argument_list ')' {$$ = $2;}
-          ;
-
-argument_list
-          : expression  {$$ = [$1];} 
-          | argument_list ',' expression {$$ = $1.contact($2);}
+          : expression                {$$ = [$1];          }
+          | arguments ',' expression  {$$ = $1.concat($3); }
           ;
 
 expression
@@ -205,8 +182,11 @@ variable
           ;
 
 literal
-    : (boolean_literal|number_literal|string_literal|array_literal) {$$ = $1;}
-    ;
+          : boolean_literal
+          | number_literal
+          | string_literal
+          | array_literal
+          ;
 
 boolean_literal
     : BOOLEAN  
@@ -226,13 +206,16 @@ array_literal
           : '[' ']' 
             {$$ = new yy.ast.ArrayLiteral([], yy.help.location(@$, @1, @2)); }
 
-          | '[' argument_list ']'
+          | '[' arguments ']'
             {$$ = new yy.ast.ArrayLiteral($2, yy.help.location(@$, @1, @3)); }
           ;
 
 function_expression
-          : variable arguments
-            {$$ = new yy.ast.FunctionExpression($1, $2, yy.help.location(@$, @1, @2));} 
+          : variable '(' arguments ')'
+            {$$ = new yy.ast.FunctionExpression($1, $3, yy.help.location(@$, @1, @4));} 
+
+          | variable '('  ')'
+            {$$ = new yy.ast.FunctionExpression($1, [], yy.help.location(@$, @1, @3));} 
           ;
 
 property_expression
@@ -241,34 +224,49 @@ property_expression
           ;
 
 method_expression
-          : property_expression arguments
-            {$$ = new yy.ast.MethodExpression($1, $2, yy.help.location(@$, @1, @2));} 
+          : property_expression '(' arguments ')'
+            {$$ = new yy.ast.MethodExpression($1, $3, yy.help.location(@$, @1, @4));} 
+
+          | property_expression '(' ')'
+            {$$ = new yy.ast.MethodExpression($1, [], yy.help.location(@$, @1, @3));} 
           ;
 
 children   
-          : (tag|control|characters) children {
-            var childs = [];
-            childs.push($1);
-            $$ = childs.concat($2);
-            }
+          : child           {$$ = [$1];          }
+          | children child  {$$ = $1.concat($2); }
+          ;
+
+child
+          : tag
+          | control 
+          | characters
           ;
 
 control
           : (for|if) {$$ = $1;}
           ;
 for
-          : '{%' FOR variable (',' variable)? IN expression '%}' children '{%' 'endfor' '%}' 
-            {$$ = new yy.ast.ForLoop($3, ($4)? $4.substring(1, $4.length-1):'index', $6, $7,
-            yy.help.location(@$, @1, @12)); }
+          : '{%' FOR variable (',' variable)? IN expression '%}' 
+             children 
+            '{%' ENDFOR '%}' 
+            {
+            
+            $$ = new yy.ast.ForLoop($3, 
+            ($4)? $4.substring(1, $4.length-1):'index',
+            $6,
+            $8,
+            yy.help.location(@$, @1, @11)); 
+            
+            }
           ;
 
 if
-          : '{%' IF (expression | binary_comparison) '%}' children '{%' 'endif' '%}'
+          : '{%' IF (expression | binary_comparison) '%}' children '{%' ENDIF '%}'
             {$$ = new yy.ast.IfCondition($3, $5, yy.help.location(@$, @1, @8)); }
 
           ;
 characters
-          : CHARACTERS
+          : (CHARACTERS|name)
             {$$ = new yy.ast.Characters($1, yy.help.location(@$, @1, @1)); }
           ;
 
