@@ -39,7 +39,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 
 /* Lexer flags */
 %options flex
-%s CHILDREN
+%x CHILDREN
 %%
 
 /* Lexer rules */
@@ -58,15 +58,15 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 'elseif'                                        return 'ELSEIF';
 'in'                                            return 'IN';
 'true'|'false'                                  return 'BOOLEAN';
-'{{'                this.begin('INITIAL');      return '{{';
+'{{'                                            return '{{';
 '}}'                                            return '}}';
 '|'                                             return '|';
-'{%'                this.begin('INITIAL');      return '{%';
-'%}'                                            return '%}';
+'{%'                                            return '{%';
+'%}'                this.begin('CHILDREN');     return '%}';
 '</'                                            return '</';
 '/>'                this.begin('CHILDREN');     return '/>';
 '>'                 this.begin('CHILDREN');     return '>';
-'<'                 this.begin('INITIAL');      return '<';
+'<'                                             return '<';
 '('                                             return '(';
 ')'                                             return ')';
 '['                                             return '[';
@@ -81,13 +81,19 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 '+'                                             return '+';
 '-'                                             return '-';
 '*'                                             return '*';
-
 '/'                                             return '/';
 '!'                                             return '!';
+','                                             return ',';
 {NumberLiteral}                                 return 'NUMBER_LITERAL';
 {StringLiteral}                                 return 'STRING_LITERAL';
 {Identifier}                                    return 'NAME';
-<CHILDREN>[^<>{%}]+    this.popState();            return 'CHARACTERS';
+
+<CHILDREN>'{{'       this.popState();           return '{{';
+<CHILDREN>'{%'       this.popState();           return '{%';
+<CHILDREN>'</'       this.popState();           return '</';
+<CHILDREN>'<'        this.popState();           return '<';
+<CHILDREN>[^/<>{%}]+ this.popState();           return 'CHARACTERS';
+
 <*><<EOF>>                                      return 'EOF';
 
 /lex
@@ -272,6 +278,7 @@ children
 child
           : tag
           | control 
+          | interpolation
           | characters
           ;
 
@@ -279,28 +286,30 @@ control
           : (for|if) {$$ = $1;}
           ;
 for
-          : '{%' FOR variable (',' variable)? IN expression '%}' 
+          : '{%' FOR variable ','? (variable)? IN expression '%}' 
              children 
             '{%' ENDFOR '%}' 
             {
             
             $$ = new yy.ast.ForLoop($3, 
-            ($4)? $4.substring(1, $4.length-1):'index',
-            $6,
-            $8,
-            yy.help.location(@$, @1, @11)); 
+            ($5)? $5 : 'index',
+            $7,
+            $9,
+            yy.help.location(@$, @1, @12)); 
             
             }
           ;
 
 if
-          : '{%' IF (expression | binary_expression) '%}' children '{%' ENDIF '%}'
+          : '{%' IF ( binary_expression | unary_expression | value_expression) '%}'
+            children 
+            '{%' ENDIF '%}'
             {$$ = new yy.ast.IfCondition($3, $5, yy.help.location(@$, @1, @8)); }
 
           ;
 
 characters
-          : (CHARACTERS|name)
+          : (CHARACTERS)
             {$$ = new yy.ast.Characters($1, yy.help.location(@$, @1, @1)); }
           ;
 

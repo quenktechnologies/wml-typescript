@@ -1,6 +1,6 @@
 import must from 'must';
 import expects from './expectations';
-import Parser from '../src/parser/Parser';
+import Parser from '../src/parse/Parser';
 
 var input = null;
 var result = null;
@@ -159,11 +159,9 @@ describe('Parser', function() {
                 '{% endif%}' +
                 '</div>';
             parse();
-            return print(result);
             compare(result, expects[this.test.title]);
 
         });
-
 
     });
 

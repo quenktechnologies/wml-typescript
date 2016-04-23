@@ -5,11 +5,11 @@
     "main": "index.js",
     "scripts": {
         "test": "npm run -s test-parser && npm run -s test-core",
-        "test-parser": "./node_modules/.bin/mocha --opts mocha.opts test/parser.js",
+        "test-parser": "./node_modules/.bin/mocha --opts mocha.opts test/parse.js",
+        "test-transpiler":"./node_modules/.bin/mocha --opts mocha.opts test/transpile.js",
         "test-core": "./node_modules/.bin/jest build",
         "build": "rm -R build; mkdir build; npm run parser; ./node_modules/.bin/babel -s inline -D src -d build",
-        "parser": "./node_modules/.bin/jison -o src/parser/ParserImpl.js jison/wml.y",
-        "parser-test": "./node_modules/.bin/jison -o src/transpiler/parser.js jison/wml.y"
+        "parser": "./node_modules/.bin/jison -o src/parse/ParserImpl.js jison/wml.y"
     },
     "author": "Lasana Murray <lmurray@quenk.com> (http://quenk.com)",
     "license": "Apache-2.0",

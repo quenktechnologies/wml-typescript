@@ -16,7 +16,7 @@ class Node {
  * @param {Tag} tag 
  * @param {Location} loc 
  */
-export class Template extends Node {
+class Template extends Node {
 
     constructor(imports, tag, loc) {
         super();
@@ -34,7 +34,7 @@ export class Template extends Node {
  * @param {string} module 
  * @param {Location} location 
  */
-export class Import extends Node {
+class Import extends Node {
 
     constructor(member, module, location) {
         super();
@@ -48,12 +48,12 @@ export class Import extends Node {
 
 /**
  * Tag represents a tag node
- * @param {stringg} name
+ * @param {string} name
  * @param {array<Attribute>} attributes
- * @param {array<Tag|Text|ControlStructure>} children
+ * @param {array<Tag|Text|ForLoop|IfCondition} children
  * @param {Location} location 
  */
-export class Tag extends Node {
+class Tag extends Node {
 
     constructor(name, attributes, children, location) {
         super();
@@ -74,9 +74,10 @@ export class Tag extends Node {
  * @param {StringLiteral|NumberLiteral|BooleanLiteral} value
  * @param {Location} location 
  */
-export class Attribute extends Node {
+class Attribute extends Node {
 
     constructor(name, namespace, value, location) {
+
         super();
         this.type = 'attribute';
         this.name = name;
@@ -94,7 +95,7 @@ export class Attribute extends Node {
  * @param {array<string>} filters 
  * @param {Location} location 
  */
-export class Interpolation extends Node {
+class Interpolation extends Node {
 
     constructor(value, filters, location) {
         super();
@@ -112,7 +113,7 @@ export class Interpolation extends Node {
  * @param {boolean} value
  * @param {Location} location 
  */
-export class BooleanLiteral extends Node {
+class BooleanLiteral extends Node {
 
     constructor(value, location) {
         super();
@@ -127,7 +128,7 @@ export class BooleanLiteral extends Node {
  * @param {number} value 
  * @param {Location} location 
  */
-export class NumberLiteral extends Node {
+class NumberLiteral extends Node {
 
     constructor(value, location) {
         super();
@@ -144,7 +145,7 @@ export class NumberLiteral extends Node {
  * @param {string} value 
  * @param {Location} location 
  */
-export class StringLiteral extends Node {
+class StringLiteral extends Node {
 
     constructor(value, location) {
         super();
@@ -160,7 +161,7 @@ export class StringLiteral extends Node {
  * @param {array} members 
  * @param {Location} location 
  */
-export class ArrayLiteral extends Node {
+class ArrayLiteral extends Node {
 
     constructor(members, location) {
         super();
@@ -172,13 +173,12 @@ export class ArrayLiteral extends Node {
 
 }
 
-
 /**
  * Characters 
  * @param {string} value 
  * @param {Location} location 
  */
-export class Characters extends Node {
+class Characters extends Node {
 
     constructor(value, location) {
         super();
@@ -195,7 +195,7 @@ export class Characters extends Node {
  * @param {string} name 
  * @param {array} args 
  */
-export class Filter extends Node {
+class Filter extends Node {
 
     constructor(name, args) {
         super();
@@ -220,7 +220,7 @@ class Expression extends Node {
  * @param {Expression} expression 
  * @param {Location} location 
  */
-export class UnaryExpression extends Expression {
+class UnaryExpression extends Expression {
 
     constructor(op, expression, location) {
 
@@ -241,11 +241,12 @@ export class UnaryExpression extends Expression {
  * @param {Expression} right 
  * @param {Location} location 
  */
-export class BinaryExpression extends Expression {
+class BinaryExpression extends Expression {
 
     constructor(left, op, right, location) {
 
         super();
+        this.type = 'binary-expression';
         this.left = left;
         this.op = op;
         this.right = right;
@@ -255,18 +256,16 @@ export class BinaryExpression extends Expression {
 
 }
 
-
-
 /**
  * FunctionExpression 
  * @param {string} name 
  * @param {array} args
  */
-export class FunctionExpression extends Expression {
+class FunctionExpression extends Expression {
 
     constructor(name, args) {
         super();
-        this.type = 'function';
+        this.type = 'function-expression';
         this.name = name;
         this.args = args;
 
@@ -279,12 +278,12 @@ export class FunctionExpression extends Expression {
  * @param {string} name 
  * @param {array} args 
  */
-export class MethodExpression extends Expression {
+class MethodExpression extends Expression {
 
     constructor(name, args) {
 
         super();
-        this.type = 'method';
+        this.type = 'method-expression';
         this.name = name;
         this.args = args;
     }
@@ -299,12 +298,12 @@ export class MethodExpression extends Expression {
  * @param {array} children 
  * @param {Location} location 
  */
-export class ForLoop extends Node {
+class ForLoop extends Node {
 
     constructor(variable, indexName, target, children, location) {
 
         super();
-        this.type = 'for';
+        this.type = 'for-loop';
         this.variable = variable;
         this.indexName = indexName;
         this.target = target;
@@ -321,14 +320,41 @@ export class ForLoop extends Node {
  * @param {array} template 
  * @param {Location} location 
  */
-export class IfCondition extends Node {
+class IfCondition extends Node {
 
     constructor(expression, template, location) {
 
         super();
+        this.type = 'if-condition';
         this.expression = expression;
         this.template = template;
         this.location = location;
+
+    }
+
+}
+
+export default class AbstractSyntaxTree {
+
+    constructor() {
+
+        this.Template = Template;
+        this.Import = Import;
+        this.Tag = Tag;
+        this.Attribute = Attribute;
+        this.Interpolation = Interpolation;
+        this.BooleanLiteral = BooleanLiteral;
+        this.NumberLiteral = NumberLiteral;
+        this.StringLiteral = StringLiteral;
+        this.ArrayLiteral = ArrayLiteral;
+        this.Characters = Characters;
+        this.Filter = Filter;
+        this.UnaryExpression = UnaryExpression;
+        this.BinaryExpression = BinaryExpression;
+        this.FunctionExpression = FunctionExpression;
+        this.MethodExpression = MethodExpression;
+        this.ForLoop = ForLoop;
+        this.IfCondition = IfCondition;
 
     }
 
