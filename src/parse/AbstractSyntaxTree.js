@@ -174,6 +174,22 @@ class ArrayLiteral extends Node {
 }
 
 /**
+ * FunctionLiteral 
+ * @param {array<string>} parameters 
+ * @param {Expression} body 
+ */
+class FunctionLiteral {
+
+    constructor(parameters, body) {
+
+        this.parameters = parameters;
+        this.body = body;
+
+    }
+
+}
+
+/**
  * Characters 
  * @param {string} value 
  * @param {Location} location 
@@ -213,6 +229,25 @@ class Filter extends Node {
 class Expression extends Node {
 
 }
+
+/**
+ * TernaryExpression 
+ * @param {Expression} logic 
+ * @param {Expression} iftrue 
+ * @param {Expression} iffalse
+ */
+class TernaryExpression {
+
+    constructor(logic, iftrue, iffalse) {
+
+        this.logic = logic;
+        this.iftrue = iftrue;
+        this.iffalse = iffalse;
+
+    }
+
+}
+
 
 /**
  * UnaryExpression 
@@ -291,6 +326,25 @@ class MethodExpression extends Expression {
 }
 
 /**
+ * BindExpression 
+ * @param {string} parent 
+ * @param {string} target 
+ * @param {array} args 
+ */
+class BindExpression {
+
+    constructor(parent, target, args) {
+
+        this.parent = parent;
+        this.target = target;
+        this.args = args;
+
+    }
+
+}
+
+
+/**
  * ForLoop 
  * @param {string} variable 
  * @param {string} [indexName='index] 
@@ -348,13 +402,16 @@ export default class AbstractSyntaxTree {
         this.BooleanLiteral = BooleanLiteral;
         this.NumberLiteral = NumberLiteral;
         this.StringLiteral = StringLiteral;
+        this.FunctionLiteral = FunctionLiteral;
         this.ArrayLiteral = ArrayLiteral;
         this.Characters = Characters;
         this.Filter = Filter;
-        this.UnaryExpression = UnaryExpression;
+        this.TernaryExpression = TernaryExpression;
         this.BinaryExpression = BinaryExpression;
+        this.UnaryExpression = UnaryExpression;
         this.FunctionExpression = FunctionExpression;
         this.MethodExpression = MethodExpression;
+        this.BindExpression = BindExpression;
         this.ForLoop = ForLoop;
         this.IfCondition = IfCondition;
 

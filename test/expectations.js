@@ -2031,7 +2031,9 @@ export default {
             }
         }
     },
-    'should parse if expressions': {
+    'should parse if expressions':
+
+    {
         'type': 'template',
         'imports': [],
         'tag': {
@@ -2059,16 +2061,16 @@ export default {
                             'match': {
                                 'first_line': 1,
                                 'last_line': 1,
-                                'first_column': 31,
-                                'last_column': 33
+                                'first_column': 32,
+                                'last_column': 34
                             },
                             'start': {
                                 'line': 1,
-                                'column': 31
+                                'column': 32
                             },
                             'end': {
                                 'line': 1,
-                                'column': 33
+                                'column': 34
                             }
                         }
                     },
@@ -2077,7 +2079,7 @@ export default {
                             'first_line': 1,
                             'last_line': 1,
                             'first_column': 11,
-                            'last_column': 33
+                            'last_column': 35
                         },
                         'start': {
                             'line': 1,
@@ -2085,27 +2087,27 @@ export default {
                         },
                         'end': {
                             'line': 1,
-                            'column': 33
+                            'column': 35
                         }
                     }
                 },
-                'template': [{
+                'iftrue': [{
                     'type': 'characters',
                     'value': 'Your length is more than 11!',
                     'location': {
                         'match': {
                             'first_line': 1,
                             'last_line': 1,
-                            'first_column': 36,
-                            'last_column': 64
+                            'first_column': 38,
+                            'last_column': 66
                         },
                         'start': {
                             'line': 1,
-                            'column': 36
+                            'column': 38
                         },
                         'end': {
                             'line': 1,
-                            'column': 64
+                            'column': 66
                         }
                     }
                 }, {
@@ -2119,16 +2121,16 @@ export default {
                             'match': {
                                 'first_line': 1,
                                 'last_line': 1,
-                                'first_column': 69,
-                                'last_column': 74
+                                'first_column': 71,
+                                'last_column': 76
                             },
                             'start': {
                                 'line': 1,
-                                'column': 69
+                                'column': 71
                             },
                             'end': {
                                 'line': 1,
-                                'column': 74
+                                'column': 76
                             }
                         }
                     }],
@@ -2136,25 +2138,26 @@ export default {
                         'match': {
                             'first_line': 1,
                             'last_line': 1,
-                            'first_column': 64,
-                            'last_column': 80
+                            'first_column': 66,
+                            'last_column': 82
                         },
                         'start': {
                             'line': 1,
-                            'column': 64
+                            'column': 66
                         },
                         'end': {
                             'line': 1,
-                            'column': 80
+                            'column': 82
                         }
                     }
                 }],
+                'iffalse': [],
                 'location': {
                     'match': {
                         'first_line': 1,
                         'last_line': 1,
                         'first_column': 5,
-                        'last_column': 90
+                        'last_column': 92
                     },
                     'start': {
                         'line': 1,
@@ -2162,7 +2165,7 @@ export default {
                     },
                     'end': {
                         'line': 1,
-                        'column': 90
+                        'column': 92
                     }
                 }
             }],
@@ -2171,7 +2174,7 @@ export default {
                     'first_line': 1,
                     'last_line': 1,
                     'first_column': 0,
-                    'last_column': 96
+                    'last_column': 98
                 },
                 'start': {
                     'line': 1,
@@ -2179,7 +2182,7 @@ export default {
                 },
                 'end': {
                     'line': 1,
-                    'column': 96
+                    'column': 98
                 }
             }
         },
@@ -2188,7 +2191,7 @@ export default {
                 'first_line': 1,
                 'last_line': 1,
                 'first_column': 0,
-                'last_column': 96
+                'last_column': 98
             },
             'start': {
                 'line': 1,
@@ -2196,10 +2199,309 @@ export default {
             },
             'end': {
                 'line': 1,
-                'column': 96
+                'column': 98
             }
         }
+    },
+    'should parse bind expressions': {
+        'type': 'template',
+        'imports': [],
+        'tag': {
+            'type': 'tag',
+            'name': 'div',
+            'attributes': [{
+                'type': 'attribute',
+                'name': 'onfocus',
+                'namespace': null,
+                'value': {
+                    'type': 'interpolation',
+                    'value': {
+                        'parent': 'this',
+                        'target': 'doAction',
+                        'args': []
+                    },
+                    'filters': [],
+                    'location': {
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 13,
+                            'last_column': 31
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 13
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 31
+                        }
+                    }
+                },
+                'location': {
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 5,
+                        'last_column': 31
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 5
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 31
+                    }
+                }
+            }],
+            'children': [],
+            'location': {
+                'match': {
+                    'first_line': 1,
+                    'last_line': 1,
+                    'first_column': 0,
+                    'last_column': 33
+                },
+                'start': {
+                    'line': 1,
+                    'column': 0
+                },
+                'end': {
+                    'line': 1,
+                    'column': 33
+                }
+            }
+        },
+        'location': {
+            'match': {
+                'first_line': 1,
+                'last_line': 1,
+                'first_column': 0,
+                'last_column': 33
+            },
+            'start': {
+                'line': 1,
+                'column': 0
+            },
+            'end': {
+                'line': 1,
+                'column': 33
+            }
+        }
+    },
+    'should parse ternary expressions': {
+        "type": "template",
+        "imports": [],
+        "tag": {
+            "type": "tag",
+            "name": "div",
+            "attributes": [{
+                "type": "attribute",
+                "name": "id",
+                "namespace": null,
+                "value": {
+                    "type": "interpolation",
+                    "value": "this.id",
+                    "filters": [],
+                    "location": {
+                        "match": {
+                            "first_line": 1,
+                            "last_line": 1,
+                            "first_column": 8,
+                            "last_column": 19
+                        },
+                        "start": {
+                            "line": 1,
+                            "column": 8
+                        },
+                        "end": {
+                            "line": 1,
+                            "column": 19
+                        }
+                    }
+                },
+                "location": {
+                    "match": {
+                        "first_line": 1,
+                        "last_line": 1,
+                        "first_column": 5,
+                        "last_column": 19
+                    },
+                    "start": {
+                        "line": 1,
+                        "column": 5
+                    },
+                    "end": {
+                        "line": 1,
+                        "column": 19
+                    }
+                }
+            }],
+            "children": [{
+                "type": "interpolation",
+                "value": {
+                    "logic": {
+                        "type": "function-expression",
+                        "name": "this.check",
+                        "args": []
+                    },
+                    "iftrue": "a",
+                    "iffalse": "b"
+                },
+                "filters": [],
+                "location": {
+                    "match": {
+                        "first_line": 1,
+                        "last_line": 1,
+                        "first_column": 20,
+                        "last_column": 45
+                    },
+                    "start": {
+                        "line": 1,
+                        "column": 20
+                    },
+                    "end": {
+                        "line": 1,
+                        "column": 45
+                    }
+                }
+            }],
+            "location": {
+                "match": {
+                    "first_line": 1,
+                    "last_line": 1,
+                    "first_column": 0,
+                    "last_column": 51
+                },
+                "start": {
+                    "line": 1,
+                    "column": 0
+                },
+                "end": {
+                    "line": 1,
+                    "column": 51
+                }
+            }
+        },
+        "location": {
+            "match": {
+                "first_line": 1,
+                "last_line": 1,
+                "first_column": 0,
+                "last_column": 51
+            },
+            "start": {
+                "line": 1,
+                "column": 0
+            },
+            "end": {
+                "line": 1,
+                "column": 51
+            }
+        }
+    },
+    'should parse function literals': {
+  'type': 'template',
+  'imports': [
+  ],
+  'tag': {
+    'type': 'tag',
+    'name': 'button',
+    'attributes': [
+      {
+        'type': 'attribute',
+        'name': 'onclick',
+        'namespace': null,
+        'value': {
+          'type': 'interpolation',
+          'value': {
+            'parameters': [
+              'e'
+            ],
+            'body': {
+              'type': 'function-expression',
+              'name': 'this.call',
+              'args': [
+                'e'
+              ]
+            }
+          },
+          'filters': [
+          ],
+          'location': {
+            'match': {
+              'first_line': 1,
+              'last_line': 1,
+              'first_column': 16,
+              'last_column': 37
+            },
+            'start': {
+              'line': 1,
+              'column': 16
+            },
+            'end': {
+              'line': 1,
+              'column': 37
+            }
+          }
+        },
+        'location': {
+          'match': {
+            'first_line': 1,
+            'last_line': 1,
+            'first_column': 8,
+            'last_column': 37
+          },
+          'start': {
+            'line': 1,
+            'column': 8
+          },
+          'end': {
+            'line': 1,
+            'column': 37
+          }
+        }
+      }
+    ],
+    'children': [
+    ],
+    'location': {
+      'match': {
+        'first_line': 1,
+        'last_line': 1,
+        'first_column': 0,
+        'last_column': 39
+      },
+      'start': {
+        'line': 1,
+        'column': 0
+      },
+      'end': {
+        'line': 1,
+        'column': 39
+      }
     }
+  },
+  'location': {
+    'match': {
+      'first_line': 1,
+      'last_line': 1,
+      'first_column': 0,
+      'last_column': 39
+    },
+    'start': {
+      'line': 1,
+      'column': 0
+    },
+    'end': {
+      'line': 1,
+      'column': 39
+    }
+  }
+}
+
+
 
 
 };

@@ -7,12 +7,15 @@ import BooleanLiteral from './BooleanLiteral';
 import NumberLiteral from './NumberLiteral';
 import StringLiteral from './StringLiteral';
 import ArrayLiteral from './ArrayLiteral';
+import FunctionLiteral from './FunctionLiteral';
 import Characters from './Characters';
 import Filter from './Filter';
-import UnaryExpression from './UnaryExpression';
+import TernaryExpression from './TernaryExpression';
 import BinaryExpression from './BinaryExpression';
+import UnaryExpression from './UnaryExpression';
 import FunctionExpression from './FunctionExpression';
 import MethodExpression from './MethodExpression';
+import BindExpression from './BindExpression';
 import ForLoop from './ForLoop';
 import IfCondition from './IfCondition';
 
@@ -32,12 +35,15 @@ class AbstractSyntaxTree {
         this.NumberLiteral = NumberLiteral;
         this.StringLiteral = StringLiteral;
         this.ArrayLiteral = ArrayLiteral;
+        this.FunctionLiteral = FunctionLiteral;
         this.Characters = Characters;
         this.Filter = Filter;
-        this.UnaryExpression = UnaryExpression;
+        this.TernaryExpression = TernaryExpression;
         this.BinaryExpression = BinaryExpression;
+        this.UnaryExpression = UnaryExpression;
         this.FunctionExpression = FunctionExpression;
         this.MethodExpression = MethodExpression;
+        this.BindExpression = BindExpression;
         this.ForLoop = ForLoop;
         this.IfCondition = IfCondition;
 

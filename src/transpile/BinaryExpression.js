@@ -17,7 +17,6 @@ class BinaryExpression {
 
     return `${this.left.toString()} ${this.op} ${this.right.toString()}`;
 
-
   }
 
 }

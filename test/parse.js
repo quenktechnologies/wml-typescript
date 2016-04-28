@@ -153,14 +153,39 @@ describe('Parser', function() {
 
             input =
                 '<div>' +
-                '{% if length(values()) >= 12 %}' +
+                '{% if (length(values()) >= 12) %}' +
                 'Your length is more than 11!' +
                 '<eye>Tiger</eye>' +
                 '{% endif%}' +
                 '</div>';
+
             parse();
             compare(result, expects[this.test.title]);
 
+        });
+
+        it('should parse bind expressions', function() {
+
+            input = '<div onfocus={{this=>doAction}}/>';
+            parse();
+            compare(result, expects[this.test.title]);
+
+        });
+
+        it('should parse ternary expressions', function() {
+
+            input = '<div id={{this.id}}>{{this.check() ? a : b }}</div>';
+            parse();
+            compare(result, expects[this.test.title]);
+
+        });
+
+        it('should parse function literals', function() {
+
+            input = '<button onclick={{(e)=>this.call(e)}}/>';
+            parse();
+            compare(result, expects[this.test.title]);
+ 
         });
 
     });
