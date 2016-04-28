@@ -19,8 +19,11 @@ describe('Transpiler', function() {
             input = `import lib from 'path/to/libs';<tag/>`;
 
             must(t.transpile(input)).eql(` 
+
 import lib from 'path/to/libs';
-export default function (make) { return make.element('tag',{ns:{}, html:{}}, null); }`.trim());
+export default function (make) { return make.node('tag',{ns:{}, html:{}}, []); }
+
+`.trim());
 
         });
 
@@ -30,9 +33,7 @@ export default function (make) { return make.element('tag',{ns:{}, html:{}}, nul
 
             must(t.transpile(input)).eql(`
 
-export default function (make) { return make.element('panel',{ns:{"css":{"align":"left"}}, html:{"type":"default","size":"40"}}, make.element('a',{ns:{}, html:{}}, 'Click'),'Here',make.element(Input,{ns:{}, html:{}}, null)); }
-
-              `.trim());
+export default function (make) { return make.node('panel',{ns:{css:{'align':'left'}}, html:{'type':'default','size':'40'}}, [make.node('a',{ns:{}, html:{}}, [make.text('Click')]),make.text('Here'),make.element(Input,{ns:{}, html:{}}, [])]); }              `.trim());
 
 
         });
@@ -47,7 +48,7 @@ export default function (make) { return make.element('panel',{ns:{"css":{"align"
                 '<vote-button/>' +
                 '<vote-count source=""/> Votes' +
                 '<textarea size=32 onchange={{this.setText}}>' +
-                'Various text <span>{{text}}</span>' +
+                'Various text <span>{{text | foo}}</span>' +
                 '</textarea>' +
                 '{% if this.waiting() %}' +
                 '<br/>' +
@@ -59,12 +60,11 @@ export default function (make) { return make.element('panel',{ns:{"css":{"align"
                 '</modal-body>' +
                 '</modal>';
 
-        must(t.transpile(input)).eql(`
+            must(t.transpile(input)).eql(`
 
-export default function (make) { return make.element('modal',{ns:{}, html:{"name":"mymodal","x":"1","y":"2"}}, make.element('modal-header',{ns:{}, html:{}}, 'My Modal'),make.element('modal-body',{ns:{}, html:{}}, 'Creativxity is inhibxited by greed and corruption.',make.element('vote-button',{ns:{}, html:{}}, null),make.element('vote-count',{ns:{}, html:{"source":""}}, null),' Votes',make.element('textarea',{ns:{}, html:{"size":"32","onchange":"this.setText"}}, 'Various text ',make.element('span',{ns:{}, html:{}}, text)),make.ifcondition(this.waiting(), function if_0(){ return [make.element('br',{ns:{}, html:{}}, null),make.element('br',{ns:{}, html:{}}, null),make.forloop(this.getUnits(),function for_1 (unit, name) {return [make.element(Unit,{ns:{}, html:{"name":"name"}}, null),make.element(Unit,{ns:{}, html:{"name":"name"}}, null),make.element(Unit,{ns:{}, html:{"name":"name","u":"unit"}}, null)]; }.bind(this))];}.bind(this), function else_0(){ return [];}.bind(this)))); }
-
-
-            `.trim());
+export default function (make) { return make.node('modal',{ns:{}, html:{'name':'mymodal','x':'1','y':'2'}}, [make.node('modal-header',{ns:{}, html:{}}, [make.text('My Modal')]),make.node('modal-body',{ns:{}, html:{}}, [make.text('Creativxity is inhibxited by greed and corruption.'),make.node('vote-button',{ns:{}, html:{}}, []),make.node('vote-count',{ns:{}, html:{'source':''}}, []),make.text(' Votes'),make.node('textarea',{ns:{}, html:{'size':32,'onchange':this.setText}}, [make.text('Various text '),make.node('span',{ns:{}, html:{}}, [foo.apply(this, [text])])]),make.ifcondition(this.waiting(), function if_0(){ return [make.node('br',{ns:{}, html:{}}, []),make.node('br',{ns:{}, html:{}}, []),make.forloop(this.getUnits(),function for_1 (unit, name) {return [make.element(Unit,{ns:{}, html:{'name':name}}, []),make.element(Unit,{ns:{}, html:{'name':name}}, []),make.element(Unit,{ns:{}, html:{'name':name,'u':unit}}, [])]; }.bind(this))];}.bind(this), function else_0(){ return [];}.bind(this))])]); }
+               
+                `.trim());
 
         });
     });

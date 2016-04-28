@@ -50,7 +50,7 @@ class Import extends Node {
  * Tag represents a tag node
  * @param {string} name
  * @param {array<Attribute>} attributes
- * @param {array<Tag|Text|ForLoop|IfCondition} children
+ * @param {array<Tag|Text|ForLoop|IfCondition>} children
  * @param {Location} location 
  */
 class Tag extends Node {
@@ -317,17 +317,19 @@ class ForLoop extends Node {
 /**
  * IfCondition 
  * @param {Expression} expression 
- * @param {array} template 
+ * @param {array} iftrue 
+ * @param {array} iffalse 
  * @param {Location} location 
  */
 class IfCondition extends Node {
 
-    constructor(expression, template, location) {
+    constructor(expression, iftrue, iffalse, location) {
 
         super();
         this.type = 'if-condition';
         this.expression = expression;
-        this.template = template;
+        this.iftrue = iftrue;
+        this.iffalse = iffalse;
         this.location = location;
 
     }

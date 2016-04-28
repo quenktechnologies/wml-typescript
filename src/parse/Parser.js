@@ -32,6 +32,22 @@ let help = {
     },
     ensureTagsMatch() {
 
+    },
+    convertOperator(op) {
+
+        switch (op) {
+
+            case '==':
+                return '===';
+
+            case '!=':
+                return '!==';
+
+            default:
+                return op;
+
+        }
+
     }
 
 };

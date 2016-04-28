@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: parse/AbstractSyntaxTree.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: parse/AbstractSyntaxTree.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>class Node {
+
+    toString() {
+
+        var o = Object.create(null);
+        Object.keys(this).forEach(k => o[k] = this[k]);
+        return JSON.stringify(o);
+
+    }
+
+}
+
+/**
+ * Template represents the entire file contents.
+ * @param {array&lt;Import>} imports 
+ * @param {Tag} tag 
+ * @param {Location} loc 
+ */
+class Template extends Node {
+
+    constructor(imports, tag, loc) {
+        super();
+        this.type = 'template';
+        this.imports = imports;
+        this.tag = tag;
+        this.location = loc;
+    }
+
+}
+
+/**
+ * Import represents an import node.
+ * @param {string} member 
+ * @param {string} module 
+ * @param {Location} location 
+ */
+class Import extends Node {
+
+    constructor(member, module, location) {
+        super();
+        this.type = 'import';
+        this.member = member;
+        this.module = module;
+        this.location = location;
+    }
+
+}
+
+/**
+ * Tag represents a tag node
+ * @param {string} name
+ * @param {array&lt;Attribute>} attributes
+ * @param {array&lt;Tag|Text|ForLoop|IfCondition>} children
+ * @param {Location} location 
+ */
+class Tag extends Node {
+
+    constructor(name, attributes, children, location) {
+        super();
+        this.type = 'tag';
+        this.name = name;
+        this.attributes = attributes;
+        this.children = children;
+        this.location = location;
+
+    }
+
+}
+
+/**
+ * Attribute
+ * @param {string} name 
+ * @param {string} namespace 
+ * @param {StringLiteral|NumberLiteral|BooleanLiteral} value
+ * @param {Location} location 
+ */
+class Attribute extends Node {
+
+    constructor(name, namespace, value, location) {
+
+        super();
+        this.type = 'attribute';
+        this.name = name;
+        this.namespace = namespace;
+        this.value = value;
+        this.location = location;
+
+    }
+
+}
+
+/**
+ * Interpolation
+ * @param {string} value 
+ * @param {array&lt;string>} filters 
+ * @param {Location} location 
+ */
+class Interpolation extends Node {
+
+    constructor(value, filters, location) {
+        super();
+        this.type = 'interpolation';
+        this.value = value;
+        this.filters = filters;
+        this.location = location;
+
+    }
+
+}
+
+/**
+ * BooleanLiteral 
+ * @param {boolean} value
+ * @param {Location} location 
+ */
+class BooleanLiteral extends Node {
+
+    constructor(value, location) {
+        super();
+        this.type = 'boolean';
+        this.value = value;
+    }
+
+}
+
+/**
+ * NumberLiteral 
+ * @param {number} value 
+ * @param {Location} location 
+ */
+class NumberLiteral extends Node {
+
+    constructor(value, location) {
+        super();
+        this.type = 'number';
+        this.value = value;
+        this.location = location;
+    }
+
+}
+
+
+/**
+ * StringLiteral 
+ * @param {string} value 
+ * @param {Location} location 
+ */
+class StringLiteral extends Node {
+
+    constructor(value, location) {
+        super();
+        this.type = 'string';
+        this.value = value;
+        this.location = location;
+    }
+
+}
+
+/**
+ * ArrayLiteral 
+ * @param {array} members 
+ * @param {Location} location 
+ */
+class ArrayLiteral extends Node {
+
+    constructor(members, location) {
+        super();
+        this.type = 'array';
+        this.members = members;
+        this.location = location;
+
+    }
+
+}
+
+/**
+ * Characters 
+ * @param {string} value 
+ * @param {Location} location 
+ */
+class Characters extends Node {
+
+    constructor(value, location) {
+        super();
+        this.type = 'characters';
+        this.value = value;
+        this.location = location;
+
+    }
+
+}
+
+/**
+ * Filter 
+ * @param {string} name 
+ * @param {array} args 
+ */
+class Filter extends Node {
+
+    constructor(name, args) {
+        super();
+        this.type = 'filter';
+        this.name = name;
+        this.args = args;
+
+    }
+
+}
+
+/**
+ * Expression 
+ */
+class Expression extends Node {
+
+}
+
+/**
+ * UnaryExpression 
+ * @param {string} op 
+ * @param {Expression} expression 
+ * @param {Location} location 
+ */
+class UnaryExpression extends Expression {
+
+    constructor(op, expression, location) {
+
+        super();
+        this.type = 'unary-expression';
+        this.op = op;
+        this.expression = expression;
+        this.location = location;
+
+    }
+
+}
+
+/**
+ * BinaryExpression 
+ * @param {Expression} left 
+ * @param {string} op 
+ * @param {Expression} right 
+ * @param {Location} location 
+ */
+class BinaryExpression extends Expression {
+
+    constructor(left, op, right, location) {
+
+        super();
+        this.type = 'binary-expression';
+        this.left = left;
+        this.op = op;
+        this.right = right;
+        this.location = location;
+
+    }
+
+}
+
+/**
+ * FunctionExpression 
+ * @param {string} name 
+ * @param {array} args
+ */
+class FunctionExpression extends Expression {
+
+    constructor(name, args) {
+        super();
+        this.type = 'function-expression';
+        this.name = name;
+        this.args = args;
+
+    }
+
+}
+
+/**
+ * MethodExpression 
+ * @param {string} name 
+ * @param {array} args 
+ */
+class MethodExpression extends Expression {
+
+    constructor(name, args) {
+
+        super();
+        this.type = 'method-expression';
+        this.name = name;
+        this.args = args;
+    }
+
+}
+
+/**
+ * ForLoop 
+ * @param {string} variable 
+ * @param {string} [indexName='index] 
+ * @param {Expression|ArrayLiteral} target
+ * @param {array} children 
+ * @param {Location} location 
+ */
+class ForLoop extends Node {
+
+    constructor(variable, indexName, target, children, location) {
+
+        super();
+        this.type = 'for-loop';
+        this.variable = variable;
+        this.indexName = indexName;
+        this.target = target;
+        this.children = children;
+        this.location = location;
+
+    }
+
+}
+
+/**
+ * IfCondition 
+ * @param {Expression} expression 
+ * @param {array} template 
+ * @param {Location} location 
+ */
+class IfCondition extends Node {
+
+    constructor(expression, template, location) {
+
+        super();
+        this.type = 'if-condition';
+        this.expression = expression;
+        this.template = template;
+        this.location = location;
+
+    }
+
+}
+
+export default class AbstractSyntaxTree {
+
+    constructor() {
+
+        this.Template = Template;
+        this.Import = Import;
+        this.Tag = Tag;
+        this.Attribute = Attribute;
+        this.Interpolation = Interpolation;
+        this.BooleanLiteral = BooleanLiteral;
+        this.NumberLiteral = NumberLiteral;
+        this.StringLiteral = StringLiteral;
+        this.ArrayLiteral = ArrayLiteral;
+        this.Characters = Characters;
+        this.Filter = Filter;
+        this.UnaryExpression = UnaryExpression;
+        this.BinaryExpression = BinaryExpression;
+        this.FunctionExpression = FunctionExpression;
+        this.MethodExpression = MethodExpression;
+        this.ForLoop = ForLoop;
+        this.IfCondition = IfCondition;
+
+    }
+
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AbstractSyntaxTree.html">AbstractSyntaxTree</a></li><li><a href="ArrayLiteral.html">ArrayLiteral</a></li><li><a href="ArrayWriter.html">ArrayWriter</a></li><li><a href="Attribute.html">Attribute</a></li><li><a href="BinaryExpression.html">BinaryExpression</a></li><li><a href="BooleanLiteral.html">BooleanLiteral</a></li><li><a href="Characters.html">Characters</a></li><li><a href="Expression.html">Expression</a></li><li><a href="Filter.html">Filter</a></li><li><a href="ForLoop.html">ForLoop</a></li><li><a href="FunctionExpression.html">FunctionExpression</a></li><li><a href="IfCondition.html">IfCondition</a></li><li><a href="Import.html">Import</a></li><li><a href="Interpolation.html">Interpolation</a></li><li><a href="MethodExpression.html">MethodExpression</a></li><li><a href="NumberLiteral.html">NumberLiteral</a></li><li><a href="StringLiteral.html">StringLiteral</a></li><li><a href="Tag.html">Tag</a></li><li><a href="Template.html">Template</a></li><li><a href="Transpiler.html">Transpiler</a></li><li><a href="UnaryExpression.html">UnaryExpression</a></li></ul><h3>Interfaces</h3><ul><li><a href="Element.html">Element</a></li><li><a href="Factory.html">Factory</a></li><li><a href="Maker.html">Maker</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.0-dev</a> on Sat Apr 23 2016 17:34:18 GMT-0400 (AST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

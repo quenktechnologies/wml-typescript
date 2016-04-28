@@ -1,4 +1,4 @@
-var Transpiler = require('./transpiler/Transpiler');
+var Transpiler = require('./transpile/Transpiler');
 var through = require('through');
 var babel = require('babel-core');
 

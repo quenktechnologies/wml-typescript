@@ -1,7 +1,0 @@
-import Input from './Input';
-
-<div class="container">
-  <div class="col-md-8">
-    <Input/>
-  </div>
-</div>

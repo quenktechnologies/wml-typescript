@@ -2,7 +2,7 @@
  * Tag 
  * @param {string} name 
  * @param {array<Attribute>} attributes 
- * @param {array<Tag|Text|ForLoop|IfCondition} children 
+ * @param {array<Tag|Text|ForLoop|IfCondition>} children 
  * @param {Location} location 
  */
 class Tag {
@@ -19,32 +19,38 @@ class Tag {
     toString() {
 
         var tag = (this.name[0] === this.name[0].toUpperCase()) ?
-            this.name : `'${this.name}'`;
+            `make.element(${this.name}` : `make.node('${this.name}'`;
 
         var ns = {};
-        var html = {};
+        var html = [];
         var children;
 
         this.attributes.forEach(a => {
 
+            var val = `'${a.name}':${a.toString()}`;
+
             if (a.namespace) {
 
-                ns[a.namespace] = ns[a.namespace] || {};
-                ns[a.namespace][a.name] = a.toString();
+                ns[a.namespace] = ns[a.namespace] || [];
+                ns[a.namespace].push(val);
 
             } else {
 
-                html[a.name] = a.toString();
+                html.push(val);
 
             }
 
         });
 
-        children = this.children.map(c => c.toString()).join(',');
-        children = children || null;
+        children = `[${this.children.map(c => c.toString()).join(',')}]`;
+        ns = '{' + Object.keys(ns).map(key => `${key}:{${ns[key].join(',')}}`).join(',') + '}';
+        html = '{' + html.join(',') + '}';
 
-        return `make.element(${tag},` +
-            `{ns:${JSON.stringify(ns)}, html:${JSON.stringify(html)}}, ${children})`;
+        ns = (ns) ? ns : '{}';
+        html = (html) ? html : '{}';
+
+        return `${tag},` +
+            `{ns:${ns}, html:${html}}, ${children})`;
 
     }
 

@@ -12,7 +12,7 @@ class Characters {
 
     toString() {
 
-        return `'${this.value}'`;
+        return `make.text('${this.value}')`;
 
     }
 

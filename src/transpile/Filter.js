@@ -16,7 +16,7 @@ class Filter {
 
     var args = this.args.slice();
 
-    args.unshift(this.name);
+    args.unshift(value);
 
     return `${this.name}.apply(this, [${args.join(',')}])`;  
 

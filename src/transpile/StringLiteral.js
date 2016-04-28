@@ -12,7 +12,7 @@ class StringLiteral {
 
     toString() {
 
-        return this.value.split('"').join('');
+        return this.value.split('"').join('\'');
 
     }
 
