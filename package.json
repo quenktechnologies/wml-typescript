@@ -8,7 +8,7 @@
         "test-parser": "./node_modules/.bin/mocha --opts mocha.opts test/parse.js",
         "test-transpiler": "./node_modules/.bin/mocha --opts mocha.opts test/transpile.js",
         "test-core": "./node_modules/.bin/jest build",
-        "build": "rm -R build; mkdir build; npm run parser; ./node_modules/.bin/babel -s inline -D src -d build",
+        "build": "rm -R lib; mkdir -p lib; npm run parser; ./node_modules/.bin/babel -s inline -D src -d lib",
         "parser": "./node_modules/.bin/jison -o src/parse/ParserImpl.js src/wml.y",
         "api-docs": "./node_modules/.bin/jsdoc -c jsdoc.json"
 

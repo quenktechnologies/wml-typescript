@@ -28,7 +28,7 @@ function adopt(child, e) {
     if (Array.isArray(child))
         return child.forEach(innerChild => adopt(innerChild, e));
 
-    e.appendChild(child);
+    e.appendChild((typeof child === 'object') ? child : document.createTextNode(child));
 
 }
 

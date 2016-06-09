@@ -17,6 +17,19 @@ class View {
     }
 
     /**
+     * use replaces the template (and optionally context) this View uses.
+     * @param {function} template 
+     * @param {object} [context] 
+     * @returns {View}
+     */
+    use(template, context) {
+
+        this._maker = new Maker(template, (context) ? context : this.context);
+        return this;
+
+    }
+
+    /**
      * findById retrieves an element by its wml:id attribute.
      * @param {string} id 
      * @return {Object} 
