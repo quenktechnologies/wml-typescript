@@ -28,7 +28,11 @@ function adopt(child, e) {
     if (Array.isArray(child))
         return child.forEach(innerChild => adopt(innerChild, e));
 
-    e.appendChild((typeof child === 'object') ? child : document.createTextNode(child));
+    if (child)
+        e.appendChild(
+            (typeof child === 'object') ?
+            child :
+            document.createTextNode(child));
 
 }
 
@@ -70,7 +74,7 @@ class Maker {
      */
     text(value) {
 
-        return document.createTextNode(value);
+        return document.createTextNode(value || '');
 
     }
 
@@ -102,15 +106,20 @@ class Maker {
 
     /**
      * element creates a wml element.
-     * @param {Factory} factory 
+     * @param {function} Construtor 
      * @param {object} attributes 
      * @param {array<string|number|Element>} children 
      * @return {Element}
      */
-    element(factory, attributes, children) {
+    element(Constructor, attributes, children) {
 
-        var e = factory.create(attributes.html, attributes.ns);
-        children.forEach(c => adopt(c, e));
+        var childs = [];
+        var e;
+
+        children.forEach(child => Array.isArray(child) ?
+            childs.push.apply(childs, child) : childs.push(child));
+
+        e = new Constructor(attributes, childs);
         this._register(e, attributes.ns.wml || null);
         return e.render();
 
