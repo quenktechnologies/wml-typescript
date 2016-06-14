@@ -31,8 +31,7 @@ function adopt(child, e) {
     if (child)
         e.appendChild(
             (typeof child === 'object') ?
-            child :
-            document.createTextNode(child));
+            child :  document.createTextNode(child || ''));
 
 }
 
@@ -61,7 +60,8 @@ class Maker {
         this._nextId = this._nextId + 1;
 
         if (this._list.hasOwnProperty(id))
-            throw new Error(`Duplicate wml id '${id}' discovered!`);
+            console.warn(`Duplicate wml id ${id} found, currently the default behaviour is to
+              overwrite but this may change at some point!`);
 
         this._list[id] = e;
 
@@ -174,6 +174,7 @@ class Maker {
      */
     render() {
 
+        this._list = {};
         return this._template.call(this._context, this);
 
     }
