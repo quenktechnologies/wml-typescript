@@ -185,8 +185,25 @@ describe('Parser', function() {
             input = '<button onclick={{(e)=>this.call(e)}}/>';
             parse();
             compare(result, expects[this.test.title]);
- 
+
         });
+
+        it('should parse fragments', function() {
+
+            input = '<tr>{% for x,i in y %}{% fragment this.getFrags(), ctx1, ctx2 %}{% endfor %}</tr>';
+            parse();
+            compare(result, expects[this.test.title]);
+
+        });
+
+        it('should parse negative numbers', function() {
+
+            input = '<tag n={{ ( -0.5 + 3) }} m={{(4 + -2)}} g={{ (10 --5) }}/>';
+            parse();
+            compare(result, expects[this.test.title]);
+
+        });
+
 
     });
 

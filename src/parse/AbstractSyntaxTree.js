@@ -390,6 +390,20 @@ class IfCondition extends Node {
 
 }
 
+class Fragment extends Node {
+
+    constructor(frag, args, location) {
+
+        super();
+        this.type = 'fragment';
+        this.fragment = frag;
+        this.location = location;
+
+    }
+
+
+}
+
 export default class AbstractSyntaxTree {
 
     constructor() {
@@ -414,6 +428,7 @@ export default class AbstractSyntaxTree {
         this.BindExpression = BindExpression;
         this.ForLoop = ForLoop;
         this.IfCondition = IfCondition;
+        this.Fragment = Fragment;
 
     }
 

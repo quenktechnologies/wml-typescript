@@ -17,11 +17,11 @@ OctalDigit [0-7]
 HexDigit [0-9a-fA-F]
 ExponentIndicator [eE]
 SignedInteger [+-]?[0-9]+
-DecimalIntegerLiteral [0]|({NonZeroDigit}{DecimalDigits}*)
+DecimalIntegerLiteral [-]?([0]|({NonZeroDigit}{DecimalDigits}*))
 ExponentPart {ExponentIndicator}{SignedInteger}
 OctalIntegerLiteral [0]{OctalDigit}+
 HexIntegerLiteral [0][xX]{HexDigit}+
-DecimalLiteral ({DecimalIntegerLiteral}\.{DecimalDigits}*{ExponentPart}?)|(\.{DecimalDigits}{ExponentPart}?)|({DecimalIntegerLiteral}{ExponentPart}?)
+DecimalLiteral ([-]?{DecimalIntegerLiteral}\.{DecimalDigits}*{ExponentPart}?)|(\.{DecimalDigits}{ExponentPart}?)|({DecimalIntegerLiteral}{ExponentPart}?)
 NumberLiteral {DecimalLiteral}|{HexIntegerLiteral}|{OctalIntegerLiteral}
 Identifier [a-zA-Z$0-9_][a-zA-Z$_0-9.-]*
 LineContinuation \\(\r\n|\r|\n)
@@ -58,7 +58,10 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <CONTROL>'else'                                 return 'ELSE';
 <CONTROL>'elseif'                               return 'ELSEIF';
 <CONTROL>'in'                                   return 'IN';
+<CONTROL>'fragment'                             return 'FRAGMENT';
 'true'|'false'                                  return 'BOOLEAN';
+{NumberLiteral}                                 return 'NUMBER_LITERAL';
+{StringLiteral}                                 return 'STRING_LITERAL';
 '{{'                                            return '{{';
 '}}'                                            return '}}';
 '|'                                             return '|';
@@ -90,8 +93,6 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 '?'                                             return '?';
 '{'                                             return '{';
 '}'                                             return '}';
-{NumberLiteral}                                 return 'NUMBER_LITERAL';
-{StringLiteral}                                 return 'STRING_LITERAL';
 {Identifier}                                    return 'ID';
 
 <CHILDREN>'{{'       this.popState();           return '{{';
@@ -194,10 +195,10 @@ arguments
           ;
 
 expression
-          : ternary_expression
-          | binary_expression
+          : value_expression
           | unary_expression
-          | value_expression
+          | ternary_expression
+          | binary_expression
           ;
 
 ternary_expression
@@ -221,9 +222,9 @@ unary_expression
           ;
 
 value_expression
-          : variable
+          : literal
+          | variable
           | property_expression
-          | literal
           | function_expression
           | method_expression
           | bind_expression
@@ -319,7 +320,7 @@ child
           ;
 
 control
-          : (for|if) {$$ = $1;}
+          : (for|if|fragment) {$$ = $1;}
           ;
 for
           : '{%' FOR variable ','? (variable)? IN expression '%}' 
@@ -345,6 +346,10 @@ if
          | '{%' IF expression '%}' children 
            '{%' 'ELSE' '%}' children '{%' ENDIF '%}'
            {$$ = new yy.ast.IfCondition($3, $5, $9, yy.help.location(@$, @1, @13));}
+         ;
+
+fragment : '{%' FRAGMENT arguments '%}'
+            {$$ = new yy.ast.Fragment($3[0], $3.slice(1, $3.length), yy.help.location(@$, @1, @3));}
          ;
 
 characters
