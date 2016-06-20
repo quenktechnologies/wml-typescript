@@ -24,7 +24,9 @@ function transform(file) {
         }
 
         this.queue(babel.transform(js, {
-            sourceMaps: true
+            sourceMaps: true,
+          presets: ['es2015'],
+          plugins:['add-module-exports']
         }).code);
 
         this.queue(null);
