@@ -166,7 +166,7 @@ describe('Parser', function() {
 
         it('should parse bind expressions', function() {
 
-            input = '<div onfocus={{this=>doAction}}/>';
+            input = '<div onfocus={{this::doAction}}/>';
             parse();
             compare(result, expects[this.test.title]);
 

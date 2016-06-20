@@ -58,7 +58,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <CONTROL>'else'                                 return 'ELSE';
 <CONTROL>'elseif'                               return 'ELSEIF';
 <CONTROL>'in'                                   return 'IN';
-<CONTROL>'include'                             return 'INCLUDE';
+<CONTROL>'include'                              return 'INCLUDE';
 'true'|'false'                                  return 'BOOLEAN';
 {NumberLiteral}                                 return 'NUMBER_LITERAL';
 {StringLiteral}                                 return 'STRING_LITERAL';
@@ -66,6 +66,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 '}}'                                            return '}}';
 '|'                                             return '|';
 '=>'                                            return '=>';
+'::'                                            return '::';
 '->'                                            return '->';
 '{%'                this.begin('CONTROL');      return '{%';
 '%}'                this.begin('CHILDREN');     return '%}';
@@ -294,16 +295,16 @@ method_expression
 
 bind_expression
 
-          : variable '=>' 'variable'
+          : variable '::' 'variable'
             {$$ = new yy.ast.BindExpression($1, $3, [] , yy.help.location(@$, @1, @3));}
 
-          |  variable '=>' 'variable' '(' arguments ')'
+          |  variable '::' 'variable' '(' arguments ')'
             {$$ = new yy.ast.BindExpression($1, $3, $5 , yy.help.location(@$, @1, @6));}
 
-          | property_expression '=>' variable 
+          | property_expression '::' variable 
             {$$ = new yy.ast.BindExpression($1, $3, [], yy.help.location(@$, @1, @6));}
 
-          | property_expression '=>' variable '(' arguments ')'
+          | property_expression '::' variable '(' arguments ')'
             {$$ = new yy.ast.BindExpression($1, $3, $5, yy.help.location(@$, @1, @6));}
           ;
 
