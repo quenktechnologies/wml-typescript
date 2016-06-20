@@ -172,21 +172,21 @@ interpolation
           : '{{' expression '}}' 
             {$$ = new yy.ast.Interpolation($2, [], yy.help.location(@$, @1, @3));} 
 
-          | '{{' expression '|' filters '}}' 
-            {$$ = new yy.ast.Interpolation($2, $4, yy.help.location(@$, @1, @5));} 
+          | '{{' expression filters '}}' 
+            {$$ = new yy.ast.Interpolation($2, $3, yy.help.location(@$, @1, @4));} 
           ;
 
 filters
-          : filter          {$$ =  [$1];         }
-          | filters filter  {$$ = $1.concat($2); }
+          : filter              {$$ =  [$1];     }
+          | filters filter      {$$ = $1.concat($2); }
           ;
 
 filter
-          : variable 
-            {$$ = new yy.ast.Filter($1, [], yy.help.location(@$, @1, @1));} 
+          : '|'  variable 
+            {$$ = new yy.ast.Filter($2, [], yy.help.location(@$, @1, @2));} 
 
-          | variable '(' arguments ')' 
-            {$$ = new yy.ast.Filter($1, $3, yy.help.location(@$, @1, @4));} 
+          | '|' variable '(' arguments ')' 
+            {$$ = new yy.ast.Filter($2, $4, yy.help.location(@$, @1, @5));} 
           ;
 
 arguments

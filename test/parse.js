@@ -204,6 +204,14 @@ describe('Parser', function() {
 
         });
 
+        it('should allow filter chaining', function() {
+
+            input = '<p>{{ value | f1 | f2(2) | f3(this.value) }}</p>';
+            parse();
+            compare(result, expects[this.test.title]);
+
+        });
+
 
     });
 

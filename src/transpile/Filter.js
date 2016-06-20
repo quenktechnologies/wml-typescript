@@ -7,14 +7,14 @@ class Filter {
   constructor(name, args, location) {
 
     this.name = name;
-    this.args = args;
+    this.arguments = args;
     this.location = location;
 
   }
 
   wrap(value) {
 
-    var args = this.args.slice();
+    var args = this.arguments.slice();
 
     args.unshift(value);
 

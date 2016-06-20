@@ -217,7 +217,7 @@ class Filter extends Node {
         super();
         this.type = 'filter';
         this.name = name;
-        this.args = args;
+        this.arguments = args;
 
     }
 

@@ -198,7 +198,7 @@ export default {
                         'filters': [{
                             'type': 'filter',
                             'name': 'x',
-                            'args': [{
+                            'arguments': [{
                                 'type': 'number',
                                 'value': '20',
                                 'location': {
@@ -2495,147 +2495,136 @@ export default {
             }
         }
     },
-    'should parse includes': 
-{
-  'type': 'template',
-  'imports': [
-  ],
-  'tag': {
-    'type': 'tag',
-    'name': 'tr',
-    'attributes': [
-    ],
-    'children': [
-      {
-        'type': 'for-loop',
-        'variable': 'x',
-        'indexName': 'i',
-        'target': 'y',
-        'children': [
-          {
-            'type': 'include',
-            'template': {
-              'type': 'function-expression',
-              'name': 'this.getFrags',
-              'args': [
-              ]
-            },
-            'arguments': {
-              'type': 'array',
-              'members': [
-                'ctx1',
-                'ctx2'
-              ],
-              'location': {
+    'should parse includes': {
+        'type': 'template',
+        'imports': [],
+        'tag': {
+            'type': 'tag',
+            'name': 'tr',
+            'attributes': [],
+            'children': [{
+                'type': 'for-loop',
+                'variable': 'x',
+                'indexName': 'i',
+                'target': 'y',
+                'children': [{
+                    'type': 'include',
+                    'template': {
+                        'type': 'function-expression',
+                        'name': 'this.getFrags',
+                        'args': []
+                    },
+                    'arguments': {
+                        'type': 'array',
+                        'members': [
+                            'ctx1',
+                            'ctx2'
+                        ],
+                        'location': {
+                            'match': {
+                                'first_line': 1,
+                                'last_line': 1,
+                                'first_column': 49,
+                                'last_column': 61
+                            },
+                            'start': {
+                                'line': 1,
+                                'column': 49
+                            },
+                            'end': {
+                                'line': 1,
+                                'column': 61
+                            }
+                        }
+                    },
+                    'location': {
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 22,
+                            'last_column': 64
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 22
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 64
+                        }
+                    }
+                }, {
+                    'type': 'include',
+                    'template': 'val',
+                    'arguments': [],
+                    'location': {
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 64,
+                            'last_column': 81
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 64
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 81
+                        }
+                    }
+                }],
+                'location': {
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 4,
+                        'last_column': 93
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 4
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 93
+                    }
+                }
+            }],
+            'location': {
                 'match': {
-                  'first_line': 1,
-                  'last_line': 1,
-                  'first_column': 49,
-                  'last_column': 61
+                    'first_line': 1,
+                    'last_line': 1,
+                    'first_column': 0,
+                    'last_column': 98
                 },
                 'start': {
-                  'line': 1,
-                  'column': 49
+                    'line': 1,
+                    'column': 0
                 },
                 'end': {
-                  'line': 1,
-                  'column': 61
+                    'line': 1,
+                    'column': 98
                 }
-              }
-            },
-            'location': {
-              'match': {
-                'first_line': 1,
-                'last_line': 1,
-                'first_column': 22,
-                'last_column': 64
-              },
-              'start': {
-                'line': 1,
-                'column': 22
-              },
-              'end': {
-                'line': 1,
-                'column': 64
-              }
             }
-          },
-          {
-            'type': 'include',
-            'template': 'val',
-            'arguments': [
-            ],
-            'location': {
-              'match': {
-                'first_line': 1,
-                'last_line': 1,
-                'first_column': 64,
-                'last_column': 81
-              },
-              'start': {
-                'line': 1,
-                'column': 64
-              },
-              'end': {
-                'line': 1,
-                'column': 81
-              }
-            }
-          }
-        ],
+        },
         'location': {
-          'match': {
-            'first_line': 1,
-            'last_line': 1,
-            'first_column': 4,
-            'last_column': 93
-          },
-          'start': {
-            'line': 1,
-            'column': 4
-          },
-          'end': {
-            'line': 1,
-            'column': 93
-          }
+            'match': {
+                'first_line': 1,
+                'last_line': 1,
+                'first_column': 0,
+                'last_column': 98
+            },
+            'start': {
+                'line': 1,
+                'column': 0
+            },
+            'end': {
+                'line': 1,
+                'column': 98
+            }
         }
-      }
-    ],
-    'location': {
-      'match': {
-        'first_line': 1,
-        'last_line': 1,
-        'first_column': 0,
-        'last_column': 98
-      },
-      'start': {
-        'line': 1,
-        'column': 0
-      },
-      'end': {
-        'line': 1,
-        'column': 98
-      }
-    }
-  },
-  'location': {
-    'match': {
-      'first_line': 1,
-      'last_line': 1,
-      'first_column': 0,
-      'last_column': 98
     },
-    'start': {
-      'line': 1,
-      'column': 0
-    },
-    'end': {
-      'line': 1,
-      'column': 98
-    }
-  }
-}
-,
     'should parse negative numbers': {
         'type': 'template',
         'imports': [],
@@ -2977,7 +2966,103 @@ export default {
                 'column': 58
             }
         }
+    },
+    'should allow filter chaining' : {
+        'type': 'template',
+        'imports': [],
+        'tag': {
+            'type': 'tag',
+            'name': 'p',
+            'attributes': [],
+            'children': [{
+                'type': 'interpolation',
+                'value': 'value',
+                'filters': [{
+                    'type': 'filter',
+                    'name': 'f1',
+                    'arguments': []
+                }, {
+                    'type': 'filter',
+                    'name': 'f2',
+                    'arguments': [{
+                        'type': 'number',
+                        'value': '2',
+                        'location': {
+                            'match': {
+                                'first_line': 1,
+                                'last_line': 1,
+                                'first_column': 22,
+                                'last_column': 23
+                            },
+                            'start': {
+                                'line': 1,
+                                'column': 22
+                            },
+                            'end': {
+                                'line': 1,
+                                'column': 23
+                            }
+                        }
+                    }]
+                }, {
+                    'type': 'filter',
+                    'name': 'f3',
+                    'arguments': [
+                        'this.value'
+                    ]
+                }],
+                'location': {
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 3,
+                        'last_column': 44
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 3
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 44
+                    }
+                }
+            }],
+            'location': {
+                'match': {
+                    'first_line': 1,
+                    'last_line': 1,
+                    'first_column': 0,
+                    'last_column': 48
+                },
+                'start': {
+                    'line': 1,
+                    'column': 0
+                },
+                'end': {
+                    'line': 1,
+                    'column': 48
+                }
+            }
+        },
+        'location': {
+            'match': {
+                'first_line': 1,
+                'last_line': 1,
+                'first_column': 0,
+                'last_column': 48
+            },
+            'start': {
+                'line': 1,
+                'column': 0
+            },
+            'end': {
+                'line': 1,
+                'column': 48
+            }
+        }
     }
+
 
 
 

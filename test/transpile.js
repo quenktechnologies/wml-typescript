@@ -33,7 +33,7 @@ export default function (make) { return make.node('tag',{ns:{}, html:{}}, []); }
 
             must(t.transpile(input)).eql(`
 
-export default function (make) { return make.node('panel',{ns:{css:{'align':'left'}}, html:{'type':'default','size':'40'}}, [make.node('a',{ns:{}, html:{}}, [make.text('Click')]),make.text('Here'),make.element(Input,{ns:{}, html:{}}, [])]); }              `.trim());
+export default function (make) { return make.node('panel',{ns:{css:{'align':'left'}}, html:{'type':'default','size':'40'}}, [make.node('a',{ns:{}, html:{}}, [make.text(\`Click\`)]),make.text(\`Here\`),make.element(Input,{ns:{}, html:{}}, [])]); }              `.trim());
 
 
         });
@@ -62,10 +62,26 @@ export default function (make) { return make.node('panel',{ns:{css:{'align':'lef
 
             must(t.transpile(input)).eql(`
 
-export default function (make) { return make.node('modal',{ns:{}, html:{'name':'mymodal','x':'1','y':'2'}}, [make.node('modal-header',{ns:{}, html:{}}, [make.text('My Modal')]),make.node('modal-body',{ns:{}, html:{}}, [make.text('Creativxity is inhibxited by greed and corruption.'),make.node('vote-button',{ns:{}, html:{}}, []),make.node('vote-count',{ns:{}, html:{'source':''}}, []),make.text(' Votes'),make.node('textarea',{ns:{}, html:{'size':32,'onchange':this.setText}}, [make.text('Various text '),make.node('span',{ns:{}, html:{}}, [foo.apply(this, [text])])]),make.ifcondition(this.waiting(), function if_0(){ return [make.node('br',{ns:{}, html:{}}, []),make.node('br',{ns:{}, html:{}}, []),make.forloop(this.getUnits(),function for_1 (unit, name) {return [make.element(Unit,{ns:{}, html:{'name':name}}, []),make.element(Unit,{ns:{}, html:{'name':name}}, []),make.element(Unit,{ns:{}, html:{'name':name,'u':unit}}, [])]; }.bind(this))];}.bind(this), function else_0(){ return [];}.bind(this))])]); }
+export default function (make) { return make.node('modal',{ns:{}, html:{'name':'mymodal','x':'1','y':'2'}}, [make.node('modal-header',{ns:{}, html:{}}, [make.text(\`My Modal\`)]),make.node('modal-body',{ns:{}, html:{}}, [make.text(\`Creativxity is inhibxited by greed and corruption.\`),make.node('vote-button',{ns:{}, html:{}}, []),make.node('vote-count',{ns:{}, html:{'source':''}}, []),make.text(\` Votes\`),make.node('textarea',{ns:{}, html:{'size':32,'onchange':this.setText}}, [make.text(\`Various text \`),make.node('span',{ns:{}, html:{}}, [foo.apply(this, [text])])]),make.ifcondition(this.waiting(), function if_0(){ return [make.node('br',{ns:{}, html:{}}, []),make.node('br',{ns:{}, html:{}}, []),make.forloop(this.getUnits(),function for_1 (unit, name) {return [make.element(Unit,{ns:{}, html:{'name':name}}, []),make.element(Unit,{ns:{}, html:{'name':name}}, []),make.element(Unit,{ns:{}, html:{'name':name,'u':unit}}, [])]; }.bind(this))];}.bind(this), function else_0(){ return [];}.bind(this))])]); }
                
                 `.trim());
 
         });
+
+        it('should transpile includes', function() {
+
+            input = '<tr>{% for x,i in y %}{% include this.getFrags() [ctx1, ctx2] %}' +
+                '{% include val %}{% endfor %}</tr>';
+
+             must(t.transpile(input)).eql(`
+               
+              export default function (make) { return make.node('tr',{ns:{}, html:{}}, [make.forloop(y,function for_2 (x, i) {return [this.getFrags().apply(this, [make].concat([ ctx1,ctx2 ])),val.apply(this, [make].concat())]; }.bind(this))]); } 
+               
+               
+               `.trim());
+
+
+        });
+
     });
 });

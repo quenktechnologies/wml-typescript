@@ -18,6 +18,7 @@ import MethodExpression from './MethodExpression';
 import BindExpression from './BindExpression';
 import ForLoop from './ForLoop';
 import IfCondition from './IfCondition';
+import Include from './Include';
 
 /**
  * AbstractSyntaxTree 
@@ -46,6 +47,7 @@ class AbstractSyntaxTree {
         this.BindExpression = BindExpression;
         this.ForLoop = ForLoop;
         this.IfCondition = IfCondition;
+        this.Include = Include;
 
     }
 
