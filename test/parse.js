@@ -188,9 +188,9 @@ describe('Parser', function() {
 
         });
 
-        it('should parse fragments', function() {
+        it('should parse includes', function() {
 
-            input = '<tr>{% for x,i in y %}{% fragment this.getFrags(), ctx1, ctx2 %}{% endfor %}</tr>';
+            input = '<tr>{% for x,i in y %}{% include this.getFrags() [ctx1, ctx2] %}{% include val %}{% endfor %}</tr>';
             parse();
             compare(result, expects[this.test.title]);
 

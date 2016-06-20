@@ -390,13 +390,14 @@ class IfCondition extends Node {
 
 }
 
-class Fragment extends Node {
+class Include extends Node {
 
-    constructor(frag, args, location) {
+    constructor(tmpl, args, location) {
 
         super();
-        this.type = 'fragment';
-        this.fragment = frag;
+        this.type = 'include';
+        this.template = tmpl;
+        this.arguments = args;
         this.location = location;
 
     }
@@ -428,7 +429,7 @@ export default class AbstractSyntaxTree {
         this.BindExpression = BindExpression;
         this.ForLoop = ForLoop;
         this.IfCondition = IfCondition;
-        this.Fragment = Fragment;
+        this.Include = Include;
 
     }
 

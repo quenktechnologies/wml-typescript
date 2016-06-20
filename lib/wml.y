@@ -58,7 +58,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <CONTROL>'else'                                 return 'ELSE';
 <CONTROL>'elseif'                               return 'ELSEIF';
 <CONTROL>'in'                                   return 'IN';
-<CONTROL>'fragment'                             return 'FRAGMENT';
+<CONTROL>'include'                             return 'INCLUDE';
 'true'|'false'                                  return 'BOOLEAN';
 {NumberLiteral}                                 return 'NUMBER_LITERAL';
 {StringLiteral}                                 return 'STRING_LITERAL';
@@ -320,7 +320,7 @@ child
           ;
 
 control
-          : (for|if|fragment) {$$ = $1;}
+          : (for|if|include) {$$ = $1;}
           ;
 for
           : '{%' FOR variable ','? (variable)? IN expression '%}' 
@@ -348,8 +348,9 @@ if
            {$$ = new yy.ast.IfCondition($3, $5, $9, yy.help.location(@$, @1, @13));}
          ;
 
-fragment : '{%' FRAGMENT arguments '%}'
-            {$$ = new yy.ast.Fragment($3[0], $3.slice(1, $3.length), yy.help.location(@$, @1, @3));}
+include  
+         :'{%' INCLUDE (variable|property_expression|function_expression|method_expression) array_literal ? '%}'
+           {$$ = new yy.ast.Include($3, ($4? $4 : []),  yy.help.location(@$, @1, @5));}
          ;
 
 characters

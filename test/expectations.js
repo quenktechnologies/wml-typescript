@@ -2495,148 +2495,51 @@ export default {
             }
         }
     },
-    'should parse fragments': {
-        'type': 'template',
-        'imports': [],
-        'tag': {
-            'type': 'tag',
-            'name': 'tr',
-            'attributes': [],
-            'children': [{
-                'type': 'for-loop',
-                'variable': 'x',
-                'indexName': 'i',
-                'target': 'y',
-                'children': [{
-                    'type': 'fragment',
-                    'fragment': {
-                        'type': 'function-expression',
-                        'name': 'this.getFrags',
-                        'args': []
-                    },
-                    'location': {
-                        'match': {
-                            'first_line': 1,
-                            'last_line': 1,
-                            'first_column': 22,
-                            'last_column': 64
-                        },
-                        'start': {
-                            'line': 1,
-                            'column': 22
-                        },
-                        'end': {
-                            'line': 1,
-                            'column': 61
-                        }
-                    }
-                }],
-                'location': {
-                    'match': {
-                        'first_line': 1,
-                        'last_line': 1,
-                        'first_column': 4,
-                        'last_column': 76
-                    },
-                    'start': {
-                        'line': 1,
-                        'column': 4
-                    },
-                    'end': {
-                        'line': 1,
-                        'column': 76
-                    }
-                }
-            }],
-            'location': {
-                'match': {
-                    'first_line': 1,
-                    'last_line': 1,
-                    'first_column': 0,
-                    'last_column': 81
-                },
-                'start': {
-                    'line': 1,
-                    'column': 0
-                },
-                'end': {
-                    'line': 1,
-                    'column': 81
-                }
-            }
-        },
-        'location': {
-            'match': {
-                'first_line': 1,
-                'last_line': 1,
-                'first_column': 0,
-                'last_column': 81
-            },
-            'start': {
-                'line': 1,
-                'column': 0
-            },
-            'end': {
-                'line': 1,
-                'column': 81
-            }
-        }
-    },
-    'should parse negative numbers' : 
+    'should parse includes': 
 {
   'type': 'template',
   'imports': [
   ],
   'tag': {
     'type': 'tag',
-    'name': 'tag',
+    'name': 'tr',
     'attributes': [
+    ],
+    'children': [
       {
-        'type': 'attribute',
-        'name': 'n',
-        'namespace': null,
-        'value': {
-          'type': 'interpolation',
-          'value': {
-            'type': 'binary-expression',
-            'left': {
-              'type': 'number',
-              'value': '-0.5',
-              'location': {
-                'match': {
-                  'first_line': 1,
-                  'last_line': 1,
-                  'first_column': 12,
-                  'last_column': 16
-                },
-                'start': {
-                  'line': 1,
-                  'column': 12
-                },
-                'end': {
-                  'line': 1,
-                  'column': 16
-                }
-              }
+        'type': 'for-loop',
+        'variable': 'x',
+        'indexName': 'i',
+        'target': 'y',
+        'children': [
+          {
+            'type': 'include',
+            'template': {
+              'type': 'function-expression',
+              'name': 'this.getFrags',
+              'args': [
+              ]
             },
-            'op': '+',
-            'right': {
-              'type': 'number',
-              'value': '3',
+            'arguments': {
+              'type': 'array',
+              'members': [
+                'ctx1',
+                'ctx2'
+              ],
               'location': {
                 'match': {
                   'first_line': 1,
                   'last_line': 1,
-                  'first_column': 19,
-                  'last_column': 20
+                  'first_column': 49,
+                  'last_column': 61
                 },
                 'start': {
                   'line': 1,
-                  'column': 19
+                  'column': 49
                 },
                 'end': {
                   'line': 1,
-                  'column': 20
+                  'column': 61
                 }
               }
             },
@@ -2644,268 +2547,66 @@ export default {
               'match': {
                 'first_line': 1,
                 'last_line': 1,
-                'first_column': 10,
-                'last_column': 21
+                'first_column': 22,
+                'last_column': 64
               },
               'start': {
                 'line': 1,
-                'column': 10
+                'column': 22
               },
               'end': {
                 'line': 1,
-                'column': 21
+                'column': 64
               }
             }
           },
-          'filters': [
-          ],
-          'location': {
-            'match': {
-              'first_line': 1,
-              'last_line': 1,
-              'first_column': 7,
-              'last_column': 24
-            },
-            'start': {
-              'line': 1,
-              'column': 7
-            },
-            'end': {
-              'line': 1,
-              'column': 24
-            }
-          }
-        },
-        'location': {
-          'match': {
-            'first_line': 1,
-            'last_line': 1,
-            'first_column': 5,
-            'last_column': 24
-          },
-          'start': {
-            'line': 1,
-            'column': 5
-          },
-          'end': {
-            'line': 1,
-            'column': 24
-          }
-        }
-      },
-      {
-        'type': 'attribute',
-        'name': 'm',
-        'namespace': null,
-        'value': {
-          'type': 'interpolation',
-          'value': {
-            'type': 'binary-expression',
-            'left': {
-              'type': 'number',
-              'value': '4',
-              'location': {
-                'match': {
-                  'first_line': 1,
-                  'last_line': 1,
-                  'first_column': 30,
-                  'last_column': 31
-                },
-                'start': {
-                  'line': 1,
-                  'column': 30
-                },
-                'end': {
-                  'line': 1,
-                  'column': 31
-                }
-              }
-            },
-            'op': '+',
-            'right': {
-              'type': 'number',
-              'value': '-2',
-              'location': {
-                'match': {
-                  'first_line': 1,
-                  'last_line': 1,
-                  'first_column': 34,
-                  'last_column': 36
-                },
-                'start': {
-                  'line': 1,
-                  'column': 34
-                },
-                'end': {
-                  'line': 1,
-                  'column': 36
-                }
-              }
-            },
+          {
+            'type': 'include',
+            'template': 'val',
+            'arguments': [
+            ],
             'location': {
               'match': {
                 'first_line': 1,
                 'last_line': 1,
-                'first_column': 29,
-                'last_column': 37
+                'first_column': 64,
+                'last_column': 81
               },
               'start': {
                 'line': 1,
-                'column': 29
+                'column': 64
               },
               'end': {
                 'line': 1,
-                'column': 37
+                'column': 81
               }
             }
-          },
-          'filters': [
-          ],
-          'location': {
-            'match': {
-              'first_line': 1,
-              'last_line': 1,
-              'first_column': 27,
-              'last_column': 39
-            },
-            'start': {
-              'line': 1,
-              'column': 27
-            },
-            'end': {
-              'line': 1,
-              'column': 39
-            }
           }
-        },
+        ],
         'location': {
           'match': {
             'first_line': 1,
             'last_line': 1,
-            'first_column': 25,
-            'last_column': 39
+            'first_column': 4,
+            'last_column': 93
           },
           'start': {
             'line': 1,
-            'column': 25
+            'column': 4
           },
           'end': {
             'line': 1,
-            'column': 39
-          }
-        }
-      },
-      {
-        'type': 'attribute',
-        'name': 'g',
-        'namespace': null,
-        'value': {
-          'type': 'interpolation',
-          'value': {
-            'type': 'binary-expression',
-            'left': {
-              'type': 'number',
-              'value': '10',
-              'location': {
-                'match': {
-                  'first_line': 1,
-                  'last_line': 1,
-                  'first_column': 46,
-                  'last_column': 48
-                },
-                'start': {
-                  'line': 1,
-                  'column': 46
-                },
-                'end': {
-                  'line': 1,
-                  'column': 48
-                }
-              }
-            },
-            'op': '-',
-            'right': {
-              'type': 'number',
-              'value': '-5',
-              'location': {
-                'match': {
-                  'first_line': 1,
-                  'last_line': 1,
-                  'first_column': 50,
-                  'last_column': 52
-                },
-                'start': {
-                  'line': 1,
-                  'column': 50
-                },
-                'end': {
-                  'line': 1,
-                  'column': 52
-                }
-              }
-            },
-            'location': {
-              'match': {
-                'first_line': 1,
-                'last_line': 1,
-                'first_column': 45,
-                'last_column': 53
-              },
-              'start': {
-                'line': 1,
-                'column': 45
-              },
-              'end': {
-                'line': 1,
-                'column': 53
-              }
-            }
-          },
-          'filters': [
-          ],
-          'location': {
-            'match': {
-              'first_line': 1,
-              'last_line': 1,
-              'first_column': 42,
-              'last_column': 56
-            },
-            'start': {
-              'line': 1,
-              'column': 42
-            },
-            'end': {
-              'line': 1,
-              'column': 56
-            }
-          }
-        },
-        'location': {
-          'match': {
-            'first_line': 1,
-            'last_line': 1,
-            'first_column': 40,
-            'last_column': 56
-          },
-          'start': {
-            'line': 1,
-            'column': 40
-          },
-          'end': {
-            'line': 1,
-            'column': 56
+            'column': 93
           }
         }
       }
-    ],
-    'children': [
     ],
     'location': {
       'match': {
         'first_line': 1,
         'last_line': 1,
         'first_column': 0,
-        'last_column': 58
+        'last_column': 98
       },
       'start': {
         'line': 1,
@@ -2913,7 +2614,7 @@ export default {
       },
       'end': {
         'line': 1,
-        'column': 58
+        'column': 98
       }
     }
   },
@@ -2922,7 +2623,7 @@ export default {
       'first_line': 1,
       'last_line': 1,
       'first_column': 0,
-      'last_column': 58
+      'last_column': 98
     },
     'start': {
       'line': 1,
@@ -2930,10 +2631,353 @@ export default {
     },
     'end': {
       'line': 1,
-      'column': 58
+      'column': 98
     }
   }
 }
+,
+    'should parse negative numbers': {
+        'type': 'template',
+        'imports': [],
+        'tag': {
+            'type': 'tag',
+            'name': 'tag',
+            'attributes': [{
+                'type': 'attribute',
+                'name': 'n',
+                'namespace': null,
+                'value': {
+                    'type': 'interpolation',
+                    'value': {
+                        'type': 'binary-expression',
+                        'left': {
+                            'type': 'number',
+                            'value': '-0.5',
+                            'location': {
+                                'match': {
+                                    'first_line': 1,
+                                    'last_line': 1,
+                                    'first_column': 12,
+                                    'last_column': 16
+                                },
+                                'start': {
+                                    'line': 1,
+                                    'column': 12
+                                },
+                                'end': {
+                                    'line': 1,
+                                    'column': 16
+                                }
+                            }
+                        },
+                        'op': '+',
+                        'right': {
+                            'type': 'number',
+                            'value': '3',
+                            'location': {
+                                'match': {
+                                    'first_line': 1,
+                                    'last_line': 1,
+                                    'first_column': 19,
+                                    'last_column': 20
+                                },
+                                'start': {
+                                    'line': 1,
+                                    'column': 19
+                                },
+                                'end': {
+                                    'line': 1,
+                                    'column': 20
+                                }
+                            }
+                        },
+                        'location': {
+                            'match': {
+                                'first_line': 1,
+                                'last_line': 1,
+                                'first_column': 10,
+                                'last_column': 21
+                            },
+                            'start': {
+                                'line': 1,
+                                'column': 10
+                            },
+                            'end': {
+                                'line': 1,
+                                'column': 21
+                            }
+                        }
+                    },
+                    'filters': [],
+                    'location': {
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 7,
+                            'last_column': 24
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 7
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 24
+                        }
+                    }
+                },
+                'location': {
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 5,
+                        'last_column': 24
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 5
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 24
+                    }
+                }
+            }, {
+                'type': 'attribute',
+                'name': 'm',
+                'namespace': null,
+                'value': {
+                    'type': 'interpolation',
+                    'value': {
+                        'type': 'binary-expression',
+                        'left': {
+                            'type': 'number',
+                            'value': '4',
+                            'location': {
+                                'match': {
+                                    'first_line': 1,
+                                    'last_line': 1,
+                                    'first_column': 30,
+                                    'last_column': 31
+                                },
+                                'start': {
+                                    'line': 1,
+                                    'column': 30
+                                },
+                                'end': {
+                                    'line': 1,
+                                    'column': 31
+                                }
+                            }
+                        },
+                        'op': '+',
+                        'right': {
+                            'type': 'number',
+                            'value': '-2',
+                            'location': {
+                                'match': {
+                                    'first_line': 1,
+                                    'last_line': 1,
+                                    'first_column': 34,
+                                    'last_column': 36
+                                },
+                                'start': {
+                                    'line': 1,
+                                    'column': 34
+                                },
+                                'end': {
+                                    'line': 1,
+                                    'column': 36
+                                }
+                            }
+                        },
+                        'location': {
+                            'match': {
+                                'first_line': 1,
+                                'last_line': 1,
+                                'first_column': 29,
+                                'last_column': 37
+                            },
+                            'start': {
+                                'line': 1,
+                                'column': 29
+                            },
+                            'end': {
+                                'line': 1,
+                                'column': 37
+                            }
+                        }
+                    },
+                    'filters': [],
+                    'location': {
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 27,
+                            'last_column': 39
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 27
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 39
+                        }
+                    }
+                },
+                'location': {
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 25,
+                        'last_column': 39
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 25
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 39
+                    }
+                }
+            }, {
+                'type': 'attribute',
+                'name': 'g',
+                'namespace': null,
+                'value': {
+                    'type': 'interpolation',
+                    'value': {
+                        'type': 'binary-expression',
+                        'left': {
+                            'type': 'number',
+                            'value': '10',
+                            'location': {
+                                'match': {
+                                    'first_line': 1,
+                                    'last_line': 1,
+                                    'first_column': 46,
+                                    'last_column': 48
+                                },
+                                'start': {
+                                    'line': 1,
+                                    'column': 46
+                                },
+                                'end': {
+                                    'line': 1,
+                                    'column': 48
+                                }
+                            }
+                        },
+                        'op': '-',
+                        'right': {
+                            'type': 'number',
+                            'value': '-5',
+                            'location': {
+                                'match': {
+                                    'first_line': 1,
+                                    'last_line': 1,
+                                    'first_column': 50,
+                                    'last_column': 52
+                                },
+                                'start': {
+                                    'line': 1,
+                                    'column': 50
+                                },
+                                'end': {
+                                    'line': 1,
+                                    'column': 52
+                                }
+                            }
+                        },
+                        'location': {
+                            'match': {
+                                'first_line': 1,
+                                'last_line': 1,
+                                'first_column': 45,
+                                'last_column': 53
+                            },
+                            'start': {
+                                'line': 1,
+                                'column': 45
+                            },
+                            'end': {
+                                'line': 1,
+                                'column': 53
+                            }
+                        }
+                    },
+                    'filters': [],
+                    'location': {
+                        'match': {
+                            'first_line': 1,
+                            'last_line': 1,
+                            'first_column': 42,
+                            'last_column': 56
+                        },
+                        'start': {
+                            'line': 1,
+                            'column': 42
+                        },
+                        'end': {
+                            'line': 1,
+                            'column': 56
+                        }
+                    }
+                },
+                'location': {
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 40,
+                        'last_column': 56
+                    },
+                    'start': {
+                        'line': 1,
+                        'column': 40
+                    },
+                    'end': {
+                        'line': 1,
+                        'column': 56
+                    }
+                }
+            }],
+            'children': [],
+            'location': {
+                'match': {
+                    'first_line': 1,
+                    'last_line': 1,
+                    'first_column': 0,
+                    'last_column': 58
+                },
+                'start': {
+                    'line': 1,
+                    'column': 0
+                },
+                'end': {
+                    'line': 1,
+                    'column': 58
+                }
+            }
+        },
+        'location': {
+            'match': {
+                'first_line': 1,
+                'last_line': 1,
+                'first_column': 0,
+                'last_column': 58
+            },
+            'start': {
+                'line': 1,
+                'column': 0
+            },
+            'end': {
+                'line': 1,
+                'column': 58
+            }
+        }
+    }
 
 
 
