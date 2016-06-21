@@ -10,7 +10,7 @@ class IfCondition {
 
         this.expression = expression;
         this.then = ithen;
-        this.else = [];
+        this.else = ielse;
         this.location = location;
 
     }

@@ -31,7 +31,7 @@ function adopt(child, e) {
     if (child)
         e.appendChild(
             (typeof child === 'object') ?
-            child :  document.createTextNode(child || ''));
+            child : document.createTextNode(child || ''));
 
 }
 
@@ -86,7 +86,7 @@ class Maker {
      */
     node(tag, attributes, children) {
 
-        var e = document.createElement(tag);
+        var e = (tag === 'fragment') ? document.createDocumentFragment() : document.createElement(tag);
         var attrs = attributes.html;
 
         Object.keys(attributes.html).forEach(key => {
