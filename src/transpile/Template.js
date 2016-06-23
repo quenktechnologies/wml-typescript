@@ -5,9 +5,10 @@
  */
 class Template {
 
-    constructor(imports, root, location) {
+    constructor(imports, args, root, location) {
 
         this.imports = imports;
+        this.arguments = args;
         this.root = root;
         this.location = location;
 
@@ -16,11 +17,13 @@ class Template {
     toString() {
 
         var str = '';
+        var args = this.arguments.join(',');
+
+        args = (args) ? ' ,' + args : args;
 
         this.imports.forEach(i => str = str + i + '\n');
 
-        str = str + `export default function (make) { return ${this.root}; }`
-
+        str = str + `export default function (make${args}) { return ${this.root}; }`
 
         return str;
 

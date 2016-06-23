@@ -67,7 +67,7 @@ describe('Parser', function() {
 
         });
 
-        it('should parse a parent tag', function() {
+        xit('should parse a parent tag', function() {
 
             input = '<panel>  \n\n\n\n\n\n\n\n\n  </panel>';
             parse();
@@ -75,7 +75,7 @@ describe('Parser', function() {
 
         });
 
-        it('should parse a parent tag with attributes', function() {
+        xit('should parse a parent tag with attributes', function() {
 
             input = '<panel type="default" size="40" align="left"> </panel>';
             parse();
@@ -83,7 +83,7 @@ describe('Parser', function() {
 
         });
 
-        it('should parse parent tags with mixed children', function() {
+        xit('should parse parent tags with mixed children', function() {
 
             input = '<panel>This is my offsprings.<a>Link</a>Hey now! <Input/></panel>';
             parse();
@@ -91,7 +91,7 @@ describe('Parser', function() {
 
         });
 
-        it('should parse parent tags with tag children (L1)', function() {
+        xit('should parse parent tags with tag children (L1)', function() {
 
             input = '<panel><a></a></panel>';
             parse();
@@ -99,7 +99,7 @@ describe('Parser', function() {
 
         });
 
-        it('should parse parent tags with tag children (L2)', function() {
+        xit('should parse parent tags with tag children (L2)', function() {
 
             input = '<panel><a href="link" onclick={{this.someting.invoke()}}>' +
                 'Click Here</a><table/></panel>';
@@ -109,7 +109,7 @@ describe('Parser', function() {
 
         });
 
-        it('should parse parent tags with tag children (L3)', function() {
+        xit('should parse parent tags with tag children (L3)', function() {
 
             input = '<panel><a href="link">Click Here</a><table/><panel c="22"></panel></panel>';
             parse();
@@ -117,7 +117,7 @@ describe('Parser', function() {
 
         });
 
-        it('should do it all together now', function() {
+        xit('should do it all together now', function() {
 
             input = `<modal name="mymodal" x="1" y="2">
                         <modal-header>My Modal</modal-header>
@@ -136,7 +136,7 @@ describe('Parser', function() {
 
         });
 
-        it('should parse for expressions', function() {
+        xit('should parse for expressions', function() {
 
             input = '<root>' +
                 '{% for item in list %}' +
@@ -149,7 +149,7 @@ describe('Parser', function() {
 
         });
 
-        it('should parse if expressions', function() {
+        xit('should parse if expressions', function() {
 
             input =
                 '<div>' +
@@ -164,7 +164,7 @@ describe('Parser', function() {
 
         });
 
-        it('should parse bind expressions', function() {
+        xit('should parse bind expressions', function() {
 
             input = '<div onfocus={{this::doAction}}/>';
             parse();
@@ -172,7 +172,7 @@ describe('Parser', function() {
 
         });
 
-        it('should parse ternary expressions', function() {
+        xit('should parse ternary expressions', function() {
 
             input = '<div id={{this.id}}>{{this.check() ? a : b }}</div>';
             parse();
@@ -180,7 +180,7 @@ describe('Parser', function() {
 
         });
 
-        it('should parse function literals', function() {
+        xit('should parse function literals', function() {
 
             input = '<button onclick={{(e)=>this.call(e)}}/>';
             parse();
@@ -188,7 +188,7 @@ describe('Parser', function() {
 
         });
 
-        it('should parse includes', function() {
+        xit('should parse includes', function() {
 
             input = '<tr>{% for x,i in y %}{% include this.getFrags() [ctx1, ctx2] %}{% include val %}{% endfor %}</tr>';
             parse();
@@ -196,7 +196,7 @@ describe('Parser', function() {
 
         });
 
-        it('should parse negative numbers', function() {
+        xit('should parse negative numbers', function() {
 
             input = '<tag n={{ ( -0.5 + 3) }} m={{(4 + -2)}} g={{ (10 --5) }}/>';
             parse();
@@ -204,7 +204,7 @@ describe('Parser', function() {
 
         });
 
-        it('should allow filter chaining', function() {
+        xit('should allow filter chaining', function() {
 
             input = '<p>{{ value | f1 | f2(2) | f3(this.value) }}</p>';
             parse();

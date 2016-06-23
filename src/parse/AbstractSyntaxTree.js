@@ -13,15 +13,17 @@ class Node {
 /**
  * Template represents the entire file contents.
  * @param {array<Import>} imports 
+ * @param {array} args
  * @param {Tag} tag 
  * @param {Location} loc 
  */
 class Template extends Node {
 
-    constructor(imports, tag, loc) {
+    constructor(imports, args, tag, loc) {
         super();
         this.type = 'template';
         this.imports = imports;
+        this.arguments = args;
         this.tag = tag;
         this.location = loc;
     }

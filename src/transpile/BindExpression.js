@@ -13,8 +13,10 @@ class BindExpression {
 
     toString() {
 
-        var args = (this.args.length > 0) ? this.args.join(',') : '';
-        return `${this.parent}.${this.target}.bind(${this.parent}, ${args})`;
+        var args = this.args.join(',');
+        args = (args)? ' ,'+args : args;
+
+        return `${this.parent}.${this.target}.bind(${this.parent}${args})`;
 
     }
 

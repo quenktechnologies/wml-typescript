@@ -1,89 +1,91 @@
 export default {
 
     'should parse imports': {
-        "type": "template",
-        "imports": [{
-            "type": "import",
-            "member": "lib",
-            "module": {
-                "type": "string",
-                "value": "\"path/to/libs\"",
-                "location": {
-                    "match": {
-                        "first_line": 1,
-                        "last_line": 1,
-                        "first_column": 16,
-                        "last_column": 30
+        'type': 'template',
+        'imports': [{
+            'type': 'import',
+            'member': 'lib',
+            'module': {
+                'type': 'string',
+                'value': '"path/to/libs"',
+                'location': {
+                    'match': {
+                        'first_line': 1,
+                        'last_line': 1,
+                        'first_column': 16,
+                        'last_column': 30
                     },
-                    "start": {
-                        "line": 1,
-                        "column": 16
+                    'start': {
+                        'line': 1,
+                        'column': 16
                     },
-                    "end": {
-                        "line": 1,
-                        "column": 30
+                    'end': {
+                        'line': 1,
+                        'column': 30
                     }
                 }
             },
-            "location": {
-                "match": {
-                    "first_line": 1,
-                    "last_line": 1,
-                    "first_column": 0,
-                    "last_column": 31
+            'location': {
+                'match': {
+                    'first_line': 1,
+                    'last_line': 1,
+                    'first_column': 0,
+                    'last_column': 31
                 },
-                "start": {
-                    "line": 1,
-                    "column": 0
+                'start': {
+                    'line': 1,
+                    'column': 0
                 },
-                "end": {
-                    "line": 1,
-                    "column": 31
+                'end': {
+                    'line': 1,
+                    'column': 31
                 }
             }
         }],
-        "tag": {
-            "type": "tag",
-            "name": "tag",
-            "attributes": [],
-            "children": [],
-            "location": {
-                "match": {
-                    "first_line": 1,
-                    "last_line": 1,
-                    "first_column": 33,
-                    "last_column": 39
+        'arguments': [],
+        'tag': {
+            'type': 'tag',
+            'name': 'tag',
+            'attributes': [],
+            'children': [],
+            'location': {
+                'match': {
+                    'first_line': 1,
+                    'last_line': 1,
+                    'first_column': 33,
+                    'last_column': 39
                 },
-                "start": {
-                    "line": 1,
-                    "column": 33
+                'start': {
+                    'line': 1,
+                    'column': 33
                 },
-                "end": {
-                    "line": 1,
-                    "column": 39
+                'end': {
+                    'line': 1,
+                    'column': 39
                 }
             }
         },
-        "location": {
-            "match": {
-                "first_line": 1,
-                "last_line": 1,
-                "first_column": 0,
-                "last_column": 39
+        'location': {
+            'match': {
+                'first_line': 1,
+                'last_line': 1,
+                'first_column': 0,
+                'last_column': 39
             },
-            "start": {
-                "line": 1,
-                "column": 0
+            'start': {
+                'line': 1,
+                'column': 0
             },
-            "end": {
-                "line": 1,
-                "column": 39
+            'end': {
+                'line': 1,
+                'column': 39
             }
         }
     },
     'should parse a self closing tag': {
         'type': 'template',
         'imports': [],
+        'arguments': [],
         'tag': {
             'type': 'tag',
             'name': 'simple',
@@ -126,6 +128,7 @@ export default {
     'should parse a self closing tag with attributes': [{
             'type': 'template',
             'imports': [],
+            'arguments': [],
             'tag': {
                 'type': 'tag',
                 'name': 'user',
@@ -330,6 +333,7 @@ export default {
         }, {
             "type": "template",
             "imports": [],
+            "arguments": [],
             "tag": {
                 "type": "tag",
                 "name": "user",
@@ -432,168 +436,180 @@ export default {
                     "column": 22
                 }
             }
-        }, {
-            'type': 'template',
-            'imports': [],
-            'tag': {
-                'type': 'tag',
-                'name': 'user',
-                'attributes': [{
-                    'type': 'attribute',
-                    'name': 'name',
-                    'namespace': null,
-                    'value': {
-                        'type': 'string',
-                        'value': '"xyaa aaz"',
-                        'location': {
-                            'match': {
-                                'first_line': 1,
-                                'last_line': 1,
-                                'first_column': 11,
-                                'last_column': 21
-                            },
-                            'start': {
-                                'line': 1,
-                                'column': 11
-                            },
-                            'end': {
-                                'line': 1,
-                                'column': 21
-                            }
-                        }
-                    },
-                    'location': {
-                        'match': {
-                            'first_line': 1,
-                            'last_line': 1,
-                            'first_column': 6,
-                            'last_column': 21
-                        },
-                        'start': {
-                            'line': 1,
-                            'column': 6
-                        },
-                        'end': {
-                            'line': 1,
-                            'column': 21
-                        }
-                    }
-                }, {
-                    'type': 'attribute',
-                    'name': 'id',
-                    'namespace': null,
-                    'value': {
-                        'type': 'string',
-                        'value': '"24"',
-                        'location': {
-                            'match': {
-                                'first_line': 1,
-                                'last_line': 1,
-                                'first_column': 25,
-                                'last_column': 29
-                            },
-                            'start': {
-                                'line': 1,
-                                'column': 25
-                            },
-                            'end': {
-                                'line': 1,
-                                'column': 29
-                            }
-                        }
-                    },
-                    'location': {
-                        'match': {
-                            'first_line': 1,
-                            'last_line': 1,
-                            'first_column': 22,
-                            'last_column': 29
-                        },
-                        'start': {
-                            'line': 1,
-                            'column': 22
-                        },
-                        'end': {
-                            'line': 1,
-                            'column': 29
-                        }
-                    }
-                }, {
-                    'type': 'attribute',
-                    'name': 'align',
-                    'namespace': null,
-                    'value': {
-                        'type': 'string',
-                        'value': '"left"',
-                        'location': {
-                            'match': {
-                                'first_line': 1,
-                                'last_line': 1,
-                                'first_column': 36,
-                                'last_column': 42
-                            },
-                            'start': {
-                                'line': 1,
-                                'column': 36
-                            },
-                            'end': {
-                                'line': 1,
-                                'column': 42
-                            }
-                        }
-                    },
-                    'location': {
-                        'match': {
-                            'first_line': 1,
-                            'last_line': 1,
-                            'first_column': 30,
-                            'last_column': 42
-                        },
-                        'start': {
-                            'line': 1,
-                            'column': 30
-                        },
-                        'end': {
-                            'line': 1,
-                            'column': 42
-                        }
-                    }
-                }],
-                'children': [],
-                'location': {
-                    'match': {
-                        'first_line': 1,
-                        'last_line': 1,
-                        'first_column': 0,
-                        'last_column': 44
-                    },
-                    'start': {
-                        'line': 1,
-                        'column': 0
-                    },
-                    'end': {
-                        'line': 1,
-                        'column': 44
-                    }
-                }
+        },
+{
+  'type': 'template',
+  'imports': [
+  ],
+  'arguments': [
+  ],
+  'tag': {
+    'type': 'tag',
+    'name': 'user',
+    'attributes': [
+      {
+        'type': 'attribute',
+        'name': 'name',
+        'namespace': null,
+        'value': {
+          'type': 'string',
+          'value': '"xyaa aaz"',
+          'location': {
+            'match': {
+              'first_line': 1,
+              'last_line': 1,
+              'first_column': 11,
+              'last_column': 21
             },
-            'location': {
-                'match': {
-                    'first_line': 1,
-                    'last_line': 1,
-                    'first_column': 0,
-                    'last_column': 44
-                },
-                'start': {
-                    'line': 1,
-                    'column': 0
-                },
-                'end': {
-                    'line': 1,
-                    'column': 44
-                }
+            'start': {
+              'line': 1,
+              'column': 11
+            },
+            'end': {
+              'line': 1,
+              'column': 21
             }
+          }
+        },
+        'location': {
+          'match': {
+            'first_line': 1,
+            'last_line': 1,
+            'first_column': 6,
+            'last_column': 21
+          },
+          'start': {
+            'line': 1,
+            'column': 6
+          },
+          'end': {
+            'line': 1,
+            'column': 21
+          }
         }
+      },
+      {
+        'type': 'attribute',
+        'name': 'id',
+        'namespace': null,
+        'value': {
+          'type': 'string',
+          'value': '"24"',
+          'location': {
+            'match': {
+              'first_line': 1,
+              'last_line': 1,
+              'first_column': 25,
+              'last_column': 29
+            },
+            'start': {
+              'line': 1,
+              'column': 25
+            },
+            'end': {
+              'line': 1,
+              'column': 29
+            }
+          }
+        },
+        'location': {
+          'match': {
+            'first_line': 1,
+            'last_line': 1,
+            'first_column': 22,
+            'last_column': 29
+          },
+          'start': {
+            'line': 1,
+            'column': 22
+          },
+          'end': {
+            'line': 1,
+            'column': 29
+          }
+        }
+      },
+      {
+        'type': 'attribute',
+        'name': 'align',
+        'namespace': null,
+        'value': {
+          'type': 'string',
+          'value': '"left"',
+          'location': {
+            'match': {
+              'first_line': 1,
+              'last_line': 1,
+              'first_column': 36,
+              'last_column': 42
+            },
+            'start': {
+              'line': 1,
+              'column': 36
+            },
+            'end': {
+              'line': 1,
+              'column': 42
+            }
+          }
+        },
+        'location': {
+          'match': {
+            'first_line': 1,
+            'last_line': 1,
+            'first_column': 30,
+            'last_column': 42
+          },
+          'start': {
+            'line': 1,
+            'column': 30
+          },
+          'end': {
+            'line': 1,
+            'column': 42
+          }
+        }
+      }
+    ],
+    'children': [
+    ],
+    'location': {
+      'match': {
+        'first_line': 1,
+        'last_line': 1,
+        'first_column': 0,
+        'last_column': 44
+      },
+      'start': {
+        'line': 1,
+        'column': 0
+      },
+      'end': {
+        'line': 1,
+        'column': 44
+      }
+    }
+  },
+  'location': {
+    'match': {
+      'first_line': 1,
+      'last_line': 1,
+      'first_column': 0,
+      'last_column': 44
+    },
+    'start': {
+      'line': 1,
+      'column': 0
+    },
+    'end': {
+      'line': 1,
+      'column': 44
+    }
+  }
+}
+
+
+
 
 
 
@@ -2967,7 +2983,7 @@ export default {
             }
         }
     },
-    'should allow filter chaining' : {
+    'should allow filter chaining': {
         'type': 'template',
         'imports': [],
         'tag': {

@@ -133,7 +133,7 @@ class Maker {
      */
     ifcondition(predicate, positive, negative) {
 
-        return ((predicate) ? positive() : negative()) || [];
+        return (predicate) ? positive() : negative();
 
     }
 

@@ -51,6 +51,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 /* global lexer roles */
 'import'                                        return 'IMPORT';
 'from'                                          return 'FROM';
+'uses'                                          return 'USES';
 <CONTROL>'for'                                  return 'FOR';
 <CONTROL>'endfor'                               return 'ENDFOR';
 <CONTROL>'if'                                   return 'IF';
@@ -113,11 +114,8 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 %%
 
 template
-          : imports tag EOF 
-            {$$ = new yy.ast.Template($1, $2, yy.help.location(@$, @1, @2)); return $$;}
-
-          | tag EOF
-            {$$ = new yy.ast.Template([], $1, yy.help.location(@$, @1, @1)); return $$;}
+          : imports? usage? tag EOF 
+            {$$ = new yy.ast.Template($1 || [], $2 || [], $3, yy.help.location(@$, @1, @4)); return $$;}
           ;
 
 imports
@@ -128,6 +126,11 @@ imports
 import    
           : IMPORT variable FROM string_literal ';' 
             {$$ = new yy.ast.Import($2, $4, yy.help.location(@$, @1, @5));}
+          ;
+
+usage
+          : USES arguments
+            {$$ = $2; }
           ;
 
 tag
@@ -208,12 +211,12 @@ ternary_expression
           ;
 
 binary_expression
-          : '(' value_expression binary_operator value_expression  ')'
+          : '(' expression binary_operator expression  ')'
             {$$ = new yy.ast.BinaryExpression($2, $3, $4,  yy.help.location(@$, @1, @5));} 
           ;
 
 binary_operator
-          : ('>'|'>='|'<'|'<='|'=='|'!='|'+'|'/'|'-') 
+          : ('>'|'>='|'<'|'<='|'=='|'!='|'+'|'/'|'-'|'=') 
             { $$ = yy.help.convertOperator($1);}
           ;
 
@@ -346,7 +349,7 @@ if
 
          | '{%' IF expression '%}' children 
            '{%' 'ELSE' '%}' children '{%' ENDIF '%}'
-           {$$ = new yy.ast.IfCondition($3, $5, $9, yy.help.location(@$, @1, @13));}
+           {$$ = new yy.ast.IfCondition($3, $5, $9, yy.help.location(@$, @1, @12));}
          ;
 
 include  
