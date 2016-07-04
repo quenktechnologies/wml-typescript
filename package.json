@@ -1,6 +1,6 @@
 {
   "name": "wml",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Widget Markup Language",
   "main": "index.js",
   "scripts": {
