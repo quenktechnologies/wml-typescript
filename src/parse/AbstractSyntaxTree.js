@@ -23,7 +23,7 @@ class Template extends Node {
         super();
         this.type = 'template';
         this.imports = imports;
-        this.arguments = args;
+        this.usage = args;
         this.tag = tag;
         this.location = loc;
     }
@@ -38,12 +38,43 @@ class Template extends Node {
  */
 class Import extends Node {
 
-    constructor(member, module, location) {
+    constructor(members, module, location) {
         super();
         this.type = 'import';
-        this.member = member;
+        this.members = members;
         this.module = module;
         this.location = location;
+    }
+
+}
+
+/**
+ * DefaultMember 
+ */
+class DefaultMember extends Node {
+
+    constructor(member, location) {
+
+        super();
+        this.type = 'default-member';
+        this.member = member;
+        this.location = location;
+
+    }
+
+}
+
+/**
+ * CompositeMember 
+ */
+class CompositeMember extends Node {
+
+    constructor(member, location) {
+        super();
+        this.type = 'composite-member';
+        this.member = member;
+        this.location = location;
+
     }
 
 }
@@ -413,6 +444,8 @@ export default class AbstractSyntaxTree {
 
         this.Template = Template;
         this.Import = Import;
+        this.DefaultMember = DefaultMember;
+        this.CompositeMember = CompositeMember;
         this.Tag = Tag;
         this.Attribute = Attribute;
         this.Interpolation = Interpolation;

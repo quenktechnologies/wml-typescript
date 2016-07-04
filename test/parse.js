@@ -1,9 +1,10 @@
 import must from 'must';
 import expects from './expectations';
-import Parser from '../src/parse/Parser';
+import Parser from '../src/compile/Parser';
 
 var input = null;
 var result = null;
+var tests = null;
 
 function parse(text) {
     result = '' + Parser.parse(text || input);
@@ -24,6 +25,26 @@ function compare(tree, that) {
 
 }
 
+function makeTest(test, index) {
+
+    if (!test.skip) {
+
+        input = test.input;
+        parse();
+        return test.print ? print(result) : compare(result, test.expect);
+
+    }
+}
+
+tests = {
+
+    'should parse preamble': [{
+        input: `import lib from "path/to/libs"; <tag/>`,
+        expect: expects['should parse preamble'][0]
+    }]
+
+};
+
 describe('Parser', function() {
 
     beforeEach(function() {
@@ -35,35 +56,52 @@ describe('Parser', function() {
 
     describe('parse()', function() {
 
-        it('should parse imports', function() {
+        Object.keys(tests).forEach(k => {
+
+            it(k, function() {
+
+                if (Array.isArray(tests[k])) {
+
+                    tests[k].forEach(makeTest);
+
+                } else {
+
+                    makeTest(tests[k]);
+
+                }
+
+            });
+        });
+
+        xit('should parse imports', function() {
 
             input = `import lib from "path/to/libs";  <tag/>`;
             parse();
-            compare(result, expects[this.test.title]);
+            compare(result, expects[this.test.txitle]);
 
         });
 
-        it('should parse a self closing tag', function() {
+        xit('should parse a self closing tag', function() {
 
             input = '<simple/>';
             parse();
-            compare(result, expects[this.test.title]);
+            compare(result, expects[this.test.txitle]);
 
         });
 
-        it('should parse a self closing tag with attributes', function() {
+        xit('should parse a self closing tag wxith attributes', function() {
 
-            input = '<user name="xyaa aaz" position={{4|x(20)}} wml:val="test"/>';
+            input = '<user name="xyaa aaz" posxition={{4|x(20)}} wml:val="test"/>';
             parse();
-            compare(result, expects[this.test.title][0]);
+            compare(result, expects[this.test.txitle][0]);
 
             input = '<user enabled id=24 />';
             parse();
-            compare(result, expects[this.test.title][1]);
+            compare(result, expects[this.test.txitle][1]);
 
             input = '<user name="xyaa aaz" id="24" align="left"/>';
             parse();
-            compare(result, expects[this.test.title][2]);
+            compare(result, expects[this.test.txitle][2]);
 
         });
 
@@ -71,58 +109,58 @@ describe('Parser', function() {
 
             input = '<panel>  \n\n\n\n\n\n\n\n\n  </panel>';
             parse();
-            compare(result, expects[this.test.title]);
+            compare(result, expects[this.test.txitle]);
 
         });
 
-        xit('should parse a parent tag with attributes', function() {
+        xit('should parse a parent tag wxith attributes', function() {
 
             input = '<panel type="default" size="40" align="left"> </panel>';
             parse();
-            compare(result, expects[this.test.title]);
+            compare(result, expects[this.test.txitle]);
 
         });
 
-        xit('should parse parent tags with mixed children', function() {
+        xit('should parse parent tags wxith mixed children', function() {
 
             input = '<panel>This is my offsprings.<a>Link</a>Hey now! <Input/></panel>';
             parse();
-            compare(result, expects[this.test.title]);
+            compare(result, expects[this.test.txitle]);
 
         });
 
-        xit('should parse parent tags with tag children (L1)', function() {
+        xit('should parse parent tags wxith tag children (L1)', function() {
 
             input = '<panel><a></a></panel>';
             parse();
-            compare(result, expects[this.test.title]);
+            compare(result, expects[this.test.txitle]);
 
         });
 
-        xit('should parse parent tags with tag children (L2)', function() {
+        xit('should parse parent tags wxith tag children (L2)', function() {
 
             input = '<panel><a href="link" onclick={{this.someting.invoke()}}>' +
                 'Click Here</a><table/></panel>';
             parse();
-            compare(result, expects[this.test.title]);
+            compare(result, expects[this.test.txitle]);
 
 
         });
 
-        xit('should parse parent tags with tag children (L3)', function() {
+        xit('should parse parent tags wxith tag children (L3)', function() {
 
             input = '<panel><a href="link">Click Here</a><table/><panel c="22"></panel></panel>';
             parse();
-            compare(result, expects[this.test.title]);
+            compare(result, expects[this.test.txitle]);
 
         });
 
-        xit('should do it all together now', function() {
+        xit('should do xit all together now', function() {
 
             input = `<modal name="mymodal" x="1" y="2">
                         <modal-header>My Modal</modal-header>
                         <modal-body>
-                         Creativity is inhibited by greed and corruption.
+                         Creativxity is inhibxited by greed and corruption.
                          <vote-button/>
                          <vote-count source={{this}}/> Votes
                          <textarea wml:id="ta" disabled size=32 onchange={{this.setText}}>
@@ -132,19 +170,19 @@ describe('Parser', function() {
                     </modal>`;
 
             parse();
-            compare(result, expects[this.test.title]);
+            compare(result, expects[this.test.txitle]);
 
         });
 
         xit('should parse for expressions', function() {
 
             input = '<root>' +
-                '{% for item in list %}' +
+                '{% for xitem in list %}' +
                 '<stem>A Stem</stem>' +
                 '{% endfor %}' +
                 '</root>';
             parse();
-            compare(result, expects[this.test.title]);
+            compare(result, expects[this.test.txitle]);
 
 
         });
@@ -160,7 +198,7 @@ describe('Parser', function() {
                 '</div>';
 
             parse();
-            compare(result, expects[this.test.title]);
+            compare(result, expects[this.test.txitle]);
 
         });
 
@@ -168,7 +206,7 @@ describe('Parser', function() {
 
             input = '<div onfocus={{this::doAction}}/>';
             parse();
-            compare(result, expects[this.test.title]);
+            compare(result, expects[this.test.txitle]);
 
         });
 
@@ -176,15 +214,15 @@ describe('Parser', function() {
 
             input = '<div id={{this.id}}>{{this.check() ? a : b }}</div>';
             parse();
-            compare(result, expects[this.test.title]);
+            compare(result, expects[this.test.txitle]);
 
         });
 
-        xit('should parse function literals', function() {
+        xit('should parse function lxiterals', function() {
 
             input = '<button onclick={{(e)=>this.call(e)}}/>';
             parse();
-            compare(result, expects[this.test.title]);
+            compare(result, expects[this.test.txitle]);
 
         });
 
@@ -192,7 +230,7 @@ describe('Parser', function() {
 
             input = '<tr>{% for x,i in y %}{% include this.getFrags() [ctx1, ctx2] %}{% include val %}{% endfor %}</tr>';
             parse();
-            compare(result, expects[this.test.title]);
+            compare(result, expects[this.test.txitle]);
 
         });
 
@@ -200,7 +238,7 @@ describe('Parser', function() {
 
             input = '<tag n={{ ( -0.5 + 3) }} m={{(4 + -2)}} g={{ (10 --5) }}/>';
             parse();
-            compare(result, expects[this.test.title]);
+            compare(result, expects[this.test.txitle]);
 
         });
 
@@ -208,7 +246,7 @@ describe('Parser', function() {
 
             input = '<p>{{ value | f1 | f2(2) | f3(this.value) }}</p>';
             parse();
-            compare(result, expects[this.test.title]);
+            compare(result, expects[this.test.txitle]);
 
         });
 

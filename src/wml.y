@@ -41,18 +41,17 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 /* Lexer flags */
 %options flex
 %x CHILDREN
+%x COMMENT
 %s CONTROL
 %%
 
 /* Lexer rules */
 
-/* whitespaces */
-<*>\s+              return;
-
-/* global lexer roles */
+<*>\s+                                          return;
 'import'                                        return 'IMPORT';
 'from'                                          return 'FROM';
 'uses'                                          return 'USES';
+'as'                                            return 'AS';
 <CONTROL>'for'                                  return 'FOR';
 <CONTROL>'endfor'                               return 'ENDFOR';
 <CONTROL>'if'                                   return 'IF';
@@ -60,10 +59,17 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <CONTROL>'else'                                 return 'ELSE';
 <CONTROL>'elseif'                               return 'ELSEIF';
 <CONTROL>'in'                                   return 'IN';
+<CONTROL>'switch'                               return 'SWITCH';
+<CONTROL>'endswitch'                            return 'ENDSWITCH';
+<CONTROL>'case'                                 return 'CASE';
+<CONTROL>'endcase'                              return 'ENDCASE';
 <CONTROL>'include'                              return 'INCLUDE';
 'true'|'false'                                  return 'BOOLEAN';
 {NumberLiteral}                                 return 'NUMBER_LITERAL';
 {StringLiteral}                                 return 'STRING_LITERAL';
+'<!--'             this.begin('COMMENT');       return;
+<COMMENT>'-->'     this.popState();             return;
+<COMMENT>[.\n]+                                 return;
 '{{'                                            return '{{';
 '}}'                                            return '}}';
 '|'                                             return '|';
@@ -116,17 +122,27 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 
 template
           : imports? usage? tag EOF 
-            {$$ = new yy.ast.Template($1 || [], $2 || [], $3, yy.help.location(@$, @1, @4)); return $$;}
+            {$$ =
+            new yy.ast.Template($1 || [], $2 || [], $3, @$); return $$;
+            }
           ;
 
 imports
-          : import          {$$ =  [$1];         }
-          | imports import  {$$ = $1.concat($2); }
+          : import_statement          {$$ =  [$1];         }
+          | imports import_statement  {$$ = $1.concat($2); }
           ;
 
-import    
-          : IMPORT variable FROM string_literal ';' 
-            {$$ = new yy.ast.Import($2, $4, yy.help.location(@$, @1, @5));}
+import_statement    
+          : IMPORT import_member FROM string_literal ';'
+            {$$ = new yy.ast.ImportStatement($2, $4, @$);}
+          ;
+
+import_member
+          : variable
+            {$$ = new yy.ast.DefaultMember($1, @$);}
+
+          | '*' AS variable
+            {$$ = new yy.ast.CompositeMember($3, @$);} 
           ;
 
 usage
@@ -138,11 +154,11 @@ tag
           : '<' tagname attributes '>' children? '</' tagname '>' 
              {
              yy.help.ensureTagsMatch($2, $8);
-             $$ = new yy.ast.Tag($2, $3, $5?$5:[], yy.help.location(@$, @1, @8));
+             $$ = new yy.ast.Tag($2, $3, $5?$5:[], @$);
              }
              
           | '<' tagname attributes '/>' 
-            { $$ = new yy.ast.Tag($2, $3, [], yy.help.location(@$, @1, @4)); }
+            { $$ = new yy.ast.Tag($2, $3, [], @$); }
           ;
 tagname
           : (variable | property_expression) {$$ = $1;}
@@ -155,12 +171,11 @@ attributes
 
 attribute 
           : attribute_name '=' attribute_value
-            {$$ = new yy.ast.Attribute($1.name, $1.namespace, $3, yy.help.location(@$, @1, @3));} 
+            {$$ = new yy.ast.Attribute($1.name, $1.namespace, $3, @$);} 
 
           | attribute_name
             {$$ = new yy.ast.Attribute($1.name, $1.namespace, 
-            new yy.ast.BooleanLiteral(true, yy.help.location(@$, @1, @1)),
-            yy.help.location(@$, @1, @1));} 
+            new yy.ast.BooleanLiteral(true, @$),@$);} 
           ;
 
 attribute_name
@@ -174,11 +189,11 @@ attribute_value
           ;
 
 interpolation
-          : '{{' expression '}}' 
-            {$$ = new yy.ast.Interpolation($2, [], yy.help.location(@$, @1, @3));} 
+          : '{{' value_expression '}}' 
+            {$$ = new yy.ast.Interpolation($2, [], @$);} 
 
-          | '{{' expression filters '}}' 
-            {$$ = new yy.ast.Interpolation($2, $3, yy.help.location(@$, @1, @4));} 
+          | '{{' value_expression filters '}}' 
+            {$$ = new yy.ast.Interpolation($2, $3, @$);} 
           ;
 
 filters
@@ -188,128 +203,10 @@ filters
 
 filter
           : '|'  variable 
-            {$$ = new yy.ast.Filter($2, [], yy.help.location(@$, @1, @2));} 
+            {$$ = new yy.ast.Filter($2, [], @$);} 
 
           | '|' variable '(' arguments ')' 
-            {$$ = new yy.ast.Filter($2, $4, yy.help.location(@$, @1, @5));} 
-          ;
-
-arguments
-          : expression                {$$ = [$1];          }
-          | arguments ',' expression  {$$ = $1.concat($3); }
-          ;
-
-expression
-          : value_expression
-          | unary_expression
-          | ternary_expression
-          | binary_expression
-          ;
-
-ternary_expression
-          : expression  '?'  expression ':' expression
-            {$$ = new yy.ast.TernaryExpression($1, $3, $5, yy.help.location(@$, @1, @5));}
-          ;
-
-binary_expression
-          : '(' expression binary_operator expression  ')'
-            {$$ = new yy.ast.BinaryExpression($2, $3, $4,  yy.help.location(@$, @1, @5));} 
-          ;
-
-binary_operator
-          : ('>'|'>='|'<'|'<='|'=='|'!='|'+'|'/'|'-'|'=') 
-            { $$ = yy.help.convertOperator($1);}
-          ;
-
-unary_expression
-          : '!' expression
-            {$$ = new yy.ast.UnaryExpression($1, $2, yy.help.location(@$, @1, @2));} 
-          ;
-
-value_expression
-          : literal
-          | variable
-          | property_expression
-          | function_expression
-          | method_expression
-          | bind_expression
-          ;
-
-literal
-          : array_literal
-          | function_literal
-          | string_literal
-          | number_literal
-          | boolean_literal
-          ;
-
-array_literal
-          : '[' ']' 
-            {$$ = new yy.ast.ArrayLiteral([], yy.help.location(@$, @1, @2)); }
-
-          | '[' arguments ']'
-            {$$ = new yy.ast.ArrayLiteral($2, yy.help.location(@$, @1, @3)); }
-          ;
-
-function_literal
-          : parameters '=>' expression
-            {$$ = new yy.ast.FunctionLiteral($1, $3, yy.help.location(@$, @1, @3)); }
-          ;
-
-parameters
-          : '(' ')'                           {$$ = [];                      }
-          | '(' variable ')'                  {$$ = [$2];                    }
-          | '(' parameters  ',' variable ')'  {$$ = $2.concat($4);           }
-          ;
-
-string_literal
-          : STRING_LITERAL {$$ = new yy.ast.StringLiteral($1, yy.help.location(@$, @1, @1)); }
-          ;
-
-number_literal
-          : NUMBER_LITERAL 
-          {$$ = new yy.ast.NumberLiteral(yy.help.parseNumber($1), yy.help.location(@$, @1, @1)); }
-          ;
-
-boolean_literal
-          : BOOLEAN  
-          {$$ = new yy.ast.BooleanLiteral(yy.help.parseBoolean($1), yy.help.location(@$, @1, @1));}
-          ;
-
-function_expression
-          : variable '(' arguments ')'
-            {$$ = new yy.ast.FunctionExpression($1, $3, yy.help.location(@$, @1, @4));} 
-
-          | variable '('  ')'
-            {$$ = new yy.ast.FunctionExpression($1, [], yy.help.location(@$, @1, @3));} 
-          ;
-
-property_expression
-          : variable '.' variable            {$$ = $1+'.'+$3;}
-          | variable '.' property_expression {$$ = $1+'.'+$3;} 
-          ;
-
-method_expression
-          : property_expression '(' arguments ')'
-            {$$ = new yy.ast.MethodExpression($1, $3, yy.help.location(@$, @1, @4));} 
-
-          | property_expression '(' ')'
-            {$$ = new yy.ast.MethodExpression($1, [], yy.help.location(@$, @1, @3));} 
-          ;
-
-bind_expression
-
-          : variable '::' 'variable'
-            {$$ = new yy.ast.BindExpression($1, $3, [] , yy.help.location(@$, @1, @3));}
-
-          |  variable '::' 'variable' '(' arguments ')'
-            {$$ = new yy.ast.BindExpression($1, $3, $5 , yy.help.location(@$, @1, @6));}
-
-          | property_expression '::' variable 
-            {$$ = new yy.ast.BindExpression($1, $3, [], yy.help.location(@$, @1, @6));}
-
-          | property_expression '::' variable '(' arguments ')'
-            {$$ = new yy.ast.BindExpression($1, $3, $5, yy.help.location(@$, @1, @6));}
+            {$$ = new yy.ast.Filter($2, $4, @$);} 
           ;
 
 children   
@@ -324,46 +221,220 @@ child
           | characters
           ;
 
+
 control
-          : (for|if|include) {$$ = $1;}
+          : (for_statement|if_statement|switch_statement|include_statement) {$$ = $1;}
           ;
-for
-          : '{%' FOR variable ','? (variable)? IN expression '%}' 
-             children 
-            '{%' ENDFOR '%}' 
+
+for_statement
+          : '{%' FOR variable ','? (variable)? IN expression '%}' for_children 
             {
             
-            $$ = new yy.ast.ForLoop($3, 
+            $$ = new yy.ast.ForStatement($3, 
             ($5)? $5 : 'index',
             $7,
             $9,
-            yy.help.location(@$, @1, @12)); 
+            $10, @$); 
             
             }
+
           ;
 
-if
+for_children
+          :  children '{%' ENDFOR '%}' 
+             {$$ = $1;} 
+
+          |  '{%' ELSE '%}' children '{%' ENDFOR '%}' 
+             {$$ = $4;}
+          ;
+          
+if_statement
          : '{%' IF expression '%}'
             children 
            '{%' ENDIF '%}'
-            {$$ = new yy.ast.IfCondition($3, $5, [], yy.help.location(@$, @1, @8)); }
+            {$$ = new yy.ast.IfStatement($3, $5, [], @$); }
 
          | '{%' IF expression '%}' children 
-           '{%' 'ELSE' '%}' children '{%' ENDIF '%}'
-           {$$ = new yy.ast.IfCondition($3, $5, $9, yy.help.location(@$, @1, @12));}
+           '{%' ELSE '%}' children '{%' ENDIF '%}'
+           {$$ = new yy.ast.IfStatement($3, $5, $9, @$);}
+
+       /*  | '{%' IF expression '%}' children 
+           '{%' ELSEIF expression '%}' children '{%' ENDIF '%}'
+           {$$ = new yy.ast.IfCondition($3, $5, $9, @$);} */
          ;
 
-include  
-         :'{%' INCLUDE (variable|property_expression|function_expression|method_expression) array_literal ? '%}'
-           {$$ = new yy.ast.Include($3, ($4? $4 : []),  yy.help.location(@$, @1, @5));}
+switch_statement
+         : '{%' SWITCH expression '%}' case_statements '{%' ENDSWITCH '%}' 
+            {$$ = new yy.ast.SwitchStatement($3, $5, @$);}
+         ;
+
+case_statements
+         : case_statement                  {$$ = [$1];          }
+         | case_statements case_statement  {$$ = $1.concat($2); }
+         ;
+
+case_statement
+         : '{%' CASE (string_literal|number_literal|boolean_literal) '%}'
+            children '{%' ENDCASE '%}'
+           {$$ = new yy.ast.CaseStatement($3, $5, @$);}
+         ;
+
+include_statement  
+         :'{%' INCLUDE 
+          (variable|property_expression|function_expression|method_expression) array_literal ? 
+          '%}'
+          {$$ = new yy.ast.Include($3, ($4? $4 : []), @$);}
          ;
 
 characters
           : (CHARACTERS)
-            {$$ = new yy.ast.Characters($1, yy.help.location(@$, @1, @1)); }
+            {$$ = new yy.ast.Characters($1, @$); }
+          ;
+
+arguments
+          : value_expression                {$$ = [$1];          }
+          | arguments ',' value_expression  {$$ = $1.concat($3); }
+          ;
+
+grouped_expression
+          : '(' expression ')' 
+            {$$ = $2;}
+          ;
+
+expression
+          : ternary_expression
+          | binary_expression
+          | unary_expression
+          | value_expression
+          | grouped_expression
+          ;
+
+ternary_expression
+          : (expression)  '?'  expression ':' expression
+            {$$ = new yy.ast.TernaryExpression($1, $3, $5, @$);}
+          ;
+
+binary_expression
+          : value_expression binary_operator value_expression
+            {$$ = new yy.ast.BinaryExpression($1, $2, $3, @$);} 
+          ;
+
+binary_operator
+          : ('>'|'>='|'<'|'<='|'=='|'!='|'+'|'/'|'-'|'=') 
+            { $$ = yy.help.convertOperator($1);}
+          ;
+
+unary_expression
+          : '!' expression
+            {$$ = new yy.ast.UnaryExpression($1, $2, @$);} 
+          ;
+
+value_expression
+          : variable
+          | literal
+          | property_expression
+          | function_expression
+          | method_expression
+          | bind_expression
           ;
 
 variable
           : ID {$$ = $1;}
           ;
 
+literal
+          : object_literal
+          | array_literal
+          | string_literal
+          | number_literal
+          | boolean_literal
+          ;
+
+object_literal
+          : '{' '}'
+            {$$ = new yy.ast.ObjectLiteral([], @$); }
+
+          | '{' name_value_pairs '}'
+            {$$ = new yy.ast.ObjectLiteral($2, @$); }
+          ;
+
+key_value_pairs
+          : key_value_pair 
+           {$$ = [$1]; }
+          
+          | key_value_pairs ',' key_value_pair 
+           {$$ = $1.concat($3); }
+          ;
+
+key_value_pair
+          : variable ':' expression
+            {$$ = {key:$1, value:$3}; }
+          ;
+
+array_literal
+          : '[' ']' 
+            {$$ = new yy.ast.ArrayLiteral([], @$); }
+
+          | '[' arguments ']'
+            {$$ = new yy.ast.ArrayLiteral($2, @$); }
+          ;
+
+string_literal
+          : STRING_LITERAL {$$ = new yy.ast.StringLiteral($1, @$); }
+          ;
+
+number_literal
+          : NUMBER_LITERAL 
+          {$$ = new yy.ast.NumberLiteral(yy.help.parseNumber($1), @$); }
+          ;
+
+boolean_literal
+          : BOOLEAN  
+          {$$ = new yy.ast.BooleanLiteral(yy.help.parseBoolean($1), @$);}
+          ;
+
+function_expression
+          : variable '(' arguments ')'
+            {$$ = new yy.ast.FunctionExpression($1, $3, @$);} 
+
+          | variable '('  ')'
+            {$$ = new yy.ast.FunctionExpression($1, [], @$);} 
+          ;
+
+method_expression
+          : property_expression '(' arguments ')'
+            {$$ = new yy.ast.MethodExpression($1, $3, @$);} 
+
+          | property_expression '(' ')'
+            {$$ = new yy.ast.MethodExpression($1, [], @$);} 
+          ;
+
+property_expression
+          : variable '.' variable            {$$ = $1+'.'+$3;}
+          | variable '.' property_expression {$$ = $1+'.'+$3;} 
+          ;
+
+bind_expression
+          : variable '::' 'variable'
+            {$$ = new yy.ast.BindExpression($1, $3, [] , @$);}
+
+          |  variable '::' 'variable' '(' arguments ')'
+            {$$ = new yy.ast.BindExpression($1, $3, $5 , @$);}
+
+          | property_expression '::' variable 
+            {$$ = new yy.ast.BindExpression($1, $3, [], @$);}
+
+          | property_expression '::' variable '(' arguments ')'
+            {$$ = new yy.ast.BindExpression($1, $3, $5, @$);}
+          ;
+
+function_literal
+          : parameters '=>' expression
+            {$$ = new yy.ast.FunctionLiteral($1, $3, @$); }
+          ;
+
+parameters
+          : '(' ')'                           {$$ = [];                      }
+          | '(' variable ')'                  {$$ = [$2];                    }
+          | '(' parameters  ',' variable ')'  {$$ = $2.concat($4);           }
+          ;
