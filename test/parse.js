@@ -138,8 +138,6 @@ tests = {
         input: '<Html.div id={{this.id}}>{{this.check() ? a : b }}</div>',
         expect: expects['should parse ternary expressions']
 
-
-
     },
     'should parse function literals': {
 
@@ -168,11 +166,19 @@ tests = {
         expect: expects['should allow filter chaining']
 
 
+    },
+    'should parse switch statements': {
+
+        input: 'import * as s from "statements";' +
+            '<Tab>' +
+            '{% switch this.getValue() %}' +
+            '{% case 3 %}<s.Statement/>{% endcase %}' +
+            '{% case "copper" %}<s.Statement/>{% endcase %}' +
+            '{% case default %}<s.Statement.Default/>{% endcase %}' +
+            '{% endswitch %}</Tab>',
+        expect: expects['should parse switch statements']
+
     }
-
-
-
-
 
 };
 
