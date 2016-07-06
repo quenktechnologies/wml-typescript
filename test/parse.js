@@ -1,6 +1,6 @@
 import must from 'must';
 import expects from './expectations';
-import Parser from '../src/compile/Parser';
+import Parser from '../src/parser/Parser';
 
 var input = null;
 var result = null;

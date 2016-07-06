@@ -23,7 +23,8 @@ OctalIntegerLiteral [0]{OctalDigit}+
 HexIntegerLiteral [0][xX]{HexDigit}+
 DecimalLiteral ([-]?{DecimalIntegerLiteral}\.{DecimalDigits}*{ExponentPart}?)|(\.{DecimalDigits}{ExponentPart}?)|({DecimalIntegerLiteral}{ExponentPart}?)
 NumberLiteral {DecimalLiteral}|{HexIntegerLiteral}|{OctalIntegerLiteral}
-Identifier [a-zA-Z$0-9_][a-zA-Z$_0-9.-]*
+Identifier [a-zA-Z$0-9_][a-zA-Z$_0-9-]*
+DotIdentifier [a-zA-Z$0-9_][a-zA-Z$_0-9.-]*
 LineContinuation \\(\r\n|\r|\n)
 OctalEscapeSequence (?:[1-7][0-7]{0,2}|[0-7]{2,3})
 HexEscapeSequence [x]{HexDigit}{2}
@@ -61,6 +62,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <CONTROL>'in'                                   return 'IN';
 <CONTROL>'switch'                               return 'SWITCH';
 <CONTROL>'endswitch'                            return 'ENDSWITCH';
+<CONTROL>'default'                              return 'DEFAULT';
 <CONTROL>'case'                                 return 'CASE';
 <CONTROL>'endcase'                              return 'ENDCASE';
 <CONTROL>'include'                              return 'INCLUDE';
@@ -100,9 +102,10 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 '!'                                             return '!';
 ','                                             return ',';
 '?'                                             return '?';
+'.'                                             return '.';
 '{'                                             return '{';
 '}'                                             return '}';
-{Identifier}                                    return 'ID';
+{Identifier}                                    return 'IDENTIFIER';
 
 <CHILDREN>'{{'       this.popState();           return '{{';
 <CHILDREN>'{%'       this.begin('CONTROL');     return '{%';
@@ -138,11 +141,11 @@ import_statement
           ;
 
 import_member
-          : variable
+          : identifier
             {$$ = new yy.ast.DefaultMember($1, @$);}
 
-          | '*' AS variable
-            {$$ = new yy.ast.CompositeMember($3, @$);} 
+          | '*' AS identifier
+            {$$ = new yy.ast.CompositeMember('* as '+$3, @$);} 
           ;
 
 usage
@@ -161,7 +164,7 @@ tag
             { $$ = new yy.ast.Tag($2, $3, [], @$); }
           ;
 tagname
-          : (variable | property_expression) {$$ = $1;}
+          : (identifier | member_access) {$$ = $1;}
           ;
 
 attributes
@@ -179,8 +182,8 @@ attribute
           ;
 
 attribute_name
-          : variable                {$$ = {namespace:null, name:$1};} 
-          | variable ':' variable   {$$ = {namespace:$1, name:$3};}
+          : identifier                {$$ = {namespace:null, name:$1};} 
+          | identifier ':' identifier   {$$ = {namespace:$1, name:$3};}
           ;
 
 attribute_value
@@ -189,10 +192,10 @@ attribute_value
           ;
 
 interpolation
-          : '{{' value_expression '}}' 
+          : '{{' (expression|function_literal) '}}' 
             {$$ = new yy.ast.Interpolation($2, [], @$);} 
 
-          | '{{' value_expression filters '}}' 
+          | '{{' expression filters '}}' 
             {$$ = new yy.ast.Interpolation($2, $3, @$);} 
           ;
 
@@ -202,10 +205,10 @@ filters
           ;
 
 filter
-          : '|'  variable 
+          : '|'  identifier 
             {$$ = new yy.ast.Filter($2, [], @$);} 
 
-          | '|' variable '(' arguments ')' 
+          | '|'  identifier '(' arguments ')' 
             {$$ = new yy.ast.Filter($2, $4, @$);} 
           ;
 
@@ -227,14 +230,14 @@ control
           ;
 
 for_statement
-          : '{%' FOR variable ','? (variable)? IN expression '%}' for_children 
+          : '{%' FOR identifier ','? (identifier)? IN expression '%}' for_children 
             {
             
             $$ = new yy.ast.ForStatement($3, 
             ($5)? $5 : 'index',
             $7,
             $9,
-            $10, @$); 
+            @$); 
             
             }
 
@@ -274,16 +277,19 @@ case_statements
          ;
 
 case_statement
-         : '{%' CASE (string_literal|number_literal|boolean_literal) '%}'
+         : '{%' CASE (string_literal|number_literal|boolean_literal|DEFAULT) '%}'
             children '{%' ENDCASE '%}'
            {$$ = new yy.ast.CaseStatement($3, $5, @$);}
          ;
 
 include_statement  
          :'{%' INCLUDE 
-          (variable|property_expression|function_expression|method_expression) array_literal ? 
+          (variable_expression|
+          property_expression|
+          function_expression|
+          method_expression) array_literal ? 
           '%}'
-          {$$ = new yy.ast.Include($3, ($4? $4 : []), @$);}
+          {$$ = new yy.ast.IncludeStatement($3, $4? $4 : null, @$);}
          ;
 
 characters
@@ -296,21 +302,21 @@ arguments
           | arguments ',' value_expression  {$$ = $1.concat($3); }
           ;
 
-grouped_expression
-          : '(' expression ')' 
-            {$$ = $2;}
-          ;
-
 expression
-          : ternary_expression
+          : grouped_expression
+          | ternary_expression
           | binary_expression
           | unary_expression
           | value_expression
-          | grouped_expression
+          ;
+
+grouped_expression
+          : '('  binary_expression ')' 
+            {$$ = $2;}
           ;
 
 ternary_expression
-          : (expression)  '?'  expression ':' expression
+          : expression  '?'  expression ':' expression
             {$$ = new yy.ast.TernaryExpression($1, $3, $5, @$);}
           ;
 
@@ -330,19 +336,19 @@ unary_expression
           ;
 
 value_expression
-          : variable
-          | literal
+          : variable_expression
+          | literal_expression
           | property_expression
           | function_expression
           | method_expression
           | bind_expression
           ;
 
-variable
-          : ID {$$ = $1;}
+variable_expression
+          : identifier {$$ = new yy.ast.VariableExpression($1, @$); }
           ;
 
-literal
+literal_expression
           : object_literal
           | array_literal
           | string_literal
@@ -367,7 +373,7 @@ key_value_pairs
           ;
 
 key_value_pair
-          : variable ':' expression
+          : identifier ':' expression
             {$$ = {key:$1, value:$3}; }
           ;
 
@@ -394,47 +400,58 @@ boolean_literal
           ;
 
 function_expression
-          : variable '(' arguments ')'
+          : identifier '(' arguments ')'
             {$$ = new yy.ast.FunctionExpression($1, $3, @$);} 
 
-          | variable '('  ')'
+          | identifier '('  ')'
             {$$ = new yy.ast.FunctionExpression($1, [], @$);} 
           ;
 
 method_expression
-          : property_expression '(' arguments ')'
+          : member_access '(' arguments ')'
             {$$ = new yy.ast.MethodExpression($1, $3, @$);} 
 
-          | property_expression '(' ')'
+          | member_access '(' ')'
             {$$ = new yy.ast.MethodExpression($1, [], @$);} 
           ;
 
 property_expression
-          : variable '.' variable            {$$ = $1+'.'+$3;}
-          | variable '.' property_expression {$$ = $1+'.'+$3;} 
+          : member_access
+            {$$ = new yy.ast.PropertyExpression($1, @$); }
           ;
 
 bind_expression
-          : variable '::' 'variable'
+          : identifier '::' 'identifier'
             {$$ = new yy.ast.BindExpression($1, $3, [] , @$);}
 
-          |  variable '::' 'variable' '(' arguments ')'
+          |  identifier '::' 'identifier' '(' arguments ')'
             {$$ = new yy.ast.BindExpression($1, $3, $5 , @$);}
 
-          | property_expression '::' variable 
+          | member_access '::' identifier 
             {$$ = new yy.ast.BindExpression($1, $3, [], @$);}
 
-          | property_expression '::' variable '(' arguments ')'
+          | member_access '::' identifier '(' arguments ')'
             {$$ = new yy.ast.BindExpression($1, $3, $5, @$);}
           ;
 
 function_literal
-          : parameters '=>' expression
+          : parameters '=>'  expression 
             {$$ = new yy.ast.FunctionLiteral($1, $3, @$); }
           ;
 
 parameters
-          : '(' ')'                           {$$ = [];                      }
-          | '(' variable ')'                  {$$ = [$2];                    }
-          | '(' parameters  ',' variable ')'  {$$ = $2.concat($4);           }
+          : '(' ')'                             {$$ = [];                      }
+          | '(' identifier ')'                  {$$ = [$2];                    }
+          | '(' parameters  ',' identifier ')'  {$$ = $2.concat($4);           }
           ;
+
+member_access
+          : identifier '.' identifier            {$$ = $1+'.'+$3;}
+          | identifier '.' member_access {$$ = $1+'.'+$3;} 
+          ;
+
+identifier
+          : IDENTIFIER {$$ = $1;}
+          ;
+
+
