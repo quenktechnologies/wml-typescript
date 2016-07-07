@@ -1,3 +1,4 @@
+import AttributeList from './AttributeList';
 /**
  *
  * Interface for Elements
@@ -99,7 +100,7 @@ class Maker {
         });
 
         children.forEach(c => adopt(c, e));
-        this._register(e, attributes.ns.wml || null);
+        this._register(e, attributes.wml || null);
         return e;
 
     }
@@ -119,30 +120,30 @@ class Maker {
         children.forEach(child => Array.isArray(child) ?
             childs.push.apply(childs, child) : childs.push(child));
 
-        e = new Constructor(attributes, childs);
-        this._register(e, attributes.ns.wml || null);
+        e = new Constructor(new AttributeList(attributes), childs);
+        this._register(e, attributes.wml || null);
         return e.render();
 
     }
 
     /**
-     * ifcondition is called to create an if conditional construct
+     * $if is called to create an if conditional construct
      * @param {*} predicate 
      * @param {function} positive 
      * @param {function} negative 
      */
-    ifcondition(predicate, positive, negative) {
+    $if(predicate, positive, negative) {
 
         return (predicate) ? positive() : negative();
 
     }
 
     /**
-     * forloop is called to create a for loop construct
+     * $for is called to create a for loop construct
      * @param {Iterable} collection 
      * @param {function} cb 
      */
-    forloop(collection, cb) {
+    $for(collection, cb) {
 
         if (Array.isArray(collection)) {
 
@@ -155,6 +156,22 @@ class Maker {
         }
 
         return [];
+    }
+
+    /**
+     * $switch simulates a switch statement
+     * @param {string|number|boolean} value 
+     * @param {object} cases 
+     */
+    $switch(value, cases) {
+
+      var result = cases[value];
+      var defaul = cases.default;
+
+      if(result) return result;
+
+      if(defaul) return deaful;
+      
     }
 
     /**

@@ -4,10 +4,10 @@
     "description": "Widget Markup Language",
     "main": "index.js",
     "scripts": {
-        "test": "npm run -s test-parser && npm run -s test-transpiler",
-        "test-parser": "./node_modules/.bin/mocha --opts mocha.opts test/parse.js",
-        "test-compiler": "./node_modules/.bin/mocha --opts mocha.opts test/compile.js",
-        "test-core": "./node_modules/.bin/jest build",
+        "test": "npm run -s test-parse && npm run -s test-compile",
+        "test-parse": "./node_modules/.bin/mocha --opts mocha.opts test/parse.js",
+        "test-compile": "./node_modules/.bin/mocha --opts mocha.opts test/compile.js",
+        "test-runtime": "./node_modules/.bin/jest lib",
         "build": "rm -R lib; mkdir -p lib; npm run parser; ./node_modules/.bin/babel -s inline -D src -d lib",
         "parser": "./node_modules/.bin/jison -o src/parser/ParserImpl.js src/wml.y",
         "api-docs": "./node_modules/.bin/jsdoc -c jsdoc.json"

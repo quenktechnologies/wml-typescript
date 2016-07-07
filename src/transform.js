@@ -1,8 +1,8 @@
-var Transpiler = require('./transpile/Transpiler');
+var Compiler = require('./parser/Compiler');
 var through = require('through');
 var babel = require('babel-core');
 
-var transpiler = new Transpiler();
+var compiler = new Compiler();
 
 function transform(file) {
 
@@ -17,7 +17,7 @@ function transform(file) {
         var js;
 
         try {
-            js = transpiler.transpile(data);
+            js = compiler.compile(data);
         } catch (e) {
             console.error(e);
             throw e;
