@@ -360,7 +360,7 @@ object_literal
           : '{' '}'
             {$$ = new yy.ast.ObjectLiteral([], @$); }
 
-          | '{' name_value_pairs '}'
+          | '{' key_value_pairs '}'
             {$$ = new yy.ast.ObjectLiteral($2, @$); }
           ;
 

@@ -2,23 +2,23 @@ import Node from './Node';
 
 /**
  * ObjectLiteral 
- * @param {array<object>} kvps 
+ * @param {array<object>} keys 
  * @param {Location} location 
  */
 class ObjectLiteral extends Node {
 
-    constructor(kvps, location) {
+    constructor(keys, location) {
 
         super(location);
         this.type = 'object-literal';
-        this.kvps = kvsp;
+        this.keys = keys;
         this.location = location;
 
     }
 
     transpile() {
 
-        return '{' + this.kvps.map(p => `${k.key}:${k.value.transpile()}`).join(',') + '}';
+        return '{' + this.keys.map(p => `${k.key}:${k.value.transpile()}`).join(',') + '}';
 
     }
 
@@ -26,7 +26,7 @@ class ObjectLiteral extends Node {
 
         var node = this.sourceNode(o.fileName, '{');
 
-        this.kvps.forEach(p => {
+        this.keys.forEach(p => {
 
             node.add(`'${p.key}'`);
             node.add(k.value.compile(o));
