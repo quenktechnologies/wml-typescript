@@ -19,7 +19,8 @@ function transform(file) {
         try {
             js = compiler.compile(data);
         } catch (e) {
-            console.error(e);
+            console.error('An error occurred while parsing ' + file + '!');
+            console.error(e.stack ? e.stack : e);
             throw e;
         }
 
