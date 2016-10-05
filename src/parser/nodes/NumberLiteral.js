@@ -7,8 +7,8 @@ class NumberLiteral extends Node {
 
     constructor(value, location) {
 
-      super(value);
-      this.type = 'number-literal';
+        super();
+        this.type = 'number-literal';
         this.value = value;
         this.location = location;
 
@@ -22,7 +22,7 @@ class NumberLiteral extends Node {
 
     compile(o) {
 
-      return this.sourceNode(o.fileName, parseFloat(this.value));
+        return this.sourceNode(o.fileName, this.value);
 
     }
 

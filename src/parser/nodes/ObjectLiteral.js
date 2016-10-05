@@ -24,19 +24,15 @@ class ObjectLiteral extends Node {
 
     compile(o) {
 
-        var node = this.sourceNode(o.fileName, '{');
+        var node = this.sourceNode(o.file, '{');
 
-        this.keys.forEach(p => {
-
-            node.add(`'${p.key}'`);
-            node.add(k.value.compile(o));
-
+        this.keys.forEach((p, i, all) => {
+            node.add([`'${p.key}':`, p.value.compile(o)]);
+            if(i < (all.length - 1))
+          node.add(',');
         });
 
-        node.add('}');
-        return node;
-
-    }
+        return node.add('}');    }
 
 }
 

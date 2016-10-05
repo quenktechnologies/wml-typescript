@@ -16,13 +16,23 @@ class PropertyExpression extends Node {
 
     transpile() {
 
-      return this.path;
+        var parts = this.path.split('.');
+        var head = parts.shift();
+
+        parts = parts.join('.');
+
+        return `make.resolve(${head}, '${parts}')`;
 
     }
 
     compile(o) {
 
-        return this.sourceNode(o.fileName, this.path);
+        var parts = this.path.split('.');
+        var head = parts.shift();
+
+        parts = parts.join('.');
+
+        return this.sourceNode(o.fileName, `make.resolve(${head}, '${parts}')`);
 
     }
 

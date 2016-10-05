@@ -22,7 +22,7 @@ class ArrayLiteral extends Node {
     compile(o) {
 
         var node = this.sourceNode(o.fileName, '[');
-        this.compileList(this.members, node, o);
+        this.compileList(this.members, node, o).add(']');
         return node;
 
     }

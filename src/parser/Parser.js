@@ -1,16 +1,16 @@
 import ParserImpl from './ParserImpl';
-import AbstractSyntaxTree from './nodes/AbstractSyntaxTree';
+import * as nodes from './nodes';
 
 let help = {
 
-  convertUsage(list) {
+    convertUsage(list) {
 
-    if(!list) return '';
+        if (!list) return '';
 
-    if(list.length < 0 ) return '';
+        if (list.length < 0) return '';
 
-    return [','].con
-    
+        return [','].con
+
     },
     parseNumber(str) {
 
@@ -48,14 +48,14 @@ class Parser {
     /** 
      * parse input and return an AST
      * @param {string} input 
-     * @param {AbstractSyntaxTree} userAST 
+     * @param {object} userAST 
      * @returns {object}
      */
     static parse(input, userAST) {
 
         ParserImpl.parser.yy = {};
         ParserImpl.parser.yy.help = help;
-        ParserImpl.parser.yy.ast = (typeof userAST === 'object') ? userAST : new AbstractSyntaxTree();
+        ParserImpl.parser.yy.ast = (typeof userAST === 'object') ? userAST : nodes;
         return ParserImpl.parser.parse(input);
 
     }

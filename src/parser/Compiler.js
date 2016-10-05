@@ -1,5 +1,5 @@
 import Parser from './Parser';
-import AbstractSyntaxTree from './nodes/AbstractSyntaxTree';
+import * as nodes from './nodes';
 
 /**
  * Compiler turns wml markup into javascript.
@@ -24,7 +24,7 @@ class Compiler {
             fileName: 'wmloutput.js'
         };
 
-        return Parser.parse(src, new AbstractSyntaxTree()).transpile();
+        return Parser.parse(src, nodes).transpile();
 
     }
 

@@ -1,14 +1,16 @@
+import Node from './Node';
 /**
  * ImportStatement 
  * @param {Member} member
  * @param {StringLiteral} module
  * @param {Location} location
  */
-class ImportStatement {
+class ImportStatement extends Node {
 
     constructor(member, module, location) {
 
-      this.type = 'import-statement';
+        super();
+        this.type = 'import-statement';
         this.member = member;
         this.module = module;
         this.location = location;
@@ -23,9 +25,11 @@ class ImportStatement {
 
     compile(o) {
 
-        return this.sourceNode(o.fileName, 'import').
+        return this.sourceNode(o.fileName, 'import ').
         add(this.member.compile(o)).
-        add(this.module.compile(o));
+        add(' ').
+        add(this.module.compile(o)).
+        add(';');
 
     }
 

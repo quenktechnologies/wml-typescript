@@ -21,6 +21,7 @@ class Node {
     }
 
     transpileList(list) {
+
         return list.map(m => m.transpile()).join(',') || '';
 
     }

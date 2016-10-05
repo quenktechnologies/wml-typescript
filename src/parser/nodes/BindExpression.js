@@ -20,7 +20,7 @@ class BindExpression extends Node {
 
     transpile() {
 
-        var args = this.args.map(a => a.transpile()).join(',');
+        var args = this.arguments.map(a => a.transpile()).join(',');
         args = (args) ? ' ,' + args : args;
 
         return `${this.path}.${this.target}.bind(${this.path}${args})`;

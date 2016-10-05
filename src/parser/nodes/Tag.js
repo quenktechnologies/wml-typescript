@@ -1,11 +1,11 @@
 import Node from './Node';
 
 /**
- * Tag 
- * @param {string} name 
- * @param {array<Attribute>} attributes 
- * @param {array<Tag|Text|ForLoop|IfCondition>} children 
- * @param {Location} location 
+ * Tag
+ * @param {string} name
+ * @param {array<Attribute>} attributes
+ * @param {array<Tag|Text|ForLoop|IfCondition>} children
+ * @param {Location} location
  */
 class Tag extends Node {
 
@@ -19,10 +19,7 @@ class Tag extends Node {
 
     }
 
-    _organizeNamespaces(list, cb) {
-
-        var butes = {
-        };
+    _organizeNamespaces(butes, list, cb) {
 
         list.forEach(a => {
 
@@ -35,7 +32,7 @@ class Tag extends Node {
 
             } else {
 
-              butes.html = butes.html || [];
+                butes.html = butes.html || [];
                 butes.html.push(val);
 
             }
@@ -49,18 +46,20 @@ class Tag extends Node {
     transpile() {
 
         var children;
-        var butes;
+        var butes = {
+            html: []
+        };
+        var spreads = this.attributes.filter(a => a.type === 'attribute-spread');
+
         var tag = (this.name[0] === this.name[0].toUpperCase()) ?
-            `make.element(${this.name}` : `make.node('${this.name}'`;
+            `make.widget(${this.name}` : `make.node('${this.name}'`;
 
-        butes = this._organizeNamespaces(this.attributes,
-            a => `'${a.name}':${a.transpile()}`);
+        this.attributes.forEach(a => a.pushStringOnNamespace(butes));
 
-        butes = '{' + (
-            Object.keys(butes).map(ns => ns + ':{' + butes[ns].join(',') + '}')) + '}';
+        butes = spreads.reduce((prev, current) => current.wrapAttributesString(prev), '{' + (
+            Object.keys(butes).map(ns => ns + ':{' + butes[ns].join(',') + '}')) + '}');
 
         children = `[${this.children.map(c => c.transpile()).join(',')}]`;
-
         return `${tag},${butes},${children})`;
 
     }
@@ -69,37 +68,44 @@ class Tag extends Node {
 
         var children;
         var node = this.sourceNode(o.fileName, '');
-        var butes;
+        var butes = {
+            html: []
+        };
+        var spreads = this.attributes.filter(a => a.type === 'attribute-spread');
+        var buffer = [];
 
         var isEle = (this.name[0] === this.name[0].toUpperCase()) ?
-            true : false;
+            false : true;
 
+        this.attributes.forEach(a => a.pushNodeOnNamespace(butes, o));
 
-        node.add('make.').
-        add(isEle ?
-            `element(${this.name}` :
-            `node('${this.name}')`).
-        add(',{');
-
-        butes = this._organizeNamespaces(this.attributes,
-            (a, i, all) => [`'${a.name}':`, a.compile(o)(i < all.length - 1) ? ',' : '']);
+        buffer.push('{');
 
         Object.keys(butes).forEach((key, i, all) => {
 
-            node.add([key, ': {']).
-            butes[key].forEach(attr => node.add(attr));
-            node.add('}');
-
-            if (i < all.length - 1)
-                node.add(',');
+            buffer.push([key, ': {']);
+            butes[key][butes[key].length - 1].pop(); //Remove trailing comma (,)
+            butes[key].forEach(a => buffer.push(a)); //Adds an array [key, ':', value, ','];
+            buffer.push((i < all.length - 1) ? ['}', ','] : '}');
 
         });
 
-        node.add('},').add('[');
+        buffer.push('}');
+
+        butes = spreads.reduce((prev, current) =>
+            current.wrapAttributes(prev, o), buffer);
+
+        node.add('make.').
+        add(isEle ?
+            `widget(${this.name}` :
+            `node('${this.name}')`).
+        add(',');
+
+        node.add.apply(node, buffer); // add everything in the buffer all at once.
+        node.add([',', '[']);
 
         return this.compileList(this.children, node, o).
-        add(']').
-        add(')');
+        add([']', ')']);
 
     }
 

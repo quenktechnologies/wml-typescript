@@ -7,12 +7,37 @@ import Maker from './Maker';
  * like feel.
  * @param {function} template A function that will be treated as a wml template.
  * @param {Object} context All references to `this` in the template will refer to this object.
+ * @param {} listener 
  */
 class View {
 
     constructor(template, context) {
 
         this._maker = new Maker(template, context);
+
+    }
+
+    /**
+     * render is a factory method for creating a new View and rendering
+     * it's contents immediately.
+     * @param {function} template
+     * @param {object|null} context 
+     * @returns {DocumentFragment}
+     */
+    static render(template, context) {
+
+        return (new View(template, context)).render();
+
+    }
+
+    /**
+     * findById retrieves an element by its wml:id attribute.
+     * @param {string} id 
+     * @return {Object} 
+     */
+    findById(id) {
+
+        return this._maker.findById(id);
 
     }
 
@@ -30,17 +55,6 @@ class View {
     }
 
     /**
-     * findById retrieves an element by its wml:id attribute.
-     * @param {string} id 
-     * @return {Object} 
-     */
-    findById(id) {
-
-        return this._maker.findById(id);
-
-    }
-
-    /**
      * render provides the DOM output of this view.
      * @return {DOMNode} 
      */
@@ -52,4 +66,5 @@ class View {
 
 
 }
+
 export default View
