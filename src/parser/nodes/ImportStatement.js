@@ -1,6 +1,6 @@
 import Node from './Node';
 /**
- * ImportStatement 
+ * ImportStatement
  * @param {Member} member
  * @param {StringLiteral} module
  * @param {Location} location
@@ -19,7 +19,7 @@ class ImportStatement extends Node {
 
     transpile() {
 
-        return `import ${this.member.transpile()} from ${this.module.transpile()};`;
+        return `import ${this.member.transpile()} from ${this.module.transpile()};\n`;
 
     }
 
@@ -29,7 +29,8 @@ class ImportStatement extends Node {
         add(this.member.compile(o)).
         add(' ').
         add(this.module.compile(o)).
-        add(';');
+        add(';').
+        add(`\n`);
 
     }
 

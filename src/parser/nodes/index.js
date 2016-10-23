@@ -1,6 +1,8 @@
 /* jshint ignore:start */
 export Template from './Template';
 export ImportStatement from './ImportStatement';
+export ExportStatement from './ExportStatement';
+export ExportFromStatement from './ExportFromStatement';
 export DefaultMember from './DefaultMember';
 export AliasMember from './AliasMember';
 export AggregateMember from './AggregateMember';
@@ -28,7 +30,10 @@ export MethodExpression from './MethodExpression';
 export BindExpression from './BindExpression';
 export ForStatement from './ForStatement';
 export IfStatement from './IfStatement';
+export ElseClause from './ElseClause';
+export ElseIfClause from './ElseIfClause';
 export SwitchStatement from './SwitchStatement';
 export CaseStatement from './CaseStatement';
 export IncludeStatement from './IncludeStatement';
 /* jshint ignore:end */
+

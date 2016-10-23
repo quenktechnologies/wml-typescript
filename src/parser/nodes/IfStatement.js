@@ -1,53 +1,62 @@
 import Node from './Node';
 
 var thenCount = 0;
-var elseCount = 0;
 
 /**
- * IfStatement 
+ * IfStatement
  * @param {Expression} expression
- * @param {array<Expression>} ithen 
- * @param {array<Expression>} ielse 
+ * @param {array<Expression>} ithen
+ * @param {array<Expression>} ielse
  */
 class IfStatement extends Node {
 
-    constructor(expression, ithen, ielse, location) {
+  constructor(expression, ithen, ielse = function() {}, location = null) {
 
-        super(location);
-        this.type = 'if-statement';
-        this.expression = expression;
-        this.then = ithen;
-        this.else = ielse;
+    super(location);
 
-    }
+    this.type = 'if-statement';
+    this.expression = expression;
+    this.then = ithen;
+    this.else = ielse;
+    this.location = location;
 
-    transpile() {
+  }
 
-        var thens = this.then.map(c => c.transpile());
-        var elses = this.else.map(c => c.transpile());
+  transpile() {
 
-        return `make.$if(${this.expression.transpile()}, ` +
-            `function if_${thenCount}(){ return [${thens}];}.bind(this), ` +
-            `function else_${elseCount}(){ return [${elses}];}.bind(this))`;
+    return `make.$if(${this.expression.transpile()}, ` +
+      `function if${thenCount}(){return [${this.then.map(t=>t.transpile()).join(',')}];}.bind(this),` +
+      `${this.else.transpile()})`;
 
-    }
+  }
 
-    compile(o) {
+  compile(o) {
 
-        var thens = this.then.map(c => c.compile(o));
-        var elses = this.else.map(c => c.compile());
+    var sn = this.sourceNode(o.fileName, '').
+    add(`make`).
+    add(`$if`).
+    add(`(`).
+    add(this.expression.transpile()).
+    add(`,`).
+    add(`function if${thenCount}()`).
+    add(`{`).
+    add(`return`).
+    add(`[`);
 
-        return this.sourceNode(o.fileName, '').
-        add('make.$if(').
-        add(this.expression.compile(o)).
-        add(`, function if_${thenCount}(){ return [`).
-        add(thens).
-        add(`}];}.bind(this), function else_${elseCount}(){ return [`).
-        add(elses).
-        add('}];}.bind(this))');
+    this.then.forEach(t => sn.add(t.compile(o)).add(`,`));
 
-    }
+    return sn.add(`]`).
+    add(`;`).
+    add(`}`).
+    add(`.`).
+    add(`bind(this)`).
+    add(`,`).
+    add(this.else.compile(o)).
+    add(`)`);
+
+  }
 
 }
 
 export default IfStatement
+

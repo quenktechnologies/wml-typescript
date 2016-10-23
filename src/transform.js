@@ -1,8 +1,6 @@
-var Compiler = require('./parser/Compiler');
+var compile = require('./');
 var through = require('through');
 var babel = require('babel-core');
-
-var compiler = new Compiler();
 
 function transform(file) {
 
@@ -17,7 +15,7 @@ function transform(file) {
     var js;
 
     try {
-      js = compiler.compile(data);
+      js = compile(data);
     } catch (e) {
       console.error('An error occurred while parsing ' + file + '!');
       console.error(e.stack ? e.stack : e);
@@ -27,7 +25,7 @@ function transform(file) {
     this.queue(babel.transform(js, {
       sourceMaps: true,
       presets: ['es2015'],
-      plugins: ['add-module-exports'],
+      plugins: ['transform-export-extensions'],
       highlightCode: false
     }).code);
 

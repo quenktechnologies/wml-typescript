@@ -2,7 +2,7 @@
   "name": "wml",
   "version": "0.1.2",
   "description": "Widget Markup Language",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "npm run -s test-parse && npm run -s test-compile",
     "test-parse": "./node_modules/.bin/mocha --opts mocha.opts test/parse.js",
@@ -47,3 +47,4 @@
     ]
   }
 }
+

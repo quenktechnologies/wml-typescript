@@ -1,4 +1,6 @@
 import must from 'must';
+import crypto from 'crypto';
+import fs from 'fs';
 import expects from './expectations';
 import Parser from '../src/parser/Parser';
 
@@ -7,209 +9,226 @@ var result = null;
 var tests = null;
 
 function parse(text) {
-    result = '' + Parser.parse(text || input);
-    result = JSON.parse(result);
+  result = '' + Parser.parse(text || input);
+  result = JSON.parse(result);
 }
 
 function json(tree) {
-    return JSON.stringify(tree);
+  return JSON.stringify(tree);
 }
 
 function print(tree) {
-    console.log(json(result));
+
+  var hash = crypto.createHash('md5');
+  console.log('================================BEGIN');
+  console.log(json(result));
+  console.log(hash.update(json(tree)).digest('hex'));
+  console.log('================================END');
+
 }
 
 function compare(tree, that) {
 
-    must(tree).eql(that);
+  must(tree).eql(that);
 
 }
 
 function makeTest(test, index) {
 
-    if (!test.skip) {
+  var hash = crypto.createHash('md5');
+  var file = index.replace(/\s/g, '-');
 
-        input = test.input;
-        parse();
-        return test.print ? print(result) : compare(result, test.expect);
+  input = test.input;
+  parse();
 
-    }
+  if (process.env.GENERATE)
+    return fs.writeFileSync(`./test/expectations/${file}.json`, json(result));
+
+  if (!test.skip) {
+
+    if (test.print)
+      return print(result, index);
+
+    compare(json(result), fs.readFileSync(`./test/expectations/${file}.json`, {
+      encoding: 'utf8'
+    }));
+
+  }
+
 }
 
 tests = {
 
-    'should parse preamble': [{
-        input: `import lib from "path/to/libs"; <tag/>`,
-        expect: expects['should parse preamble'][0]
-    }, {
-        input: `import * as lib from "path/to/libs"; <tag/>`,
-        expect: expects['should parse preamble'][1]
-    }],
-    'should parse a self closing tag': {
-        input: '<simple/>',
-        expect: expects['should parse a self closing tag']
-    },
-    'should parse a self closing tag with attributes': [{
-        input: '<user name="xyaa aaz" position={{4|x(20)}} wml:val="test"/>',
-        expect: expects['should parse a self closing tag wxith attributes'][0]
+  'should parse default import': {
+    input: `import lib from "path/to/libs"; <tag/>`
+  },
+  'should parse all import': {
+    input: `import * as lib from "path/to/libs"; <tag/>`
+  },
+  'should parse named import': {
+    input: `import {A, B} from "path/to/a/b";`
+  },
+  'should parse a self closing tag': {
+    input: '<simple/>'
+  },
+  'should parse a self closing tag with attributes 0': {
+    input: '<user name="xyaa aaz" position={{4|x(20)}} wml:val="test"/>',
+  },
+  'should parse a self closing tag with attributes 1': {
+    input: '<user enabled id=24 />',
+  },
+  'should parse a self closing tag with attributes 2': {
+    input: '<user name="xyaa aaz" id="24" align="left"/>',
+  },
+  'should parse a parent tag': {
+    input: '<panel>  \n\n\n\n\n\n\n\n\n  </panel>'
+  },
+  'should parse a parent tag with attributes': {
+    input: '<panel type="default" size="40" align="left"> </panel>'
+  },
+  'should parse parent tags with mixed children': {
+    input: '<panel> This is my offsprings.<a>Link</a>Hey now! <Input/></panel>'
+  },
+  'should parse parent tags with tag children (L1)': {
+    input: '<panel><a></a></panel>'
+  },
+  'should parse parent tags with tag children (L2)': {
+    input: '<panel><a href="link" onclick={{this.someting.invoke()}}>' +
+      'Click Here</a><table/></panel>'
+  },
+  'should parse parent tags with tag children (L3)': {
+    input: '<panel><a href="link">Click Here</a><table/><panel c="22"></panel></panel>'
+  },
+  'should do it all together now': {
 
-    }, {
-        input: '<user enabled id=24 />',
-        expect: expects['should parse a self closing tag wxith attributes'][1]
-    }, {
-        input: '<user name="xyaa aaz" id="24" align="left"/>',
-        expect: expects['should parse a self closing tag wxith attributes'][2]
+    input: '<modal name="mymodal" x="1" y="2">' +
+      '<modal-header>My Modal</modal-header>' +
+      '<modal-body>' +
+      'Creativxity is inhibxited by greed and corruption.' +
+      '<vote-button/>' +
+      '<vote-count source={{this}}/> Votes' +
+      '<textarea wml:id="ta" disabled size=32 onchange={{this.setText}}>' +
+      ' Various text' +
+      '</textarea>' +
+      '</modal-body>' +
+      '</modal>'
 
-    }],
+  },
+  'should parse for expressions': {
 
-    'should parse a parent tag': {
-        input: '<panel>  \n\n\n\n\n\n\n\n\n  </panel>',
-        expect: expects['should parse a parent tag']
-    },
-    'should parse a parent tag with attributes': {
-        input: '<panel type="default" size="40" align="left"> </panel>',
-        expect: expects['should parse a parent tag with attributes']
+    input: '<root>' +
+      '{% for item in list %}' +
+      '<stem>A Stem</stem>' +
+      '{% endfor %}' +
+      '</root>'
 
-    },
-    'should parse parent tags wxith mixed children': {
+  },
 
-        input: '<panel> This is my offsprings.<a>Link</a>Hey now! <Input/></panel>',
-        expect: expects['should parse parent tags with mixed children']
+  'should parse bind expressions': {
 
-    },
+    input: '<div onfocus={{this::doAction}}/>'
 
-    'should parse parent tags with tag children (L1)': {
+  },
+  'should parse ternary expressions': {
 
-        input: '<panel><a></a></panel>',
-        expect: expects['should parse parent tags with tag children (L1)']
-    },
+    input: '<Html.div id={{this.id}}>{{this.check() ? a : b }}</div>'
 
-    'should parse parent tags wxith tag children (L2)': {
+  },
+  'should parse function literals': {
 
-        input: '<panel><a href="link" onclick={{this.someting.invoke()}}>' +
-            'Click Here</a><table/></panel>',
-        expect: expects['should parse parent tags wxith tag children (L2)']
+    input: '<button onclick={{(e)=>this.call(e)}}/>'
 
+  },
 
-    },
+  'should parse includes': {
 
-    'should parse parent tags wxith tag children (L3)': {
+    input: '<tr>{% for x,i in y %}' +
+      '{% include this.getFrags() [ctx1, ctx2] %}{% include val %}{% endfor %}</tr>'
 
-        input: '<panel><a href="link">Click Here</a><table/><panel c="22"></panel></panel>',
-        expect: expects['should parse parent tags wxith tag children (L3)']
+  },
+  'should parse negative numbers': {
 
-    },
+    input: '<tag n={{ ( -0.5 + 3) }} m={{(4 + -2)}} g={{ (10 --5) }}/>'
 
-    'should do it all together now': {
+  },
 
-        input: '<modal name="mymodal" x="1" y="2">' +
-            '<modal-header>My Modal</modal-header>' +
-            '<modal-body>' +
-            'Creativxity is inhibxited by greed and corruption.' +
-            '<vote-button/>' +
-            '<vote-count source={{this}}/> Votes' +
-            '<textarea wml:id="ta" disabled size=32 onchange={{this.setText}}>' +
-            ' Various text' +
-            '</textarea>' +
-            '</modal-body>' +
-            '</modal>',
-        expect: expects['should do it all together now']
+  'should allow filter chaining': {
 
-    },
-    'should parse for expressions': {
+    input: '<p>{{ this._::value | f1 | f2(2) | f3(this.value) }}</p>'
 
-        input: '<root>' +
-            '{% for item in list %}' +
-            '<stem>A Stem</stem>' +
-            '{% endfor %}' +
-            '</root>',
-        expect: expects['should parse for expressions']
+  },
+  'should parse switch statements': {
 
-    },
+    input: 'import * as s from "statements";' +
+      '<Tab>' +
+      '{% switch this.getValue() %}' +
+      '{% case 3 %}<s.Statement/>{% endcase %}' +
+      '{% case "copper" %}<s.Statement/>{% endcase %}' +
+      '{% default case %}<s.Statement.Default/>{% endcase %}' +
+      '{% endswitch %}</Tab>'
 
-    'should parse bind expressions': {
+  },
+  'should parse if statements': {
 
-        input: '<div onfocus={{this::doAction}}/>',
-        expect: expects['should parse bind expressions']
+    input: '<Tag>{% if value %} <text>Text</text> {% endif %}</Tag>'
 
-    },
-    'should parse ternary expressions': {
+  },
 
-        input: '<Html.div id={{this.id}}>{{this.check() ? a : b }}</div>',
-        expect: expects['should parse ternary expressions']
+  'should parse if else statements': {
 
-    },
-    'should parse function literals': {
+    input: '<Tag>{% if value %}<text>Text</text>{% else %}<text>else</text>{% endif %}</Tag>'
 
-        input: '<button onclick={{(e)=>this.call(e)}}/>',
-        expect: expects['should parse function literals']
+  },
 
-    },
+  'should parse if else if statements': {
 
-    'should parse includes': {
+    input: '<Tag>{% if value %}<text>Text</text>{% else if value %} <text>else</text>{% endif %}</Tag>'
 
-        input: '<tr>{% for x,i in y %}' +
-            '{% include this.getFrags() [ctx1, ctx2] %}{% include val %}{% endfor %}</tr>',
-        expect: expects['should parse includes']
+  },
 
-    },
-    'should parse negative numbers': {
+  'should parse export statements': {
 
-        input: '<tag n={{ ( -0.5 + 3) }} m={{(4 + -2)}} g={{ (10 --5) }}/>',
-        expect: expects['should parse negative numbers']
+    input: '{% export view %}<View/>{% endexport %}'
 
-    },
+  },
 
-    'should allow filter chaining': {
+  'should parse export from statements': {
 
-        input: '<p>{{ this._::value | f1 | f2(2) | f3(this.value) }}</p>',
-        expect: expects['should allow filter chaining']
+    input: '{% export view from "somewhere" %}'
 
-
-    },
-    'should parse switch statements': {
-
-        input: 'import * as s from "statements";' +
-            '<Tab>' +
-            '{% switch this.getValue() %}' +
-            '{% case 3 %}<s.Statement/>{% endcase %}' +
-            '{% case "copper" %}<s.Statement/>{% endcase %}' +
-            '{% case default %}<s.Statement.Default/>{% endcase %}' +
-            '{% endswitch %}</Tab>',
-        expect: expects['should parse switch statements']
-
-    }
+  }
 
 };
 
 describe('Parser', function() {
 
-    beforeEach(function() {
+  beforeEach(function() {
 
-        input = null;
-        result = null;
+    input = null;
+    result = null;
 
+  });
+
+  describe('parse()', function() {
+
+    Object.keys(tests).forEach(k => {
+
+      it(k, function() {
+
+        if (Array.isArray(tests[k])) {
+
+          tests[k].forEach(makeTest);
+
+        } else {
+
+          makeTest(tests[k], k);
+
+        }
+
+      });
     });
 
-    describe('parse()', function() {
-
-        Object.keys(tests).forEach(k => {
-
-            it(k, function() {
-
-                if (Array.isArray(tests[k])) {
-
-                    tests[k].forEach(makeTest);
-
-                } else {
-
-                    makeTest(tests[k]);
-
-                }
-
-            });
-        });
-
-    });
+  });
 
 });
+

@@ -48,79 +48,79 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 
 /* Lexer rules */
 
-<*>\s+                                          return;
-'import'                                        return 'IMPORT';
-'from'                                          return 'FROM';
-'uses'                                          return 'USES';
-'as'                                            return 'AS';
-'new'                                           return 'NEW';
-<CONTROL>'for'                                  return 'FOR';
-<CONTROL>'endfor'                               return 'ENDFOR';
-<CONTROL>'if'                                   return 'IF';
-<CONTROL>'endif'                                return 'ENDIF';
-<CONTROL>'else'                                 return 'ELSE';
-<CONTROL>'elseif'                               return 'ELSEIF';
-<CONTROL>'in'                                   return 'IN';
-<CONTROL>'switch'                               return 'SWITCH';
-<CONTROL>'endswitch'                            return 'ENDSWITCH';
-<CONTROL>'default'                              return 'DEFAULT';
-<CONTROL>'case'                                 return 'CASE';
-<CONTROL>'endcase'                              return 'ENDCASE';
-<CONTROL>'include'                              return 'INCLUDE';
-<CONTROL>'export'                               return 'EXPORT';
-<CONTROL>'endexport'                            return 'ENDEXPORT';
-'true'|'false'                                  return 'BOOLEAN';
-{NumberLiteral}                                 return 'NUMBER_LITERAL';
-{StringLiteral}                                 return 'STRING_LITERAL';
-'<!--'             this.begin('COMMENT');       return;
-<COMMENT>'-->'     this.popState();             return;
-<COMMENT>[.\n]+                                 return;
-'{{'                                            return '{{';
-'}}'                                            return '}}';
-'|'                                             return '|';
-'=>'                                            return '=>';
-'::'                                            return '::';
-'->'                                            return '->';
-'..'                                            return '..';
-'{%'                this.begin('CONTROL');      return '{%';
-'%}'                this.begin('CHILDREN');     return '%}';
-'</'                                            return '</';
-'/>'                this.begin('CHILDREN');     return '/>';
-'>'                 this.begin('CHILDREN');     return '>';
-'<'                                             return '<';
-'('                                             return '(';
-')'                                             return ')';
-'['                                             return '[';
-']'                                             return ']';
-';'                                             return ';'
-':'                                             return ':';
-'='                                             return '='
-'=='                                            return '==';
-'!='                                            return '!=';
-'>='                                            return '>=';
-'<='                                            return '<=';
-'+'                                             return '+';
-'-'                                             return '-';
-'*'                                             return '*';
-'/'                                             return '/';
-'&&'                                            return '&&';
-'||'                                            return '||';
-'^'                                             return '^';
-'!'                                             return '!';
-','                                             return ',';
-'?'                                             return '?';
-'.'                                             return '.';
-'{'                                             return '{';
-'}'                                             return '}';
-{Identifier}                                    return 'IDENTIFIER';
+<*>\s+                                                   return;
+'import'                                                 return 'IMPORT';
+'from'                                                   return 'FROM';
+'uses'                                                   return 'USES';
+'as'                                                     return 'AS';
+'new'                                                    return 'NEW';
+<CONTROL>'for'                                           return 'FOR';
+<CONTROL>'endfor'                                        return 'ENDFOR';
+<CONTROL>'if'                                            return 'IF';
+<CONTROL>'endif'                                         return 'ENDIF';
+<CONTROL>'else'                                          return 'ELSE';
+<CONTROL>'elseif'                                        return 'ELSEIF';
+<CONTROL>'in'                                            return 'IN';
+<CONTROL>'switch'                                        return 'SWITCH';
+<CONTROL>'endswitch'                                     return 'ENDSWITCH';
+<CONTROL>'default'                                       return 'DEFAULT';
+<CONTROL>'case'                                          return 'CASE';
+<CONTROL>'endcase'                                       return 'ENDCASE';
+<CONTROL>'include'                                       return 'INCLUDE';
+<CONTROL>'export'                                        return 'EXPORT';
+<CONTROL>'endexport'                                     return 'ENDEXPORT';
+'true'|'false'                                           return 'BOOLEAN';
+{NumberLiteral}                                          return 'NUMBER_LITERAL';
+{StringLiteral}                                          return 'STRING_LITERAL';
+<INITIAL,CHILDREN,CONTROL>'<!--' this.begin('COMMENT');     return;
+<COMMENT>(.|\r|\n)*?'-->'     this.popState();           return;
+<COMMENT>'-->'                this.popState();           return;
+'{{'                                                     return '{{';
+'}}'                                                     return '}}';
+'|'                                                      return '|';
+'=>'                                                     return '=>';
+'::'                                                     return '::';
+'->'                                                     return '->';
+'..'                                                     return '..';
+'{%'                         this.begin('CONTROL');      return '{%';
+'%}'                         this.begin('CHILDREN');     return '%}';
+'</'                                                     return '</';
+'/>'                         this.begin('CHILDREN');     return '/>';
+'>'                          this.begin('CHILDREN');     return '>';
+'<'                                                      return '<';
+'('                                                      return '(';
+')'                                                      return ')';
+'['                                                      return '[';
+']'                                                      return ']';
+';'                                                      return ';'
+':'                                                      return ':';
+'='                                                      return '='
+'=='                                                     return '==';
+'!='                                                     return '!=';
+'>='                                                     return '>=';
+'<='                                                     return '<=';
+'+'                                                      return '+';
+'-'                                                      return '-';
+'*'                                                      return '*';
+'/'                                                      return '/';
+'&&'                                                     return '&&';
+'||'                                                     return '||';
+'^'                                                      return '^';
+'!'                                                      return '!';
+','                                                      return ',';
+'?'                                                      return '?';
+'.'                                                      return '.';
+'{'                                                      return '{';
+'}'                                                      return '}';
+{Identifier}                                             return 'IDENTIFIER';
 
-<CHILDREN>'{{'       this.popState();           return '{{';
-<CHILDREN>'{%'       this.begin('CONTROL');     return '{%';
-<CHILDREN>'</'       this.popState();           return '</';
-<CHILDREN>'<'        this.popState();           return '<';
-<CHILDREN>[^/<>{%}]+ this.popState();           return 'CHARACTERS';
+<CHILDREN>'{{'       this.popState();                    return '{{';
+<CHILDREN>'{%'       this.begin('CONTROL');              return '{%';
+<CHILDREN>'</'       this.popState();                    return '</';
+<CHILDREN>'<'        this.popState();                    return '<';
+<CHILDREN>[^/<>{%}]+ this.popState();                    return 'CHARACTERS';
 
-<*><<EOF>>                                      return 'EOF';
+<*><<EOF>>                                               return 'EOF';
 
 /lex
 %right <*> '?' ':' '=>'
@@ -131,13 +131,13 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 %%
 
 template
-          : imports? exports? usage? tag EOF
+          : imports? usage? exports? tag? EOF
             {$$ =
             new yy.ast.Template(
             $1 || [],
             $2 || [],
             $3 || [],
-            $4, @$); return $$;
+            $4 || null, @$); return $$;
             }
           ;
 
@@ -149,6 +149,7 @@ imports
 import_statement
           : IMPORT import_member FROM string_literal ';'
             {$$ = new yy.ast.ImportStatement($2, $4, @$);}
+
           ;
 
 import_member
@@ -190,18 +191,18 @@ exports
           : export
             {$$ = [$1]; }
 
-          | exports ',' export
-            {$$ = $1.concat($3);}
+          | exports export
+            {$$ = $1.concat($2);}
 
           ;
 
 export
           : '{%' EXPORT identifier '%}'
-            children
+            tag
             '{%' ENDEXPORT '%}'
-            {$$ = new yy.ast.ExportStatement($3, $5, $@);      }
+            {$$ = new yy.ast.ExportStatement($3, $5, @$);      }
 
-          | '{%' EXPORT identifier from string_literal '%}'
+          | '{%' EXPORT identifier FROM string_literal '%}'
             {$$ = new yy.ast.ExportFromStatement($3, $5, @$);  }
 
           ;
@@ -314,23 +315,42 @@ for_children
           ;
 
 if_statement
-         : '{%' IF expression '%}'
-            children
-           '{%' ENDIF '%}'
-            {$$ = new yy.ast.IfStatement($3, $5, [], @$); }
 
-         | '{%' IF expression '%}' children
-           '{%' ELSE '%}' children '{%' ENDIF '%}'
-           {$$ = new yy.ast.IfStatement($3, $5, $9, @$);}
+         : '{%' IF expression '%}' children '{%' ENDIF '%}'
+           {$$ = new yy.ast.IfStatement($3, $5, null, @$); }
 
-       /*  | '{%' IF expression '%}' children
-           '{%' ELSEIF expression '%}' children '{%' ENDIF '%}'
-           {$$ = new yy.ast.IfCondition($3, $5, $9, @$);} */
+         | '{%' IF expression '%}' children else_clause
+           {$$ = new yy.ast.IfStatement($3, $5, $6, @$); }
+
+         ;
+
+else_clause
+
+         :  '{%' ELSE '%}' children '{%' ENDIF '%}'
+            {$$ = new yy.ast.ElseClause($4, @$);                              }
+
+         |  '{%' ELSE IF expression '%}' children '{%' ENDIF '%}'
+            {$$ = new yy.ast.ElseIfClause($4, $6, null,  @$);                 }
+
+         |  '{%' ELSE IF expression '%}' children else_clause                 }
+            {$$ = new yy.ast.ElseIfClause($4, $6, $7, @$);                    }
+
+         ;
+
+else_if_clause
+
+         :  '{%' ELSE IF expression '%}' children
+            {$$ = new yy.ast.ElseIfStatement($4, $6, @$);           }
+
+         |  '{%' ELSE IF expression '%}' children
+
          ;
 
 switch_statement
+
          : '{%' SWITCH expression '%}' case_statements '{%' ENDSWITCH '%}'
             {$$ = new yy.ast.SwitchStatement($3, $5, @$);}
+
          ;
 
 case_statements
@@ -339,9 +359,14 @@ case_statements
          ;
 
 case_statement
-         : '{%' CASE (string_literal|number_literal|boolean_literal|DEFAULT) '%}'
+
+         : '{%' CASE (string_literal|number_literal|boolean_literal) '%}'
             children '{%' ENDCASE '%}'
            {$$ = new yy.ast.CaseStatement($3, $5, @$);}
+
+         | '{%' DEFAULT CASE '%}'
+            children '{%' ENDCASE '%}'
+           {$$ = new yy.ast.CaseStatement(null, $5, @$);}
          ;
 
 include_statement
@@ -508,7 +533,7 @@ new_expression
 function_literal
 
           : identifier '=>'  expression
-            {$$ = new yy.ast.FunctionLiteral($1, $3, @$);   }
+            {$$ = new yy.ast.FunctionLiteral([$1], $3, @$);   }
 
           | parameters  '=>'  expression
             {$$ = new yy.ast.FunctionLiteral($1, $3, @$);   }

@@ -3,16 +3,17 @@ import Node from './Node';
 var count = 0;
 
 /**
- * CaseStatement 
+ * CaseStatement
  * @param {ValueExpression} expression
- * @param {array<Expression>} children 
+ * @param {array<Expression>} children
  * @param {Location} location
  */
 class CaseStatement extends Node {
 
     constructor(expression, children, location) {
 
-        super(location);
+        super();
+
         this.type = 'case-statement';
         this.expression = expression;
         this.children = children;

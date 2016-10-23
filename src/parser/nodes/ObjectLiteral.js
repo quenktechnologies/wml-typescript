@@ -1,9 +1,9 @@
 import Node from './Node';
 
 /**
- * ObjectLiteral 
- * @param {array<object>} keys 
- * @param {Location} location 
+ * ObjectLiteral
+ * @param {array<object>} keys
+ * @param {Location} location
  */
 class ObjectLiteral extends Node {
 
@@ -18,7 +18,7 @@ class ObjectLiteral extends Node {
 
     transpile() {
 
-        return '{' + this.keys.map(p => `${k.key}:${k.value.transpile()}`).join(',') + '}';
+        return '{' + this.keys.map(k => `${k.key}:${k.value.transpile()}`).join(',') + '}';
 
     }
 

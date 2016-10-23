@@ -6,25 +6,20 @@ class Widget {
   constructor(attrs, children) {
 
     this.attrs = attrs._attrs;
-this.attributes = attrs;
+    this.attributes = attrs;
     this.children = children;
 
   }
 
-    onRendered() {
+  onRendered() {
 
-    }
+  }
 
-    onRemoved() {
+  onRemoved() {
 
-    }
-
-    render() {
-
-        return null;
-
-    }
+  }
 
 }
 
 export default Widget
+

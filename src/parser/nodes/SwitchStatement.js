@@ -1,60 +1,64 @@
 import Node from './Node';
 
 /**
- * SwitchStatement 
+ * SwitchStatement
  * @param {Expression} expression
- * @param {array<CaseStatement>} cases 
- * @param {Location} location 
+ * @param {array<CaseStatement>} cases
+ * @param {Location} location
  */
 class SwitchStatement extends Node {
 
-    constructor(expression, cases, location) {
+  constructor(expression, cases, location) {
 
-        super(location);
-        this.type = 'switch-statement';
-        this.expression = expression;
-        this.cases = cases;
+    super(location);
+    this.type = 'switch-statement';
+    this.expression = expression;
+    this.cases = cases;
 
-    }
+  }
 
-    transpile() {
+  transpile() {
 
-        var str = '{';
+    var str = '{';
 
+    this.cases.forEach(c => {
 
-        this.cases.forEach(c =>
-            str = str + c.expression.transpile() + ':' + c.transpile() + ',');
+      str = `${str} ${(c.expression) ? c.expression.transpile() : 'default'}` +
+        ` : ${c.transpile()}, `;
 
-        str = str.substring(0, str.length - 1);
-        str = str + '}';
+    });
 
-        return `make.$switch(${this.expression.transpile()},${str})`;
+    str = str.substring(0, str.length - 1);
+    str = str + '}';
 
-    }
+    return `make.$switch(${this.expression.transpile()},${str})`;
 
-    compile(o) {
+  }
 
-        var node = this.sourceNode(o.fileName, '');
+  compile(o) {
 
-        node.add(`make.$switch(`).
-        add(this.expression.compile(o)).
-        add(',{');
+    var node = this.sourceNode(o.fileName, '');
 
-        this.cases.forEach((c, k, all) => {
+    node.add(`make.$switch(`).
+    add(this.expression.compile(o)).
+    add(',{');
 
-            node.add(c.value.compile(o)).
-            add(':').
-            add(c.compile(o));
+    this.cases.forEach((c, k, all) => {
 
-            if (k < all.length - 1)
-                node.add(',');
+      node.add((c.expression) ? c.expression.compile(o) : `default`).
+      add(':').
+      add(c.compile(o));
 
-        });
+      if (k < all.length - 1)
+        node.add(',');
 
-        return node.add('})');
+    });
 
-    }
+    return node.add('})');
+
+  }
 
 }
 
 export default SwitchStatement
+
