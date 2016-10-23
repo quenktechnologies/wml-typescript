@@ -1,42 +1,42 @@
-var Transpiler = require('./transpile/Transpiler');
+var compile = require('./');
 var through = require('through');
 var babel = require('babel-core');
 
-var transpiler = new Transpiler();
-
 function transform(file) {
 
-    var data = '';
+  var data = '';
 
-    function write(buf) {
-        data += buf;
+  function write(buf) {
+    data += buf;
+  }
+
+  function end() {
+
+    var js;
+
+    try {
+      js = compile(data);
+    } catch (e) {
+      console.error('An error occurred while parsing ' + file + '!');
+      console.error(e.stack ? e.stack : e);
+      throw e;
     }
 
-    function end() {
+    this.queue(babel.transform(js, {
+      sourceMaps: true,
+      presets: ['es2015'],
+      plugins: ['transform-export-extensions'],
+      highlightCode: false
+    }).code);
 
-        var js;
+    this.queue(null);
 
-        try {
-            js = transpiler.transpile(data);
-        } catch (e) {
-            console.error(e);
-            throw e;
-        }
+  }
 
-        this.queue(babel.transform(js, {
-            sourceMaps: true,
-            presets: ['es2015'],
-            plugins: ['add-module-exports'],
-            highlightCode: false
-        }).code);
-
-        this.queue(null);
-
-    }
-
-    if (!(/\.wml$/).test(file)) return through();
-    return through(write, end);
+  if (!(/\.wml$/).test(file)) return through();
+  return through(write, end);
 
 }
 
 module.exports = transform;
+
