@@ -1,5 +1,5 @@
 {
-  "name": "wml",
+  "name": "@quenk/wml",
   "version": "0.1.3",
   "description": "Widget Markup Language",
   "main": "lib/index.js",
