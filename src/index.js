@@ -6,7 +6,7 @@ const DEFAULT_OPTIONS = {
   fileName: 'wmloutput.js'
 };
 
-function compile(src, ast = nodes, o = DEFAULT_OPTIONS) {
+export function compile(src, ast = nodes, o = DEFAULT_OPTIONS) {
 
   return Parser.parse(src, nodes).transpile();
 
