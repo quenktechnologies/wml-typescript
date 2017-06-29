@@ -10,7 +10,7 @@ var thenCount = 0;
  */
 class IfStatement extends Node {
 
-  constructor(expression, ithen, ielse = function() {}, location = null) {
+  constructor(expression, ithen, ielse=null, location = null) {
 
     super(location);
 
@@ -26,7 +26,7 @@ class IfStatement extends Node {
 
     return `make.$if(${this.expression.transpile()}, ` +
       `function if${thenCount}(){return [${this.then.map(t=>t.transpile()).join(',')}];}.bind(this),` +
-      `${this.else.transpile()})`;
+      `${this.else?this.else.transpile():''})`;
 
   }
 
