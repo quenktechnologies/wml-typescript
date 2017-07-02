@@ -105,8 +105,9 @@ class Template extends Node {
         this.ids = {};
         this.widgets.forEach(w => w.removed());
         this.widgets = [];
-         console.error('this is it ', this);
+
         tree = this.template.call(this.context);
+
         this.ids['root'] = (this.ids['root'])? this.ids['root']:tree;
         this.widgets.forEach(w => w.rendered());
 
