@@ -119,7 +119,7 @@ function $$text(value) {
  */
 function $$resolve(head, path) {
 
-  var ret = $$property(head, path);
+  var ret = $$property(path, head);
 
   return (ret == null) ? '' : ret;
 
@@ -176,7 +176,7 @@ class Attributes {
      */
     ${ts(o, 'read<A>(path:string, defaultValue?:A): A', 'read(path, defaultValue)')} {
 
-        var ret = $$property(this._attrs, path.split(':').join('.'));
+        var ret = $$property(path.split(':').join('.'), this._attrs);
       return (ret != null) ? ret : (defaultValue != null) ? defaultValue : '';
 
     }
