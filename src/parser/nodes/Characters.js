@@ -1,7 +1,7 @@
 import Node from './Node';
 
 /**
- * Characters 
+ * Characters
  */
 class Characters extends Node {
 
@@ -9,13 +9,13 @@ class Characters extends Node {
 
       super(location);
       this.type = 'characters';
-        this.value = value;
+      this.value = value;
 
     }
 
     transpile() {
 
-        return `make.text(\`${this.value}\`)`;
+        return `$$text(\`${this.value}\`)`;
 
     }
 

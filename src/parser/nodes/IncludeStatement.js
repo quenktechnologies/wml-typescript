@@ -1,7 +1,7 @@
 import Node from './Node';
 
 /*
- * IncludeStatement 
+ * IncludeStatement
  */
 class IncludeStatement extends Node {
 
@@ -17,7 +17,7 @@ class IncludeStatement extends Node {
     transpile() {
 
         var args = (this.arguments !== null) ? this.arguments.transpile() : '[]';
-        return `${this.template.transpile()}.apply(this, [make].concat(${args}))`;
+        return `${this.template.transpile()}.apply(this, [view].concat(${args}))`;
 
     }
 

@@ -53,7 +53,7 @@ class Tag extends Node {
     var spreads = this.attributes.filter(a => a.type === 'attribute-spread');
 
     var tag = (this.name[0] === this.name[0].toUpperCase()) ?
-      `make.widget(${this.name}` : `make.node('${this.name}'`;
+      `$$widget(${this.name}` : `$$node('${this.name}'`;
 
     this.attributes.forEach(a => a.pushStringOnNamespace(butes));
 
@@ -61,7 +61,7 @@ class Tag extends Node {
       Object.keys(butes).map(ns => ns + ':{' + butes[ns].join(',') + '}')) + '}');
 
     children = `[${this.children.map(c => c.transpile()).join(',')}]`;
-    return `${tag},${butes},${children})`;
+    return `${tag},${butes},${children}, view)`;
 
   }
 

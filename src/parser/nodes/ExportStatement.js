@@ -20,7 +20,7 @@ class ExportStatement extends Node {
 
   transpile() {
 
-    return `export function ${this.id}(make) { ` +
+    return `export function ${this.id}(view) { ` +
       `return ${this.root.transpile()};}\n`;
 
   }

@@ -31,7 +31,7 @@ class SwitchStatement extends Node {
     str = str.substring(0, str.length - 1);
     str = str + '}';
 
-    return `make.$switch(${this.expression.transpile()},${str})`;
+    return `$$switch(${this.expression.transpile()},${str})`;
 
   }
 
@@ -39,7 +39,7 @@ class SwitchStatement extends Node {
 
     var node = this.sourceNode(o.fileName, '');
 
-    node.add(`make.$switch(`).
+    node.add(`$$switch(`).
     add(this.expression.compile(o)).
     add(',{');
 

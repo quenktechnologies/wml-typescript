@@ -10,7 +10,7 @@ var thenCount = 0;
  */
 class IfStatement extends Node {
 
-  constructor(expression, ithen, ielse=null, location = null) {
+  constructor(expression, ithen, ielse = null, location = null) {
 
     super(location);
 
@@ -24,7 +24,7 @@ class IfStatement extends Node {
 
   transpile() {
 
-    return `make.$if(${this.expression.transpile()}, ` +
+    return `$$if(${this.expression.transpile()}, ` +
       `function if${thenCount}(){return [${this.then.map(t=>t.transpile()).join(',')}];}.bind(this),` +
       `${this.else?this.else.transpile():''})`;
 
@@ -33,8 +33,7 @@ class IfStatement extends Node {
   compile(o) {
 
     var sn = this.sourceNode(o.fileName, '').
-    add(`make`).
-    add(`$if`).
+    add(`$$if`).
     add(`(`).
     add(this.expression.transpile()).
     add(`,`).

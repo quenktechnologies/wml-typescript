@@ -1,6 +1,7 @@
 import Parser from './parser/Parser';
 import * as nodes from './parser/nodes';
 import * as babel from 'babel-core';
+import {js_beautify} from 'js-beautify';
 import es2015 from 'babel-preset-es2015';
 import exports from 'babel-plugin-transform-export-extensions';
 
@@ -24,7 +25,7 @@ export function es5ify(js) {
 export function compile(src, o = DEFAULT_OPTIONS, ast = nodes) {
 
   let output = Parser.parse(src, nodes).transpile();
-  return (o.es2015) ? es5ify(output) : output;
+  return js_beautify((o.es2015) ? es5ify(output) : output);
 
 }
 

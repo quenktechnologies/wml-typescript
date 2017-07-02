@@ -2,7 +2,7 @@ import Node from './Node';
 
 var count = 0;
 /**
- * ForStatement 
+ * ForStatement
  */
 class ForStatement extends Node {
 
@@ -22,7 +22,7 @@ class ForStatement extends Node {
 
         count = count + 1;
 
-        return `make.$for(${this.target.transpile()},` +
+        return `$$for(${this.target.transpile()},` +
             `function for_${count} (${this.variable}, ${this.index}, ${this.array}) {` +
             `return [${this.transpileList(this.children)}]; }.bind(this))`;
 

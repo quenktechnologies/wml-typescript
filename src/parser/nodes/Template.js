@@ -1,4 +1,9 @@
 import Node from './Node';
+import preamble from '../preamble';
+import {
+  js_beautify
+} from 'js-beautify';
+
 
 /**
  * Template
@@ -29,11 +34,58 @@ class Template extends Node {
 
     args = (args) ? ' ,' + args : args;
 
-    this.imports.forEach(i => str = str + i.transpile());
-    str = `${str}\n`;
-    this.exports.forEach(e => str = str + e.transpile());
+    let imports = this.imports.map(i => i.transpile());
+    let exports = this.exports.map(e => e.transpile());
 
-    return `${str}\nexport default function (make${args}) { return ${this.root.transpile()}; }`;
+    return `${imports} \n ${preamble()} \n ${exports}
+    export class Main {
+
+       constructor(context) {
+
+          let view = this;
+
+          this.ids = {};
+          this.widgets = [];
+
+          this.tree = null;
+          this.context = context;
+          this.template = function(){return ${this.root.transpile()}};
+
+       }
+
+       static render(context) {
+
+         return (new Main(context)).render();
+
+       }
+
+       findById(id) {
+
+        return (this.ids[id]) ? this.ids[id] : null;
+
+       }
+
+       render() {
+
+        var tree = null;
+
+        this.ids = {};
+        this.widgets.forEach(w => w.removed());
+        this.widgets = [];
+
+        tree = this.template.call(this.context);
+        this.ids.root = (this.ids.root)? this.ids.root:tree;
+        this.widgets.forEach(w => w.rendered());
+
+        return tree;
+
+      }
+
+     }
+
+     export default Main;
+
+    `;
 
   }
 
