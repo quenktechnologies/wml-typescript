@@ -4,6 +4,15 @@ import {
   js_beautify
 } from 'js-beautify';
 
+const typescript = () => `
+
+  ids: object;
+  widgets: View[];
+  tree: HTMLElement;
+  context: object;
+  template: ()=>HTMLElement;
+
+`;
 
 /**
  * Template
@@ -27,7 +36,7 @@ class Template extends Node {
 
   }
 
-  transpile() {
+  transpile(o) {
 
     var str = '';
     var args = this.uses.map(p => p.transpile()).join(',');
@@ -39,6 +48,8 @@ class Template extends Node {
 
     return `${imports} \n ${preamble()} \n ${exports}
     export class Main {
+
+      ${(o.typescript)? typescript() : ''}
 
        constructor(context) {
 
