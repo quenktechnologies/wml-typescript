@@ -1,18 +1,31 @@
 import Node from './Node';
 import preamble from '../preamble';
+import * as babel from 'babel-core';
+import es2015 from 'babel-preset-es2015';
+import exports from 'babel-plugin-transform-export-extensions';
 import {
   js_beautify
 } from 'js-beautify';
 
 const typescript = () => `
 
-  ids: object;
-  widgets: View[];
+  ids: {[key:string]: WMLElement};
+  widgets: Widget[];
   tree: HTMLElement;
   context: object;
   template: ()=>HTMLElement;
 
 `;
+
+const es5 = (js, opts = {}) =>
+  babel.transform(js, Object.assign({
+    sourceMaps: true,
+    presets: [es2015],
+    plugins: [exports],
+    highlightCode: false
+  }, opts)).code;
+
+const pretty = js_beautify;
 
 /**
  * Template
@@ -45,9 +58,18 @@ class Template extends Node {
 
     let imports = this.imports.map(i => i.transpile());
     let exports = this.exports.map(e => e.transpile());
+    let pipeline = [];
+    let output = code => pipeline.reduce((p, c) => c(p), code);
 
-    return `${imports} \n ${preamble()} \n ${exports}
-    export class Main {
+    if (o.es5)
+      pipeline.push((typeof o.es5 === 'object') ? s => es5(s, o.es5) : es5);
+
+    if (o.pretty)
+      pipeline.push(pretty);
+
+    return output(`${imports} \n ${preamble(o)} \n ${exports}
+
+    export class Main ${o.typescript? 'implements View' : ''}{
 
       ${(o.typescript)? typescript() : ''}
 
@@ -70,7 +92,7 @@ class Template extends Node {
 
        }
 
-       findById(id) {
+       ${o.typescript? 'findById(id:string) : WMLElement ' : 'findById(id)'}{
 
         return (this.ids[id]) ? this.ids[id] : null;
 
@@ -83,9 +105,9 @@ class Template extends Node {
         this.ids = {};
         this.widgets.forEach(w => w.removed());
         this.widgets = [];
-
+         console.error('this is it ', this);
         tree = this.template.call(this.context);
-        this.ids.root = (this.ids.root)? this.ids.root:tree;
+        this.ids['root'] = (this.ids['root'])? this.ids['root']:tree;
         this.widgets.forEach(w => w.rendered());
 
         return tree;
@@ -96,7 +118,7 @@ class Template extends Node {
 
      export default Main;
 
-    `;
+    `);
 
   }
 

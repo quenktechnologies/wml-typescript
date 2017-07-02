@@ -1,5 +1,30 @@
 /* The property-seek module literally copied and pasted here for conveinence. */
-const source = `
+
+const ts = (o, txt, dtxt = '') => o.typescript ? txt : dtxt;
+
+const view = () => `
+
+export interface View {
+
+ render(): HTMLElement;
+ findById(id:string): WMLElement;
+
+}
+`;
+
+const widget = () => `
+export interface Widget {
+
+  rendered(): void;
+  removed(): void;
+  render(): HTMLElement;
+
+}`;
+
+const element = () => `
+export type WMLElement = HTMLElement | Node | EventTarget | Widget`;
+
+export default o => `
 function $$boundary_to_dot(value) {
   return value.split('][').join('.').split('[').join('.');
 }
@@ -138,15 +163,9 @@ function $$node(tag, attributes, children, view) {
  */
 class Attributes {
 
-    constructor(attrs) {
+    constructor(${ts(o, 'public _attrs:any',  '_attrs')}) {
 
-        this._attrs = attrs;
-
-    }
-
-    static isset(value) {
-
-      return [null, undefined].indexOf(value) < 0;
+        this._attrs = _attrs;
 
     }
 
@@ -155,63 +174,12 @@ class Attributes {
      * @param {string} path
      * @param {*} defaultValue - This value is returned if the value is not set.
      */
-    read(path, defaultValue) {
+    ${ts(o, 'read<A>(path:string, defaultValue?:A): A', 'read(path, defaultValue)')} {
 
         var ret = $$property(this._attrs, path.split(':').join('.'));
-
-        defaultValue = Attributes.isset(defaultValue)? defaultValue : '';
-
-        if(!Attributes.isset(ret))
-            return defaultValue;
-
-        return ret;
+      return (ret != null) ? ret : (defaultValue != null) ? defaultValue : '';
 
     }
-
-    /**
-     * require is like read but throws an Error if the value is not supplied.
-     * @param {string} path
-     * @returns {*}
-     */
-    require(path) {
-
-        var ret = this.read(path);
-
-        if(!Attributes.isset(ret))
-            throw new ReferenceError(\`\${path} is required!\`);
-
-        return ret;
-
-    }
-
-    /**
-     * requireArray requires the value to be an array, if no
-     * value is read then default is provided.
-     * @param {string} path
-     * @param {*} defaultValue
-     */
-    requireArray(path, defaultValue) {
-
-        var ret = this.read(path);
-
-        if(!Attributes.isset(ret)) {
-
-            if (Attributes.isset(defaultValue))
-                return defaultValue;
-
-            throw new ReferenceError(\`\${path} is required!\`);
-
-        } else {
-
-            if (Array.isArray(ret))
-                return ret;
-
-            throw new TypeError(\`\${path} must be an array got \${typeof ret}!\`);
-
-        }
-
-    }
-
 
 }
 
@@ -238,7 +206,7 @@ function $$widget(Constructor, attributes, children, view) {
     if (attributes.wml.id)
       $$register(attributes.wml.id, w, view.ids);
 
-  this.widgets.push(w);
+  view.widgets.push(w);
   return w.render();
 
 }
@@ -268,7 +236,7 @@ function $$for(collection, cb) {
 
    } else if (typeof collection === 'object') {
 
-     return Object.keys(collection).map((key, i, all) => cb(collection[key], key, all));
+     return Object.keys(collection).map((key, _, all) => cb(collection[key], key, all));
 
    }
 
@@ -291,7 +259,10 @@ function $$switch(value, cases) {
     if (defaul) return defaul;
 
 }
-`;
 
-export default  () => source;
+${ts(o, view())}
+${ts(o, widget())}
+${ts(o, element())}
+
+`;
 
