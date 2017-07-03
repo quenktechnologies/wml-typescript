@@ -217,7 +217,7 @@ function $$widget(Constructor, attributes, children, view) {
  * @param {function} positive
  * @param {function} negative
  */
-function $$if(predicate, positive, negative) {
+function $$if(predicate, positive, negative?) {
 
   return (predicate) ? positive() : negative();
 
