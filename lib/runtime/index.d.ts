@@ -39,6 +39,7 @@ export declare class Attributes {
 
   static isset(value): boolean;
 
+  has(path: string): boolean;
   read<A>(path: string, defaultValue?: A): A;
 
   require<A>(path: string): A;

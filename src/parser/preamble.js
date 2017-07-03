@@ -169,6 +169,12 @@ class Attributes {
 
     }
 
+    ${ts(o, 'has(path:string): boolean', 'has(path)')}{
+
+      return this.read(path) == null;
+
+    }
+
     /**
      * read a value form the internal list.
      * @param {string} path
