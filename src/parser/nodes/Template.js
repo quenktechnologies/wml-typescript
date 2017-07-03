@@ -27,6 +27,11 @@ const es5 = (js, opts = {}) =>
 
 const pretty = js_beautify;
 
+const rootElement = (root, o) =>
+  root ? root.transpile() : (o.typescript) ?
+  '<HTMLElement><Node>document.createDocumentFragment()' :
+  'document.createDocumentFragment()';
+
 /**
  * Template
  * @param {array<Import>} imports
@@ -82,7 +87,9 @@ class Template extends Node {
 
           this.tree = null;
           this.context = context;
-          this.template = function(){return ${this.root.transpile()}};
+          this.template = function(){
+            return ${rootElement(this.root, o)}
+          }
 
        }
 
