@@ -44,3 +44,9 @@ export declare class Attributes {
   require<A>(path: string): A;
 
 }
+
+export declare interface Renderable {
+
+  render(): HTMLElement
+
+}
