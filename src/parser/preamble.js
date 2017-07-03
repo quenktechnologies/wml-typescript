@@ -85,23 +85,6 @@ function $$adopt(child, e) {
 }
 
 /**
- * $$register a Widget or Node by the specified wml:id
- * @param {string} id
- * @param {Widget|Node} target
- * @param {object} ids
- */
-function $$register(id, target, ids) {
-
-  if (ids.hasOwnProperty(id))
-    throw new Error('Duplicate id \\'' +id+'\\' detected!');
-
-  ids[id] = target;
-
-  return target;
-
-}
-
-/**
  * $$text creates a DOMTextNode
  * @param {string} value
  */
@@ -150,7 +133,7 @@ function $$node(tag, attributes, children, view) {
 
   if (attributes.wml)
     if (attributes.wml.id)
-      $$register(attributes.wml.id, e, view.ids);
+      view.register(attributes.wml.id, e);
 
   return e;
 
@@ -210,7 +193,7 @@ function $$widget(Constructor, attributes, children, view) {
 
   if (attributes.wml)
     if (attributes.wml.id)
-      $$register(attributes.wml.id, w, view.ids);
+      view.register(attributes.wml.id, w);
 
   view.widgets.push(w);
   return w.render();

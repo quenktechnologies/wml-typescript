@@ -99,6 +99,17 @@ class Template extends Node {
 
        }
 
+       ${o.typescript? 'register(id:string, w:WMLElement): Main' : 'register(id, w)'}{
+
+
+         if (this.ids.hasOwnProperty(id))
+           throw new Error('Duplicate id \\'' +id+'\\' detected!');
+
+         this.ids[id] = w;
+         return this;
+
+       }
+
        ${o.typescript? 'findById(id:string) : WMLElement ' : 'findById(id)'}{
 
         return (this.ids[id]) ? this.ids[id] : null;
