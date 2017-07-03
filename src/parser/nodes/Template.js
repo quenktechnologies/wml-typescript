@@ -56,8 +56,8 @@ class Template extends Node {
 
     args = (args) ? ' ,' + args : args;
 
-    let imports = this.imports.map(i => i.transpile());
-    let exports = this.exports.map(e => e.transpile());
+    let imports = this.imports.map(i => i.transpile()).join('');
+    let exports = this.exports.map(e => e.transpile()).join('');
     let pipeline = [];
     let output = code => pipeline.reduce((p, c) => c(p), code);
 
