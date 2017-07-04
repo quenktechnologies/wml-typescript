@@ -116,6 +116,33 @@ class Template extends Node {
 
        }
 
+       ${o.typescript? 'invalidate(): void' : 'invalidate()'} {
+
+        var childs;
+        var parent = this.tree.parentNode;
+        var realFirstChild;
+        var realFirstChildIndex;
+
+         if (this.tree == null)
+           throw new ReferenceError('Cannot invalidate a view that has not been rendered!');
+
+         if (this.tree.parentNode == null)
+           throw new ReferenceError('Attempt to invalidate a view that has not been inserted to DOM!');
+
+         childs = ${o.typescript? '(<Element> this.tree.parentNode)' : 'this.tree.parentNode'}.children;
+
+         //for some reason the reference stored does not have the correct parent node.
+         //we do this to get a 'live' version of the node.
+         for (let i = 0; i < childs.length; i++)
+           if (childs[i] === this.tree) {
+             realFirstChild = childs[i];
+             realFirstChildIndex = i;
+           }
+
+         parent.replaceChild(this.render(), realFirstChild);
+
+       }
+
        render() {
 
         var tree = null;

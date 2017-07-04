@@ -154,7 +154,7 @@ class Attributes {
 
     ${ts(o, 'has(path:string): boolean', 'has(path)')}{
 
-      return this.read(path) == null;
+      return this.read(path) != null;
 
     }
 
