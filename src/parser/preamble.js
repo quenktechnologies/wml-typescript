@@ -80,7 +80,7 @@ function $$adopt(child, e) {
     if (child)
       e.appendChild(
         (typeof child === 'object') ?
-        child : document.createTextNode(child || ''));
+        child : document.createTextNode(child == null? '' : child));
 
 }
 
@@ -90,7 +90,7 @@ function $$adopt(child, e) {
  */
 function $$text(value) {
 
-  return document.createTextNode(value || '');
+  return document.createTextNode(value == null ?  '' : value);
 
 }
 
