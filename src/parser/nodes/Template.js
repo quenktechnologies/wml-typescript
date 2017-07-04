@@ -145,18 +145,14 @@ class Template extends Node {
 
        render() {
 
-        var tree = null;
-
         this.ids = {};
         this.widgets.forEach(w => w.removed());
         this.widgets = [];
-
-        tree = this.template.call(this.context);
-
-        this.ids['root'] = (this.ids['root'])? this.ids['root']:tree;
+        this.tree = this.template.call(this.context);
+        this.ids['root'] = (this.ids['root'])? this.ids['root']:this.tree;
         this.widgets.forEach(w => w.rendered());
 
-        return tree;
+        return this.tree;
 
       }
 
