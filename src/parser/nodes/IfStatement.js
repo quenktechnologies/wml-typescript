@@ -26,7 +26,7 @@ class IfStatement extends Node {
 
     return `$$if(${this.expression.transpile()}, ` +
       `function if${thenCount}(){return [${this.then.map(t=>t.transpile()).join(',')}];}.bind(this),` +
-      `${this.else?this.else.transpile():''})`;
+      `${this.else?this.else.transpile():'function(){}'})`;
 
   }
 

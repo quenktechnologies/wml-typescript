@@ -196,6 +196,11 @@ tests = {
 
     input: '{% export view from "somewhere" %}'
 
+  },
+
+  'should parse complicated expressions': {
+
+    input: '<div class={{(Styles.A + " ") + Style.B}}/>'
   }
 
 };
