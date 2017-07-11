@@ -127,13 +127,13 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 %right '!'
 
 %ebnf
-%start template
+%start module
 %%
 
-template
+module
           : imports? usage? exports? tag? EOF
             {$$ =
-            new yy.ast.Template(
+            new yy.ast.Module(
             $1 || [],
             $2 || [],
             $3 || [],

@@ -1,5 +1,5 @@
 /* jshint ignore:start */
-export Template from './Template';
+export Module from './Module';
 export ImportStatement from './ImportStatement';
 export ExportStatement from './ExportStatement';
 export ExportFromStatement from './ExportFromStatement';
