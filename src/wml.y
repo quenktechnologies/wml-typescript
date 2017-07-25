@@ -54,6 +54,8 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 'uses'                                                   return 'USES';
 'as'                                                     return 'AS';
 'new'                                                    return 'NEW';
+'macro'                                                  return 'MACRO';
+'endmacro'                                               return 'ENDMACRO';
 <CONTROL>'for'                                           return 'FOR';
 <CONTROL>'endfor'                                        return 'ENDFOR';
 <CONTROL>'if'                                            return 'IF';
@@ -69,6 +71,8 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <CONTROL>'include'                                       return 'INCLUDE';
 <CONTROL>'export'                                        return 'EXPORT';
 <CONTROL>'endexport'                                     return 'ENDEXPORT';
+<CONTROL>'view'                                          return 'VIEW';
+<CONTROL>'endview'                                       return 'ENDVIEW';
 'true'|'false'                                           return 'BOOLEAN';
 {NumberLiteral}                                          return 'NUMBER_LITERAL';
 {StringLiteral}                                          return 'STRING_LITERAL';
@@ -131,13 +135,12 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 %%
 
 module
-          : imports? usage? exports? tag? EOF
+          : imports? exports? tag? EOF
             {$$ =
             new yy.ast.Module(
             $1 || [],
             $2 || [],
-            $3 || [],
-            $4 || null, @$); return $$;
+            $3 || null, @$); return $$;
             }
           ;
 
@@ -147,7 +150,7 @@ imports
           ;
 
 import_statement
-          : IMPORT import_member FROM string_literal ';'
+          : IMPORT import_member FROM string_literal
             {$$ = new yy.ast.ImportStatement($2, $4, @$);}
 
           ;
@@ -197,19 +200,40 @@ exports
           ;
 
 export
-          : '{%' EXPORT identifier '%}'
-            tag
-            '{%' ENDEXPORT '%}'
-            {$$ = new yy.ast.ExportStatement($3, $5, @$);      }
-
-          | '{%' EXPORT identifier FROM string_literal '%}'
-            {$$ = new yy.ast.ExportFromStatement($3, $5, @$);  }
-
+          : (view_statement|
+             macro_statement|
+             export_from_statement)
+            {$$ = $1;                                           }
           ;
 
-usage
-          : USES arguments
-            {$$ = $2; }
+view_statement
+
+          : '{%' VIEW identifier '%}'
+            tag
+            '{%' ENDVIEW '%}'
+            {$$ = new yy.ast.ViewStatement($3, $5, @$);     }
+          ;
+
+macro_statement
+
+          : '{%' MACRO identifier '%}' tag '{%' ENDMACRO '%}'
+            {$$ = new yy.ast.MacroStatement($3, [], $5, @$);    }
+
+          | '{%' MACRO identifier '('  ')' '%}'
+            tag
+            '{%' ENDMACRO '%}'
+            {$$ = new yy.ast.MacroStatement($3, [], $7, @$);    }
+
+          | '{%' MACRO identifier '(' arguments ')' '%}'
+            tag
+            '{%' ENDMACRO '%}'
+            {$$ = new yy.ast.MacroStatement($3, $5, $8, @$);    }
+          ;
+
+export_from_statement
+
+          : '{%' EXPORT identifier FROM string_literal '%}'
+            {$$ = new yy.ast.ExportFromStatement($3, $5, @$);  }
           ;
 
 tag

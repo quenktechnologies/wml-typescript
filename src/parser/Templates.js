@@ -1,18 +1,26 @@
 /* The property-seek module literally copied and pasted here for conveinence. */
 
-const ts = (o, txt, dtxt = '') => o.typescript ? txt : dtxt;
+const _ts = (o, txt, dtxt = '') => o.typescript ? txt : dtxt;
 
-const view = () => `
+const _typescriptProperties = () => `
+  ids: {[key:string]: WMLElement};
+  widgets: Widget[];
+  tree: HTMLElement;
+  context: object;
+  template: ()=>HTMLElement;
+`;
+
+
+const _view = () => `
 
 export interface View {
 
  render(): HTMLElement;
  findById(id:string): WMLElement;
 
-}
-`;
+}`;
 
-const widget = () => `
+const _widget = () => `
 export interface Widget {
 
   rendered(): void;
@@ -21,10 +29,11 @@ export interface Widget {
 
 }`;
 
-const element = () => `
-export type WMLElement = HTMLElement | Node | EventTarget | Widget`;
+const _element = () =>
+  `export type WMLElement = HTMLElement | Node | EventTarget | Widget`;
 
-export default o => `
+export const preamble = o => `
+
 function $$boundary_to_dot(value) {
   return value.split('][').join('.').split('[').join('.');
 }
@@ -146,13 +155,13 @@ function $$node(tag, attributes, children, view) {
  */
 class Attributes {
 
-    constructor(${ts(o, 'public _attrs:any',  '_attrs')}) {
+    constructor(${_ts(o, 'public _attrs:any',  '_attrs')}) {
 
         this._attrs = _attrs;
 
     }
 
-    ${ts(o, 'has(path:string): boolean', 'has(path)')}{
+    ${_ts(o, 'has(path:string): boolean', 'has(path)')}{
 
       return this.read(path) != null;
 
@@ -163,7 +172,7 @@ class Attributes {
      * @param {string} path
      * @param {*} defaultValue - This value is returned if the value is not set.
      */
-    ${ts(o, 'read<A>(path:string, defaultValue?:A): A', 'read(path, defaultValue)')} {
+    ${_ts(o, 'read<A>(path:string, defaultValue?:A): A', 'read(path, defaultValue)')} {
 
         var ret = $$property(path.split(':').join('.'), this._attrs);
       return (ret != null) ? ret : (defaultValue != null) ? defaultValue : '';
@@ -249,9 +258,100 @@ function $$switch(value, cases) {
 
 }
 
-${ts(o, view())}
-${ts(o, widget())}
-${ts(o, element())}
+${_ts(o, _view())}
+${_ts(o, _widget())}
+${_ts(o, _element())}`;
 
-`;
+const _rootElement = (root, o) =>
+  root ? root.transpile(o) : (o.typescript) ?
+  '<HTMLElement><Node>document.createDocumentFragment()' :
+  'document.createDocumentFragment()';
+
+export const view = (name, tag, o) =>
+
+  `export class ${name} ${o.typescript? 'implements View' : ''}{
+
+      ${(o.typescript)? _typescriptProperties() : ''}
+
+       constructor(context) {
+
+          let view = this;
+
+          this.ids = {};
+          this.widgets = [];
+
+          this.tree = null;
+          this.context = context;
+          this.template = function(){
+            return ${_rootElement(tag, o)}
+          }
+
+       }
+
+       static render(context) {
+
+         return (new ${name}(context)).render();
+
+       }
+
+       ${o.typescript? 'register(id:string, w:WMLElement): '+name : 'register(id, w)'}{
+
+
+         if (this.ids.hasOwnProperty(id))
+           throw new Error('Duplicate id \\'' +id+'\\' detected!');
+
+         this.ids[id] = w;
+         return this;
+
+       }
+
+       ${o.typescript? 'findById(id:string) : WMLElement ' : 'findById(id)'}{
+
+        return (this.ids[id]) ? this.ids[id] : null;
+
+       }
+
+       ${o.typescript? 'invalidate(): void' : 'invalidate()'} {
+
+        var childs;
+        var parent = this.tree.parentNode;
+        var realFirstChild;
+        var realFirstChildIndex;
+
+         if (this.tree == null)
+           throw new ReferenceError('Cannot invalidate a view that has not been rendered!');
+
+         if (this.tree.parentNode == null)
+           throw new ReferenceError('Attempt to invalidate a view that has not been inserted to DOM!');
+
+         childs = ${o.typescript? '(<Element> this.tree.parentNode)' : 'this.tree.parentNode'}.children;
+
+         //for some reason the reference stored does not have the correct parent node.
+         //we do this to get a 'live' version of the node.
+         for (let i = 0; i < childs.length; i++)
+           if (childs[i] === this.tree) {
+             realFirstChild = childs[i];
+             realFirstChildIndex = i;
+           }
+
+         parent.replaceChild(this.render(), realFirstChild);
+
+       }
+
+       render() {
+
+        this.ids = {};
+        this.widgets.forEach(w => w.removed());
+        this.widgets = [];
+        this.tree = this.template.call(this.context);
+        this.ids['root'] = (this.ids['root'])? this.ids['root']:this.tree;
+        this.widgets.forEach(w => w.rendered());
+
+        return this.tree;
+
+      }
+
+     }
+
+    `;
 
