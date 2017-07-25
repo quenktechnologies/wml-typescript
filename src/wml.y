@@ -44,18 +44,25 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 %x CHILDREN
 %x COMMENT
 %x CONTROL
+%x EXPRESSION
 %%
 
 /* Lexer rules */
 
-<*>\s+                                                   return;
-'import'                                                 return 'IMPORT';
-'from'                                                   return 'FROM';
-'uses'                                                   return 'USES';
-'as'                                                     return 'AS';
-'new'                                                    return 'NEW';
-'macro'                                                  return 'MACRO';
-'endmacro'                                               return 'ENDMACRO';
+<*>\s+                                                   return;               
+
+<INITIAL>'import'                                        return 'IMPORT';
+<INITIAL>'from'                                          return 'FROM';
+<INITIAL>'as'                                            return 'AS';
+<INITIAL>'</'                                            return '</';
+<INITIAL>'{%'                this.begin('CONTROL');      return '{%';
+<INITIAL>'<!--'              this.begin('COMMENT');      return;
+<INITIAL>'>'                 this.begin('CHILDREN');     return '>';
+<INITIAL>'/>'                this.begin('CHILDREN');     return '/>';
+<INITIAL>'{{'                this.begin('EXPRESSION');   return '{{';
+
+<CONTROL>'macro'                                         return 'MACRO';
+<CONTROL>'endmacro'                                      return 'ENDMACRO';
 <CONTROL>'for'                                           return 'FOR';
 <CONTROL>'endfor'                                        return 'ENDFOR';
 <CONTROL>'if'                                            return 'IF';
@@ -70,59 +77,59 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <CONTROL>'endcase'                                       return 'ENDCASE';
 <CONTROL>'include'                                       return 'INCLUDE';
 <CONTROL>'export'                                        return 'EXPORT';
+<CONTROL>'from'                                          return 'FROM';
 <CONTROL>'endexport'                                     return 'ENDEXPORT';
 <CONTROL>'view'                                          return 'VIEW';
 <CONTROL>'endview'                                       return 'ENDVIEW';
-'true'|'false'                                           return 'BOOLEAN';
-{NumberLiteral}                                          return 'NUMBER_LITERAL';
-{StringLiteral}                                          return 'STRING_LITERAL';
-<INITIAL,CHILDREN,CONTROL>'<!--' this.begin('COMMENT');  return;
-<COMMENT>(.|\r|\n)*?'-->'     this.popState();           return;
-<COMMENT>'-->'                this.popState();           return;
-'{{'                                                     return '{{';
-'}}'                                                     return '}}';
-'|'                                                      return '|';
-'=>'                                                     return '=>';
-'::'                                                     return '::';
-'->'                                                     return '->';
-'..'                                                     return '..';
-'{%'                         this.begin('CONTROL');      return '{%';
-'%}'                         this.begin('CHILDREN');     return '%}';
-'</'                                                     return '</';
-'/>'                         this.begin('CHILDREN');     return '/>';
-'>'                          this.begin('CHILDREN');     return '>';
-'<'                                                      return '<';
-'('                                                      return '(';
-')'                                                      return ')';
-'['                                                      return '[';
-']'                                                      return ']';
-';'                                                      return ';'
-':'                                                      return ':';
-'='                                                      return '='
-'=='                                                     return '==';
-'!='                                                     return '!=';
-'>='                                                     return '>=';
-'<='                                                     return '<=';
-'+'                                                      return '+';
-'-'                                                      return '-';
-'*'                                                      return '*';
-'/'                                                      return '/';
-'&&'                                                     return '&&';
-'||'                                                     return '||';
-'^'                                                      return '^';
-'!'                                                      return '!';
-','                                                      return ',';
-'?'                                                      return '?';
-'.'                                                      return '.';
-'{'                                                      return '{';
-'}'                                                      return '}';
-{Identifier}                                             return 'IDENTIFIER';
+<CONTROL>'%}'                this.popState();            return '%}';
 
-<CHILDREN>'{{'       this.popState();                    return '{{';
-<CHILDREN>'{%'       this.begin('CONTROL');              return '{%';
-<CHILDREN>'</'       this.popState();                    return '</';
-<CHILDREN>'<'        this.popState();                    return '<';
-<CHILDREN>[^/<>{%}]+ this.popState();                    return 'CHARACTERS';
+<EXPRESSION>'new'                                        return 'NEW';
+<EXPRESSION>'|'                                          return '|';
+<EXPRESSION>'=>'                                         return '=>';
+<EXPRESSION>'::'                                         return '::';
+<EXPRESSION>'->'                                         return '->';
+<EXPRESSION>'..'                                         return '..';
+<EXPRESSION>'}}'             this.popState();            return '}}';
+
+<CHILDREN>'{{'               this.begin('EXPRESSION');   return '{{';
+<CHILDREN>'{%'               this.begin('CONTROL');      return '{%';
+<CHILDREN>'<!--'             this.begin('COMMENT');      return;
+<CHILDREN>'</'               this.popState();            return '</';
+<CHILDREN>'<'                this.popState();            return '<';
+<CHILDREN>[^/<>{%}]+         this.popState();            return 'CHARACTERS';
+
+<COMMENT>(.|\r|\n)*?'-->'    this.popState();            return;
+
+<*>'true'|'false'                                        return 'BOOLEAN';
+<*>{NumberLiteral}                                       return 'NUMBER_LITERAL';
+<*>{StringLiteral}                                       return 'STRING_LITERAL';
+<*>'>'                                                   return '>';
+<*>'<'                                                   return '<';
+<*>'('                                                   return '(';
+<*>')'                                                   return ')';
+<*>'['                                                   return '[';
+<*>']'                                                   return ']';
+<*>';'                                                   return ';'
+<*>':'                                                   return ':';
+<*>'='                                                   return '='
+<*>'=='                                                  return '==';
+<*>'!='                                                  return '!=';
+<*>'>='                                                  return '>=';
+<*>'<='                                                  return '<=';
+<*>'+'                                                   return '+';
+<*>'-'                                                   return '-';
+<*>'*'                                                   return '*';
+<*>'/'                                                   return '/';
+<*>'&&'                                                  return '&&';
+<*>'||'                                                  return '||';
+<*>'^'                                                   return '^';
+<*>'!'                                                   return '!';
+<*>','                                                   return ',';
+<*>'?'                                                   return '?';
+<*>'.'                                                   return '.';
+<*>'{'                                                   return '{';
+<*>'}'                                                   return '}';
+<*>{Identifier}                                          return 'IDENTIFIER';
 
 <*><<EOF>>                                               return 'EOF';
 

@@ -188,19 +188,19 @@ tests = {
 
     'should parse macro statements': {
 
-        input: '{% macro view %}<View/>{% endmacro %}'
+        input: '{% macro _view %}<View/>{% endmacro %}'
 
     },
 
     'should parse macro statements with args': {
 
-        input: '{% macro view(a,b,c) %} <View a={{a}} b={{b}} c={{c}}/> {% endmacro %}'
+        input: '{% macro _view(a,b,c) %} <View a={{a}} b={{b}} c={{c}}/> {% endmacro %}'
 
     },
 
     'should parse export from statements': {
 
-        input: '{% export view from "somewhere" %}'
+        input: '{% export _view from "somewhere" %}'
 
     },
 
