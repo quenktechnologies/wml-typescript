@@ -43,7 +43,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 %options flex
 %x CHILDREN
 %x COMMENT
-%s CONTROL
+%x CONTROL
 %%
 
 /* Lexer rules */
@@ -76,7 +76,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 'true'|'false'                                           return 'BOOLEAN';
 {NumberLiteral}                                          return 'NUMBER_LITERAL';
 {StringLiteral}                                          return 'STRING_LITERAL';
-<INITIAL,CHILDREN,CONTROL>'<!--' this.begin('COMMENT');     return;
+<INITIAL,CHILDREN,CONTROL>'<!--' this.begin('COMMENT');  return;
 <COMMENT>(.|\r|\n)*?'-->'     this.popState();           return;
 <COMMENT>'-->'                this.popState();           return;
 '{{'                                                     return '{{';
