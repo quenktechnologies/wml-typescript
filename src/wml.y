@@ -456,13 +456,13 @@ call_expression
           ;
 
 bind_expression
-          : IDENTIFIER '::' 'IDENTIFIER'
+          : identifier '::' 'identifier'
             {$$ = new yy.ast.BindExpression($1, $3, [] , @$);}
 
-          | IDENTIFIER '::' 'IDENTIFIER' arguments 
+          | identifier '::' 'identifier' arguments 
             {$$ = new yy.ast.BindExpression($1, $3, $4 , @$);}
 
-          | member_expression '::' IDENTIFIER
+          | member_expression '::' identifier
             {$$ = new yy.ast.BindExpression($1, $3, [], @$);}
 
           | member_expression '::' IDENTIFIER arguments
@@ -494,6 +494,15 @@ parameter_list
 
 member_expression
           : identifier '.' identifier   
+            {$$ = new yy.ast.MemberExpression($1, $3, @$); }
+
+          | array_literal '.' identifier   
+            {$$ = new yy.ast.MemberExpression($1, $3, @$); }
+
+          | object_literal '.' identifier   
+            {$$ = new yy.ast.MemberExpression($1, $3, @$); }
+
+          | string_literal '.' identifier
             {$$ = new yy.ast.MemberExpression($1, $3, @$); }
 
           | call_expression '.' identifier

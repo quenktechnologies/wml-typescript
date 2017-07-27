@@ -30,7 +30,7 @@ export interface Widget {
 }`;
 
 const _element = () =>
-  `export type WMLElement = HTMLElement | Node | EventTarget | Widget`;
+    `export type WMLElement = HTMLElement | Node | EventTarget | Widget`;
 
 export const preamble = o => `
 
@@ -136,7 +136,8 @@ function $$node(tag, attributes, children, view) {
 
       if (typeof attributes.html[key] === 'function') {
         e[key] = attributes.html[key];
-      } else {
+      } else if((attributes.html[key] != null) && (attributes.html[key] != '')) {
+          console.error('well ', key, attributes.html[key]);
         e.setAttribute(key, attributes.html[key]);
       }
     });
@@ -266,13 +267,13 @@ ${_ts(o, _widget())}
 ${_ts(o, _element())}`;
 
 const _rootElement = (root, o) =>
-  root ? root.transpile(o) : (o.typescript) ?
-  '<HTMLElement><Node>document.createDocumentFragment()' :
-  'document.createDocumentFragment()';
+    root ? root.transpile(o) : (o.typescript) ?
+    '<HTMLElement><Node>document.createDocumentFragment()' :
+    'document.createDocumentFragment()';
 
 export const view = (name, tag, o) =>
 
-  `export class ${name} ${o.typescript? 'implements View' : ''}{
+    `export class ${name} ${o.typescript? 'implements View' : ''}{
 
       ${(o.typescript)? _typescriptProperties() : ''}
 
@@ -357,4 +358,3 @@ export const view = (name, tag, o) =>
      }
 
     `;
-

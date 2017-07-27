@@ -14,7 +14,7 @@ class Identifier extends Node {
 
     }
 
-    transpile() {
+    transpile(o) {
 
         return this.name;
 

@@ -1,29 +1,32 @@
 import Node from './Node';
 
 /**
- * BindExpression 
- * @param {string} path 
+ * BindExpression
+ * @param {string} path
  * @param {string} target
  * @param {array<Expression>} args
  */
 class BindExpression extends Node {
 
-    constructor(path, target, args, location) {
+    constructor(object, member, args, location) {
 
         super(location);
         this.type = 'bind-expression';
-        this.path = path;
-        this.target = target;
+        this.object = object;
+        this.member = member;
         this.arguments = args;
 
     }
 
-    transpile() {
+    transpile(o) {
 
-        var args = this.arguments.map(a => a.transpile()).join(',');
+        var args = this.arguments.map(a => a.transpile(o)).join(',');
+        var object = this.object.transpile(o);
+        var member = this.member.transpile(o);
+
         args = (args) ? ' ,' + args : args;
 
-        return `${this.path}.${this.target}.bind(${this.path}${args})`;
+        return `${object}.${member}.bind(${object}${args})`;
 
     }
 
