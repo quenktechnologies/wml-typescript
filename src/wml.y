@@ -89,7 +89,6 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <EXPRESSION>'::'                                         return '::';
 <EXPRESSION>'->'                                         return '->';
 <EXPRESSION>'..'                                         return '..';
-<EXPRESSION>'@'                                          return '@';
 <EXPRESSION>'}}'             this.popState();            return '}}';
 
 <CHILDREN>'{{'               this.begin('EXPRESSION');   return '{{';
@@ -131,6 +130,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <*>'.'                                                   return '.';
 <*>'{'                                                   return '{';
 <*>'}'                                                   return '}';
+<*>'@'                                                   return '@';
 <*>{Identifier}                                          return 'IDENTIFIER';
 
 <*><<EOF>>                                               return 'EOF';
