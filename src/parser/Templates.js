@@ -137,7 +137,6 @@ function $$node(tag, attributes, children, view) {
       if (typeof attributes.html[key] === 'function') {
         e[key] = attributes.html[key];
       } else if((attributes.html[key] != null) && (attributes.html[key] != '')) {
-          console.error('well ', key, attributes.html[key]);
         e.setAttribute(key, attributes.html[key]);
       }
     });
