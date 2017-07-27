@@ -1,15 +1,15 @@
 import Node from './Node';
 
 /**
- * VariableExpression 
+ * Identifier
  * @param {string} name
  */
-class VariableExpression extends Node {
+class Identifier extends Node {
 
     constructor(name, location) {
 
         super(location);
-        this.type = 'variable-expression';
+        this.type = 'identifier';
         this.name = name;
 
     }
@@ -28,4 +28,4 @@ class VariableExpression extends Node {
 
 }
 
-export default VariableExpression
+export default Identifier

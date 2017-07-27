@@ -134,9 +134,9 @@ tests = {
         input: '<Html.div id={{this.id}}>{{this.check() ? a : b }}</div>'
 
     },
-    'should parse function literals': {
+    'should parse function expressions': {
 
-        input: '<button onclick={{(e)=>this.call(e)}}/>'
+        input: '<button onclick={{\\e =>this.call(e)}}/>'
 
     },
 
@@ -204,9 +204,16 @@ tests = {
 
     },
 
+    'should parse binary expressions': {
+
+        input: '<p>{{(Styles.A  + Styles.B)}}</p>'
+
+
+    },
+
     'should parse complicated expressions': {
 
-        input: '<div class={{(Styles.A + " ") + Style.B}}/>'
+        input: '<div class={{((Styles.A + " ") + Style.B)}}/>'
     }
 
 };

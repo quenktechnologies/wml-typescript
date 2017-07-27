@@ -5,19 +5,20 @@ import Node from './Node';
  */
 class NewExpression extends Node {
 
-    constructor(name, args, location) {
+    constructor(callee, args, location) {
 
         super(location);
         this.type = 'new-expression';
-        this.name = name;
+        this.callee = callee;
         this.arguments = args;
 
     }
 
-    transpile() {
+    transpile(o) {
 
-        var args = this.transpileList(this.arguments);
-        return `new ${this.name}(${args})`;
+        var callee = this.callee.transpile(o);
+        var args = this.arguments.map(a=>a.transpile(o));
+        return `new ${callee}(${args})`;
 
     }
 

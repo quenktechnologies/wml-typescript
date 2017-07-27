@@ -1,35 +1,46 @@
 import Node from './Node';
 
+var count = 0;
 /**
  * FunctionExpression
+ * @param {array<string>} parameters
+ * @param {Expression} expression
+ * @param {Location} location
  */
 class FunctionExpression extends Node {
 
-    constructor(name, args, location) {
+    constructor(parameters, expression, location) {
 
-        super(location);
+        super();
         this.type = 'function-expression';
-        this.name = name;
-        this.arguments = args;
+        this.parameters = parameters;
+        this.expression = expression;
+        this.location = location;
 
     }
 
-    transpile() {
+    transpile(o) {
 
-        var args = this.transpileList(this.arguments);
-        return `${this.name}(${args})`;
+        var params = this.parameters.map(p => p.transpile(o)).join(',');
+        count = count + 1;
+
+        return `function function_literal_${count}(${params})` +
+            `{ return ${this.expression.transpile(o)}; }.bind(this)`;
 
     }
 
     compile(o) {
 
-        var node = this.sourceNode(o.fileName, this.name).
-        add('(');
+        var node = this.sourceNode(o.fileName, '');
 
-        return this.compileList(this.arguments, node, o).
-        add(')');
+        node.add(`function function_literal_${count}(${this.parameters.join(',')})`).
+        add('{ return ');
+
+        return this.compileList(this.body.compile(o)).
+        add('; } bind(this)');
 
     }
 
 }
+
 export default FunctionExpression

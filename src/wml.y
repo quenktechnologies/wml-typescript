@@ -120,6 +120,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <*>'-'                                                   return '-';
 <*>'*'                                                   return '*';
 <*>'/'                                                   return '/';
+<*>'\\'                                                  return '\\';
 <*>'&&'                                                  return '&&';
 <*>'||'                                                  return '||';
 <*>'^'                                                   return '^';
@@ -134,8 +135,9 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <*><<EOF>>                                               return 'EOF';
 
 /lex
-%right <*> '?' ':' '=>'
+%right '?' ':' '=>'
 %right '!'
+%right ','
 
 %ebnf
 %start module
@@ -170,17 +172,17 @@ import_member
           ;
 
 default_member
-          : identifier
+          : IDENTIFIER
             {$$ = new yy.ast.DefaultMember($1, @$);}
           ;
 
 alias_member
-          : identifier AS identifier
+          : IDENTIFIER AS IDENTIFIER
             {$$ = new yy.ast.AliasMember($1, $3, @$);}
           ;
 
 aggregate_member
-          : '*' AS identifier
+          : '*' AS IDENTIFIER
             {$$ = new yy.ast.AggregateMember($3, @$);}
           ;
 
@@ -207,15 +209,13 @@ exports
           ;
 
 export
-          : (view_statement|
-             macro_statement|
-             export_from_statement)
+          : (view_statement | macro_statement | export_from_statement)
             {$$ = $1;                                           }
           ;
 
 view_statement
 
-          : '{%' VIEW identifier '%}'
+          : '{%' VIEW IDENTIFIER '%}'
             tag
             '{%' ENDVIEW '%}'
             {$$ = new yy.ast.ViewStatement($3, $5, @$);     }
@@ -223,15 +223,10 @@ view_statement
 
 macro_statement
 
-          : '{%' MACRO identifier '%}' tag '{%' ENDMACRO '%}'
+          : '{%' MACRO IDENTIFIER '%}' tag '{%' ENDMACRO '%}'
             {$$ = new yy.ast.MacroStatement($3, [], $5, @$);    }
 
-          | '{%' MACRO identifier '('  ')' '%}'
-            tag
-            '{%' ENDMACRO '%}'
-            {$$ = new yy.ast.MacroStatement($3, [], $7, @$);    }
-
-          | '{%' MACRO identifier '(' arguments ')' '%}'
+          | '{%' MACRO IDENTIFIER arguments '%}'
             tag
             '{%' ENDMACRO '%}'
             {$$ = new yy.ast.MacroStatement($3, $5, $8, @$);    }
@@ -239,7 +234,7 @@ macro_statement
 
 export_from_statement
 
-          : '{%' EXPORT identifier FROM string_literal '%}'
+          : '{%' EXPORT IDENTIFIER FROM string_literal '%}'
             {$$ = new yy.ast.ExportFromStatement($3, $5, @$);  }
           ;
 
@@ -254,7 +249,11 @@ tag
             { $$ = new yy.ast.Tag($2, $3, [], @$); }
           ;
 tagname
-          : (identifier | member_access) {$$ = $1;}
+          : IDENTIFIER
+            {$$ = $1;                      }
+
+          | tagname '.' IDENTIFIER  
+            {$$ = [$1, $3].join('.');      }
           ;
 
 attributes
@@ -269,26 +268,20 @@ attribute
           | attribute_name
             {$$ = new yy.ast.Attribute($1.name, $1.namespace,
             new yy.ast.BooleanLiteral(true, @$),@$);}
-
-          | '..'member_access
-            {$$ = new yy.ast.AttributeSpread($2, '', @$);}
-
-          | '..' '(' (member_access|identifier) ')' member_access
-            {$$ = new yy.ast.AttributeSpread($5, $3,  @$);}
           ;
 
 attribute_name
-          : identifier                  {$$ = {namespace:null, name:$1};}
-          | identifier ':' identifier   {$$ = {namespace:$1, name:$3};}
+          : IDENTIFIER                  {$$ = {namespace:null, name:$1};}
+          | IDENTIFIER ':' IDENTIFIER   {$$ = {namespace:$1, name:$3};}
           ;
 
 attribute_value
-          : interpolation                             {$$ = $1;}
-          | (string_literal|number_literal)           {$$ = $1;}
+          : (interpolation|string_literal|number_literal) 
+            {$$ = $1;}
           ;
 
 interpolation
-          : '{{' (expression|function_literal) '}}'
+          : '{{' expression '}}'
             {$$ = new yy.ast.Interpolation($2, [], @$);}
 
           | '{{' expression filters '}}'
@@ -304,8 +297,8 @@ filter
           : '|'  tagname
             {$$ = new yy.ast.Filter($2, [], @$);}
 
-          | '|'  tagname '(' arguments ')'
-            {$$ = new yy.ast.Filter($2, $4, @$);}
+          | '|'  tagname arguments 
+            {$$ = new yy.ast.Filter($2, $3, @$);}
           ;
 
 children
@@ -322,17 +315,18 @@ child
 
 
 control
-          : (for_statement|if_statement|switch_statement|include_statement) {$$ = $1;}
+          : (for_statement|if_statement|switch_statement|include_statement) 
+            {$$ = $1;}
           ;
 
 for_statement
-          : '{%' FOR identifier IN expression '%}' for_children
+          : '{%' FOR IDENTIFIER IN expression '%}' for_children
             {$$ = new yy.ast.ForStatement($3, 'index', 'array', $5, $7, @$);}
 
-          | '{%' FOR identifier ',' identifier IN expression '%}' for_children
+          | '{%' FOR IDENTIFIER ',' IDENTIFIER IN expression '%}' for_children
             {$$ = new yy.ast.ForStatement($3, $5, 'array', $7, $9, @$);}
 
-          | '{%' FOR identifier ',' identifier ',' identifier IN expression '%}'
+          | '{%' FOR IDENTIFIER ',' IDENTIFIER ',' IDENTIFIER IN expression '%}'
             for_children
             {$$ = new yy.ast.ForStatement($3, $5, $7, $9, $11, @$);}
           ;
@@ -401,12 +395,7 @@ case_statement
          ;
 
 include_statement
-         :'{%' INCLUDE
-          (variable_expression|
-          property_expression|
-          function_expression|
-          method_expression) array_literal ?
-          '%}'
+         :'{%' INCLUDE expression array_literal ? '%}'
           {$$ = new yy.ast.IncludeStatement($3, $4? $4 : null, @$);}
          ;
 
@@ -416,61 +405,108 @@ characters
           ;
 
 arguments
-          : value_expression                {$$ = [$1];          }
-          | arguments ',' value_expression  {$$ = $1.concat($3); }
+          : '(' ')'
+            {$$ = [];                                      }
+
+          | '(' argument_list ')'
+            {$$ = $2;                                      }
+
+          ;
+
+argument_list
+          : expression
+            {$$ = [$1];                                    }
+
+          | argument_list ',' expression
+            {$$ = $1.concat($3);                           }
           ;
 
 expression
-          : grouped_expression
-          | ternary_expression
-          | binary_expression
-          | unary_expression
-          | value_expression
-          ;
+         : '(' expression ')'
+            { $$ = $2;                                         }
 
-grouped_expression
-          : '('  binary_expression ')'
-            {$$ = $2;}
-          ;
-
-ternary_expression
-          : expression  '?'  expression ':' expression
+          | expression  '?' expression ':' expression
             {$$ = new yy.ast.TernaryExpression($1, $3, $5, @$);}
-          ;
 
-binary_expression
-          : value_expression binary_operator value_expression
-            {$$ = new yy.ast.BinaryExpression($1, $2, $3, @$);}
+          | '(' expression binary_operator expression ')'
+            {$$ = new yy.ast.BinaryExpression($2, $3, $4, @$); }
 
-          | grouped_expression binary_operator grouped_expression
-            {$$ = new yy.ast.BinaryExpression($1, $2, $3, @$);}
-          ;
+          | '!' expression
+            {$$ = new yy.ast.UnaryExpression($1, $2, @$);      }
+
+          | (new_expression | call_expression | member_expression | 
+             function_expression | bind_expression | 
+             object_literal | array_literal | string_literal | 
+             number_literal | boolean_literal number_literal |
+             identifier)
+            {$$ = $1;                                          } 
+         ;
 
 binary_operator
           : ('>'|'>='|'<'|'<='|'=='|'!='|'+'|'/'|'-'|'='|'&&'|'||'|'^')
             { $$ = yy.help.convertOperator($1);}
           ;
 
-unary_expression
-          : '!' expression
-            {$$ = new yy.ast.UnaryExpression($1, $2, @$);}
+call_expression
+          : identifier arguments
+            {$$ = new yy.ast.CallExpression($1, $2, @$);    }
+
+          | member_expression arguments
+            {$$ = new yy.ast.CallExpression($1, $2, @$);    }
           ;
 
-value_expression
-          : variable_expression
-          | literal_expression
-          | property_expression
-          | function_expression
-          | method_expression
-          | bind_expression
-          | new_expression
+bind_expression
+          : IDENTIFIER '::' 'IDENTIFIER'
+            {$$ = new yy.ast.BindExpression($1, $3, [] , @$);}
+
+          | IDENTIFIER '::' 'IDENTIFIER' arguments 
+            {$$ = new yy.ast.BindExpression($1, $3, $4 , @$);}
+
+          | member_expression '::' IDENTIFIER
+            {$$ = new yy.ast.BindExpression($1, $3, [], @$);}
+
+          | member_expression '::' IDENTIFIER arguments
+            {$$ = new yy.ast.BindExpression($1, $3, $4, @$);}
           ;
 
-variable_expression
-          : identifier {$$ = new yy.ast.VariableExpression($1, @$); }
+new_expression
+          : NEW identifier
+            {$$ = new yy.ast.NewExpression($2, [], @$);}
+
+          | NEW identifier arguments
+            {$$ = new yy.ast.NewExpression($2, $3, @$);}
           ;
 
-literal_expression
+function_expression
+
+          : '\\' parameter_list '=>'  expression
+            {$$ = new yy.ast.FunctionExpression($2, $4, @$);   }
+          ;
+
+parameter_list
+
+          : identifier
+            {$$ = [$1];                                     }
+
+          | parameter_list ',' identifier
+            {$$ = [$1, $3];                                 }
+          ;
+
+member_expression
+          : identifier '.' identifier   
+            {$$ = new yy.ast.MemberExpression($1, $3, @$); }
+
+          | call_expression '.' identifier
+            {$$ = new yy.ast.MemberExpression($1, $3, @$); }
+
+          | bind_expression '.' identifier
+            {$$ = new yy.ast.MemberExpression($1, $3, @$); }
+
+          | member_expression '.' identifier
+            {$$ = new yy.ast.MemberExpression($1, $3, @$); }
+          ;
+
+literal
           : object_literal
           | array_literal
           | string_literal
@@ -495,7 +531,7 @@ key_value_pairs
           ;
 
 key_value_pair
-          : (identifier|STRING_LITERAL) ':' expression
+          : (IDENTIFIER|STRING_LITERAL) ':' expression
             {$$ = {key:$1, value:$3}; }
           ;
 
@@ -503,7 +539,7 @@ array_literal
           : '[' ']'
             {$$ = new yy.ast.ArrayLiteral([], @$); }
 
-          | '[' arguments ']'
+          | '[' argument_list ']'
             {$$ = new yy.ast.ArrayLiteral($2, @$); }
           ;
 
@@ -521,84 +557,7 @@ boolean_literal
           {$$ = new yy.ast.BooleanLiteral(yy.help.parseBoolean($1), @$);}
           ;
 
-function_expression
-          : identifier '(' arguments ')'
-            {$$ = new yy.ast.FunctionExpression($1, $3, @$);}
-
-          | identifier '('  ')'
-            {$$ = new yy.ast.FunctionExpression($1, [], @$);}
-          ;
-
-method_expression
-          : member_access '(' arguments ')'
-            {$$ = new yy.ast.MethodExpression($1, $3, @$);}
-
-          | member_access '(' ')'
-            {$$ = new yy.ast.MethodExpression($1, [], @$);}
-          ;
-
-property_expression
-          : member_access
-            {$$ = new yy.ast.PropertyExpression($1, @$); }
-          ;
-
-bind_expression
-          : identifier '::' 'identifier'
-            {$$ = new yy.ast.BindExpression($1, $3, [] , @$);}
-
-          |  identifier '::' 'identifier' '(' arguments ')'
-            {$$ = new yy.ast.BindExpression($1, $3, $5 , @$);}
-
-          | member_access '::' identifier
-            {$$ = new yy.ast.BindExpression($1, $3, [], @$);}
-
-          | member_access '::' identifier '(' arguments ')'
-            {$$ = new yy.ast.BindExpression($1, $3, $5, @$);}
-          ;
-
-new_expression
-          : NEW (indentifier|member_access) '(' arguments ')'
-            {$$ = new yy.ast.NewExpression($2, $4, @$);}
-          ;
-
-function_literal
-
-          : identifier '=>'  expression
-            {$$ = new yy.ast.FunctionLiteral([$1], $3, @$);   }
-
-          | parameters  '=>'  expression
-            {$$ = new yy.ast.FunctionLiteral($1, $3, @$);   }
-
-          ;
-
-parameters
-
-          : '(' ')'
-            {$$ = [];                                       }
-
-          | '(' identifier ')'
-            {$$ = [$2];                                     }
-
-          | '(' parameter_list ')'
-            {$$ = $2;                                       }
-
-          ;
-
-parameter_list
-
-          : identifier ',' identifier
-            {$$ = [$1, $3];                                 }
-
-          | parameter_list ',' identifier
-            {$$ = $1.concat($3);                            }
-
-          ;
-
-member_access
-          : identifier '.' identifier           {$$ = $1+'.'+$3;               }
-          | identifier '.' member_access        {$$ = $1+'.'+$3;               }
-          ;
-
 identifier
-          : IDENTIFIER {$$ = $1;}
+          : IDENTIFIER
+            {$$ = new yy.ast.Identifier($1, @$); }
           ;
