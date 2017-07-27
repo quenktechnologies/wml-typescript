@@ -229,15 +229,18 @@ function $$if(predicate, positive, negative) {
  * @param {Iterable} collection
  * @param {function} cb
  */
-function $$for(collection, cb) {
+function $$for(collection, cb, cb2) {
 
   if (Array.isArray(collection)) {
 
-    return collection.map(cb);
+    return collection.length > 0 ? collection.map(cb) : cb2();
 
    } else if (typeof collection === 'object') {
 
-     return Object.keys(collection).map((key, _, all) => cb(collection[key], key, all));
+       var l = Object.keys(collection);
+
+     return (l.length > 0)?
+           l.map((key, _, all) => cb(collection[key], key, all)) : cb2;
 
    }
 

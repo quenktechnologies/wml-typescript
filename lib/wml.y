@@ -89,6 +89,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <EXPRESSION>'::'                                         return '::';
 <EXPRESSION>'->'                                         return '->';
 <EXPRESSION>'..'                                         return '..';
+<EXPRESSION>'@'                                          return '@';
 <EXPRESSION>'}}'             this.popState();            return '}}';
 
 <CHILDREN>'{{'               this.begin('EXPRESSION');   return '{{';
@@ -320,23 +321,28 @@ control
           ;
 
 for_statement
-          : '{%' FOR IDENTIFIER IN expression '%}' for_children
-            {$$ = new yy.ast.ForStatement($3, 'index', 'array', $5, $7, @$);}
+          : '{%' FOR identifier IN expression '%}' children '{%' ENDFOR '%}'
+            {$$ = new yy.ast.ForStatement($3, null, null, $5, $7, [], @$);}
 
-          | '{%' FOR IDENTIFIER ',' IDENTIFIER IN expression '%}' for_children
-            {$$ = new yy.ast.ForStatement($3, $5, 'array', $7, $9, @$);}
+          | '{%' FOR identifier ',' identifier IN expression '%}' 
+            children '{%' ENDFOR '%}'
+            {$$ = new yy.ast.ForStatement($3, $5, null, $7, $9, [], @$);}
 
-          | '{%' FOR IDENTIFIER ',' IDENTIFIER ',' IDENTIFIER IN expression '%}'
-            for_children
-            {$$ = new yy.ast.ForStatement($3, $5, $7, $9, $11, @$);}
-          ;
+          | '{%' FOR identifier ',' identifier ',' identifier IN expression '%}'
+            children '{%' ENDFOR '%}'
+            {$$ = new yy.ast.ForStatement($3, $5, $7, $9, $11, [], @$);}
 
-for_children
-          :  children '{%' ENDFOR '%}'
-             {$$ = $1;}
+          | '{%' FOR identifier IN expression '%}' 
+             children '{%' ELSE '%}' children '{%' ENDFOR '%}'
+            {$$ = new yy.ast.ForStatement($3, null, null, $5, $7, $11, @$);}
 
-          |  '{%' ELSE '%}' children '{%' ENDFOR '%}'
-             {$$ = $4;}
+          | '{%' FOR identifier ',' identifier IN expression '%}' 
+            children '{%' ELSE '%}' children '{%' ENDFOR '%}'
+            {$$ = new yy.ast.ForStatement($3, $5, null, $7, $9, $13, @$);}
+
+          | '{%' FOR identifier ',' identifier ',' identifier IN expression '%}'
+            children '{%' ELSE '%}' children '{%' ENDFOR '%}'
+            {$$ = new yy.ast.ForStatement($3, $5, null, $7, $9, $15, @$);}
           ;
 
 if_statement
@@ -569,4 +575,6 @@ boolean_literal
 identifier
           : IDENTIFIER
             {$$ = new yy.ast.Identifier($1, @$); }
+          | '@'
+            {$$ = new yy.ast.Identifier('this.attributes', @$)}
           ;
