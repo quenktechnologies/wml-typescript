@@ -143,7 +143,7 @@ tests = {
     'should parse includes': {
 
         input: '<tr>{% for x,i in y %}' +
-            '{% include this.getFrags() [ctx1, ctx2] %}{% include val %}{% endfor %}</tr>'
+            '{% include (this.getFrags()) (ctx1, ctx2) %}{% include val %}{% endfor %}</tr>'
 
     },
     'should parse negative numbers': {

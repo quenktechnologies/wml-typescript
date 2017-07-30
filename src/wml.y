@@ -401,8 +401,23 @@ case_statement
          ;
 
 include_statement
-         :'{%' INCLUDE expression array_literal ? '%}'
-          {$$ = new yy.ast.IncludeStatement($3, $4? $4 : null, @$);}
+         :'{%' INCLUDE identifier arguments  '%}'
+          {$$ = new yy.ast.IncludeStatement($3, $4, @$);}
+
+         |'{%' INCLUDE identifier '%}'
+          {$$ = new yy.ast.IncludeStatement($3, null, @$);}
+
+         |'{%' INCLUDE member_expression arguments  '%}'
+          {$$ = new yy.ast.IncludeStatement($3, $4, @$);}
+
+         |'{%' INCLUDE member_expression '%}'
+          {$$ = new yy.ast.IncludeStatement($3, null, @$);}
+
+         |'{%' INCLUDE '(' call_expression ')' arguments '%}'
+          {$$ = new yy.ast.IncludeStatement($3, $4, @$);}
+
+         |'{%' INCLUDE '(' call_expression ')' '%}'
+          {$$ = new yy.ast.IncludeStatement($3, null, @$);}        
          ;
 
 characters
