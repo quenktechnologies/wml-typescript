@@ -214,7 +214,20 @@ tests = {
     'should parse complicated expressions': {
 
         input: '<div class={{((Styles.A + " ") + Style.B)}}/>'
+    },
+
+    'should allow for expression after macro': {
+
+        input:'{% macro sven %} {% for a in b %} {{b}} {% endfor %} {% endmacro %}'
+
+    },
+    'should allow if expression after macro': {
+
+        input:'{% macro ate %} {% if a %} {{a}} {% endif %} {% endmacro %}'
+
     }
+
+
 
 };
 

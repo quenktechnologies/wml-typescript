@@ -224,13 +224,13 @@ view_statement
 
 macro_statement
 
-          : '{%' MACRO IDENTIFIER '%}' tag '{%' ENDMACRO '%}'
+          : '{%' MACRO IDENTIFIER '%}' children '{%' ENDMACRO '%}'
             {$$ = new yy.ast.MacroStatement($3, [], $5, @$);    }
 
           | '{%' MACRO IDENTIFIER arguments '%}'
-            tag
+            children
             '{%' ENDMACRO '%}'
-            {$$ = new yy.ast.MacroStatement($3, $5, $8, @$);    }
+            {$$ = new yy.ast.MacroStatement($3, $4, $6, @$);    }
           ;
 
 export_from_statement
@@ -368,15 +368,6 @@ else_clause
 
          ;
 
-else_if_clause
-
-         :  '{%' ELSE IF expression '%}' children
-            {$$ = new yy.ast.ElseIfStatement($4, $6, @$);           }
-
-         |  '{%' ELSE IF expression '%}' children
-
-         ;
-
 switch_statement
 
          : '{%' SWITCH expression '%}' case_statements '{%' ENDSWITCH '%}'
@@ -405,19 +396,19 @@ include_statement
           {$$ = new yy.ast.IncludeStatement($3, $4, @$);}
 
          |'{%' INCLUDE identifier '%}'
-          {$$ = new yy.ast.IncludeStatement($3, null, @$);}
+          {$$ = new yy.ast.IncludeStatement($3, [], @$);}
 
          |'{%' INCLUDE member_expression arguments  '%}'
           {$$ = new yy.ast.IncludeStatement($3, $4, @$);}
 
          |'{%' INCLUDE member_expression '%}'
-          {$$ = new yy.ast.IncludeStatement($3, null, @$);}
+          {$$ = new yy.ast.IncludeStatement($3, [], @$);}
 
          |'{%' INCLUDE '(' call_expression ')' arguments '%}'
-          {$$ = new yy.ast.IncludeStatement($3, $4, @$);}
+          {$$ = new yy.ast.IncludeStatement($4, $6, @$);}
 
          |'{%' INCLUDE '(' call_expression ')' '%}'
-          {$$ = new yy.ast.IncludeStatement($3, null, @$);}        
+          {$$ = new yy.ast.IncludeStatement($4, [], @$);}        
          ;
 
 characters
@@ -510,7 +501,7 @@ parameter_list
             {$$ = [$1];                                     }
 
           | parameter_list ',' identifier
-            {$$ = [$1, $3];                                 }
+            {$$ = $1.concat($3);                            }
           ;
 
 member_expression

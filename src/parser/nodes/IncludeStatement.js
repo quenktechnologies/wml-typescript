@@ -7,28 +7,19 @@ class IncludeStatement extends Node {
 
     constructor(tmpl, args, location) {
 
-        super(location);
+        super();
         this.type = 'include-statement';
         this.template = tmpl;
         this.arguments = args;
+        this.location = location;
 
     }
 
-    transpile() {
+    transpile(o) {
 
-        var args = (this.arguments !== null) ? this.arguments.transpile() : '[]';
-        return `${this.template.transpile()}.apply(this, [view].concat(${args}))`;
+        var args = this.arguments.map(a => a.transpile(o)).join(',');
 
-    }
-
-    compile(o) {
-
-        var args = (this.arguments !== null) ? this.arguments.compile() : '[]';
-
-        return this.sourceNode(o.fileName, this.template.compile(o)).
-        add('.apply(this, [make].concat(').
-        add(args).
-        add('))');
+        return `${this.template.transpile(o)}.apply(this, [view, ${args}])`;
 
     }
 

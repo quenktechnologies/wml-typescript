@@ -24,22 +24,11 @@ class CaseStatement extends Node {
     transpile() {
 
         count = count + 1;
-        return `function case_statement${count}() { return`+
-          `[${this.transpileList(this.children)}];}.bind(this)`;
-
-    }
-
-    compile(o) {
-
-        count = count + 1;
-
-        var node = this.sourceNode(o.fileName, `function case_statement${count}() { return [`);
-
-        return this.compileList(this.children, node, o).
-        add('];}.bind(this');
+        return `function case_statement${count}() { ` +
+            `return $box([${this.children.map(c=>c.transpile(o)).join(',')}]);}.bind(this)`;
 
     }
 
 }
 
-export default CaseStatement
+    export default CaseStatement

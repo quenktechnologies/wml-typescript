@@ -25,34 +25,15 @@ class ForStatement extends Node {
         var index = this.index ? this.index.transpile(o) : '_';
         var array = this.array ? this.array.transpile(o) : '__';
         var src = this.src.transpile(o);
-        var children = this.children.map(c => c.transpile(o));
         var otherwise = this.otherwise.map(c => c.transpile(o));
 
         count = count + 1;
 
         return `$$for(${src},` +
             `function for${count} (${variable}, ${index}, ${array}) {` +
-            `return [${children}]; }.bind(this),` +
-            `function otherwise${count}() {
-               return [${otherwise}];
-            })`;
-
-    }
-
-    compile(o) {
-
-        var node = this.sourceNode(o.fileName, '');
-
-        count = count + 1;
-
-        node.add('make.$for(').
-        add(this.target.compile(o)).
-        add(`function for_${count} (${this.variable}, ${this.index}, ${this.array}) {`).
-        add('return [');
-
-        this.compileList(this.children, node, o);
-        return node.add(']; }.bind(this))');
-
+            `return $$box([${this.children.map(c=>c.transpile(o)).join(',')}])}` +
+            `.bind(this), function otherwise${count}() {` +
+            `return $$box([${this.otherwise.map(c=>c.transpile(o)).join(',')}])}.bind(this))`;
 
     }
 

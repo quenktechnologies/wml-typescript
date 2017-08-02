@@ -8,42 +8,24 @@ var elses = 0;
  */
 class ElseClause extends Node {
 
-  constructor(children = [], location = {}) {
+    constructor(children = [], location = {}) {
 
-    super();
+        super();
 
-    this.type = 'else-clause';
-    this.children = children;
-    this.location = location;
+        this.type = 'else-clause';
+        this.children = children;
+        this.location = location;
 
-  }
+    }
 
-  transpile() {
+    transpile(o) {
 
-    return `function else_clause${elses++}() { return ` +
-      `[${this.children.map(c=>c.transpile()).join(',')}];}.bind(this)`;
+        return `function else_clause${elses++}() {` +
+            `return $$box([${this.children.map(c=>c.transpile(o)).join(',')}]);` +
+            `}.bind(this)`;
 
-  }
-
-  compile(o) {
-
-    var sn = this.sourceNode(o.fileName, '').
-    add(`function else_clause${elses++}()`).
-    add(`{`).
-    add(`return`).
-    add(`[`);
-
-    this.children.forEach(c => sn.add(c.compile(o)).add(','));
-
-    return sn.add(`]`).
-      add(`;`).
-    add(`}`).
-      add(`.`).
-      add(`bind(this)`);
-
-  }
+    }
 
 }
 
 export default ElseClause
-

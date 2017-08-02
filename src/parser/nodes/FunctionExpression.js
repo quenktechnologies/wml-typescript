@@ -29,18 +29,6 @@ class FunctionExpression extends Node {
 
     }
 
-    compile(o) {
-
-        var node = this.sourceNode(o.fileName, '');
-
-        node.add(`function function_literal_${count}(${this.parameters.join(',')})`).
-        add('{ return ');
-
-        return this.compileList(this.body.compile(o)).
-        add('; } bind(this)');
-
-    }
-
 }
 
 export default FunctionExpression

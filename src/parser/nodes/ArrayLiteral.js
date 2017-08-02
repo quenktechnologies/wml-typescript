@@ -1,9 +1,9 @@
 import Node from './Node';
 
 /**
- * ArrayLiteral 
- * @param {array} members 
- * @param {Location} location 
+ * ArrayLiteral
+ * @param {array} members
+ * @param {Location} location
  */
 class ArrayLiteral extends Node {
 
@@ -13,19 +13,12 @@ class ArrayLiteral extends Node {
         this.members = members;
     }
 
-    transpile() {
+    transpile(o) {
 
-        return '[' + this.members.map(m => m.transpile()).join(',') + ']';
-
-    }
-
-    compile(o) {
-
-        var node = this.sourceNode(o.fileName, '[');
-        this.compileList(this.members, node, o).add(']');
-        return node;
+        return '[' + this.members.map(m => m.transpile(o)).join(',') + ']';
 
     }
+
 }
 
 export default ArrayLiteral

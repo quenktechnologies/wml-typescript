@@ -1,7 +1,7 @@
 import Node from './Node';
 import {
-    preamble,
-    view as viewFn
+    view as viewFn,
+    runtime as runtimeFn
 } from '../Templates';
 import * as babel from 'babel-core';
 import es2015 from 'babel-preset-es2015';
@@ -44,6 +44,7 @@ class Module extends Node {
     transpile(o) {
 
         let pipeline = [];
+        let runtime = runtimeFn(o.module);
         let imports = this.imports.map(i => i.transpile(o)).join('');
         let exports = this.exports.map(e => e.transpile(o)).join('');
         let view = this.root ? viewFn('Main', this.root, o) : '';
@@ -55,7 +56,7 @@ class Module extends Node {
         if (o.pretty)
             pipeline.push(pretty);
 
-        return output(`${imports} \n ${preamble(o)} \n ${exports} ${view}`);
+        return output(`${runtime} \n ${imports} \n ${exports} ${view}`);
 
     }
 

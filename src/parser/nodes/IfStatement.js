@@ -10,52 +10,28 @@ var thenCount = 0;
  */
 class IfStatement extends Node {
 
-  constructor(expression, ithen, ielse = null, location = null) {
+    constructor(expression, ithen, ielse = null, location = null) {
 
-    super(location);
+        super(location);
 
-    this.type = 'if-statement';
-    this.expression = expression;
-    this.then = ithen;
-    this.else = ielse;
-    this.location = location;
+        this.type = 'if-statement';
+        this.expression = expression;
+        this.then = ithen;
+        this.else = ielse;
+        this.location = location;
 
-  }
+    }
 
-  transpile() {
+    transpile(o) {
 
-    return `$$if(${this.expression.transpile()}, ` +
-      `function if${thenCount}(){return [${this.then.map(t=>t.transpile()).join(',')}];}.bind(this),` +
-      `${this.else?this.else.transpile():'function(){}'})`;
+        return `$$if(${this.expression.transpile()}, ` +
+            `function if${thenCount++}() {` +
+            `return $$box([${this.then.map(t =>t.transpile(o)).join(',')}])` +
+            `}.bind(this), ` +
+            ` ${this.else ? this.else.transpile(o) : '$$empty'})`;
 
-  }
-
-  compile(o) {
-
-    var sn = this.sourceNode(o.fileName, '').
-    add(`$$if`).
-    add(`(`).
-    add(this.expression.transpile()).
-    add(`,`).
-    add(`function if${thenCount}()`).
-    add(`{`).
-    add(`return`).
-    add(`[`);
-
-    this.then.forEach(t => sn.add(t.compile(o)).add(`,`));
-
-    return sn.add(`]`).
-    add(`;`).
-    add(`}`).
-    add(`.`).
-    add(`bind(this)`).
-    add(`,`).
-    add(this.else.compile(o)).
-    add(`)`);
-
-  }
+    }
 
 }
 
 export default IfStatement
-

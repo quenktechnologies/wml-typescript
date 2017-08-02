@@ -24,15 +24,6 @@ class CallExpression extends Node {
 
     }
 
-    compile(o) {
-
-        var node = this.sourceNode(o.fileName, this.name).
-        add('(');
-
-        return this.compileList(this.arguments, node, o).
-        add(')');
-
-    }
 
 }
 export default CallExpression
