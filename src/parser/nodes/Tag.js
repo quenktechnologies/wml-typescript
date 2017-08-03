@@ -48,7 +48,8 @@ class Tag extends Node {
 
     var children;
     var butes = {
-      html: []
+      html: [],
+        wml:[]
     };
     var spreads = this.attributes.filter(a => a.type === 'attribute-spread');
 
