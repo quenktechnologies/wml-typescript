@@ -11,7 +11,7 @@ const DEFAULT_OPTIONS = {
 };
 
 export const compile = (src, o = {}, ast = nodes) =>
-  Parser.parse(src, nodes).transpile(Object.assign(o, DEFAULT_OPTIONS));
+  Parser.parse(src, nodes).transpile(Object.assign({}, DEFAULT_OPTIONS, o));
 
 
 export default compile

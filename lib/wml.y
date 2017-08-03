@@ -111,6 +111,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <*>']'                                                   return ']';
 <*>';'                                                   return ';'
 <*>':'                                                   return ':';
+<*>':::'                                                 return ':::';
 <*>'='                                                   return '='
 <*>'=='                                                  return '==';
 <*>'!='                                                  return '!=';
@@ -581,6 +582,10 @@ boolean_literal
 identifier
           : IDENTIFIER
             {$$ = new yy.ast.Identifier($1, @$); }
+
           | '@'
             {$$ = new yy.ast.Identifier('this.attributes', @$)}
+
+          | IDENTIFIER ':::' IDENTIFIER
+            {$$ = new yy.ast.Identifier($1, @$); }
           ;

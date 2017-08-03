@@ -19,9 +19,9 @@ import {
 
 export const view = (name, tag, o) => `
 
-export class ${name} extends AppView {
+export class ${name}${o.typescript?'<C> extends AppView<C>':'extends AppView'}{
 
-    constructor(context) {
+    constructor(context${o.typescript?':C':''}) {
 
         super(context);
 
@@ -30,12 +30,6 @@ export class ${name} extends AppView {
         this.template = function() {
             return ${_rootElement(tag, o)}
         }
-
-       }
-
-       static render(context) {
-
-         return (new ${name}(context)).render();
 
        }
 

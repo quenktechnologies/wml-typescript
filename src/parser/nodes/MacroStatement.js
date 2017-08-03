@@ -19,11 +19,11 @@ class MacroStatement extends Node {
 
     transpile(o) {
 
-        let args = ['view'].concat(this.arguments.map(a => a.transpile(o)));
+        let args = [`view${o.typescript?':AppView<Z>':''}`].concat(this.arguments.map(a => a.transpile(o)));
         let kids = this.children.map(c => c.transpile(o)).join(',');
 
         return `
-        export function ${this.id}(${args}) {
+        export function ${this.id}${o.typescript?'<Z>':''}(${args}) {
         return $$box([${kids}]);}
         `;
 
