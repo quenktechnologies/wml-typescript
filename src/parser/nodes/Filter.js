@@ -1,7 +1,7 @@
 import Node from './Node';
 
 /**
- * Filter 
+ * Filter
  */
 class Filter extends Node {
 
@@ -21,9 +21,9 @@ class Filter extends Node {
 
     }
 
-    transpile() {
+    transpile(o) {
 
-        var args = this.arguments.map(a=>a.transpile());
+        var args = this.arguments.map(a=>a.transpile(o));
         return `${this.name}.apply(this, [${args}])`;
 
     }

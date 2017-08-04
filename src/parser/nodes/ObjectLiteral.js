@@ -16,9 +16,9 @@ class ObjectLiteral extends Node {
 
     }
 
-    transpile() {
+    transpile(o) {
 
-        return '{' + this.keys.map(k => `${k.key}:${k.value.transpile()}`).join(',') + '}';
+        return '{' + this.keys.map(k => `${k.key}:${k.value.transpile(o)}`).join(',') + '}';
 
     }
 

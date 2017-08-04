@@ -5,11 +5,12 @@ import Node from './Node';
  */
 class CallExpression extends Node {
 
-    constructor(callee, args, location) {
+    constructor(callee, hints, args, location) {
 
         super();
         this.type = 'function-expression';
         this.callee = callee;
+        this.hints = hints;
         this.arguments = args;
         this.location = location;
 
@@ -19,8 +20,9 @@ class CallExpression extends Node {
 
         var callee = this.callee.transpile(o);
         var args = this.arguments.map(a => a.transpile(o));
+        var hints = this.hints.map(h => h.transpile(o)).join(',');
 
-        return `${callee}(${args})`;
+        return `${callee}${hints?'<'+hints+'>':''}(${args})`;
 
     }
 

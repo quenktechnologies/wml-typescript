@@ -1,7 +1,7 @@
 import Node from './Node';
 
 /**
- * CompositeMember 
+ * CompositeMember
  * @param {array<Member>} member
  * @param {Location} location
  */
@@ -16,30 +16,9 @@ class CompositeMember extends Node {
 
     }
 
-    transpile() {
+    transpile(o) {
 
-        return `{ ${this.members.map(m=>m.transpile()).join(',')} }`;
-
-    }
-
-    compile(o) {
-
-        var nodes = this.members.map(m => m.compile(o));
-        var node = this.sourceNode(o.fileName, 'import * as').
-        add('{');
-
-        nodes.forEach((n, i, all) => {
-
-            node.add(n);
-
-            if (i !== all.length - 1)
-                node.add(',');
-
-        });
-
-        node.add('}').
-        add(this.member.compile(o)).
-        add(this.module.compile(o));
+        return `{ ${this.members.map(m=>m.transpile(o)).join(',')} }`;
 
     }
 

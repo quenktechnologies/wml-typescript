@@ -17,9 +17,9 @@ class ImportStatement extends Node {
 
     }
 
-    transpile() {
+    transpile(o) {
 
-        return `import ${this.member.transpile()} from ${this.module.transpile()};\n`;
+        return `import ${this.member.transpile(o)} from ${this.module.transpile(o)};\n`;
 
     }
 

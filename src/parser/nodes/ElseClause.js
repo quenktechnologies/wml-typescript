@@ -1,5 +1,5 @@
 import Node from './Node';
-
+import { flatten } from '../util';
 var elses = 0;
 
 /**
@@ -20,9 +20,8 @@ class ElseClause extends Node {
 
     transpile(o) {
 
-        return `function else_clause${elses++}() {` +
-            `return $$box([${this.children.map(c=>c.transpile(o)).join(',')}]);` +
-            `}.bind(this)`;
+        return `function else_clause${elses++}()` +
+            `{ return ${flatten(this.children, o)} }`;
 
     }
 

@@ -1,10 +1,10 @@
 import Node from './Node';
 
 /**
- * TernaryExpression 
- * @param {Expression} logic 
- * @param {Expression} iftrue 
- * @param {Expression} iffalse 
+ * TernaryExpression
+ * @param {Expression} logic
+ * @param {Expression} iftrue
+ * @param {Expression} iffalse
  */
 class TernaryExpression extends Node {
 
@@ -18,9 +18,9 @@ class TernaryExpression extends Node {
 
     }
 
-    transpile() {
+    transpile(o) {
 
-        return `(${this.logic.transpile()})? ${this.iftrue.transpile()} : ${this.iffalse.transpile()}`;
+        return `(${this.logic.transpile(o)})? ${this.iftrue.transpile(o)} : ${this.iffalse.transpile(o)}`;
 
     }
 

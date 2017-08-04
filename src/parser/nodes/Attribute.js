@@ -1,7 +1,7 @@
 import Node from './Node';
 
 /**
- * Attribute 
+ * Attribute
  */
 class Attribute extends Node {
 
@@ -17,11 +17,11 @@ class Attribute extends Node {
 
     /**
      * pushStringOnNamespace adds this attribute's value to it's namespace.
-     * @param {object} namespaces 
+     * @param {object} namespaces
      */
-    pushStringOnNamespace(namespaces) {
+    pushStringOnNamespace(namespaces, o) {
 
-        var val = `'${this.name}': ${this.value.transpile()}`;
+        var val = `'${this.name}': ${this.value.transpile(o)}`;
 
         if (this.namespace) {
 
@@ -38,7 +38,7 @@ class Attribute extends Node {
 
     /**
      * pushNodeOnNamespace adds this attribute's SourceNode to it's namespace.
-     * @param {object} namespacess 
+     * @param {object} namespacess
      */
     pushNodeOnNamespace(namespaces, o) {
 

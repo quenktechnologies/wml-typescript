@@ -18,9 +18,9 @@ class ExportFromStatement extends Node {
 
   }
 
-  transpile() {
+  transpile(o) {
 
-    return `export ${this.id} from ${this.module.transpile()};\n`;
+    return `export ${this.id} from ${this.module.transpile(o)};\n`;
 
   }
 

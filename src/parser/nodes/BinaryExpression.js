@@ -1,7 +1,7 @@
 import Node from './Node';
 
 /**
- * BinaryExpression 
+ * BinaryExpression
  */
 class BinaryExpression extends Node {
 
@@ -15,9 +15,9 @@ class BinaryExpression extends Node {
 
     }
 
-    transpile() {
+    transpile(o) {
 
-        return `${this.left.transpile()} ${this.op} ${this.right.transpile()}`;
+        return `${this.left.transpile(o)} ${this.op} ${this.right.transpile(o)}`;
 
     }
 

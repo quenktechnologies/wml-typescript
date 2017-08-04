@@ -1,4 +1,5 @@
 import Node from './Node';
+import { flatten } from '../util';
 
 var elseifs = 0;
 var elseififs = 0;
@@ -26,11 +27,11 @@ class ElseIfClause extends Node {
 
     transpile(o) {
 
-        return `function elseif${elseifs++}() {` +
-            `return make.$if(${this.expression.transpile(o)},` +
-            `function if${elseififs++}() {` +
-            `return $$box([${this.then.map(t=>t.transpile(o)).join(',')}])}.bind(this),` +
-            `${this.else.transpile(o)})}.bind(this)`;
+        return `function elseif${elseifs++}()` +
+            `{ return $$if(${this.expression.transpile(o)},` +
+            `function if${elseififs++}() ` +
+            `{ return ${flatten(this.then, o)}; }, ` +
+            `${this.else.transpile(o)});}.bind(this)`;
 
     }
 

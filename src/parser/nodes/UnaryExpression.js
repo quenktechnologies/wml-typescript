@@ -1,10 +1,10 @@
 import Node from './Node';
 
 /**
- * UnaryExpression 
- * @param {string} op 
- * @param {Expression} expression 
- * @param {Location} location 
+ * UnaryExpression
+ * @param {string} op
+ * @param {Expression} expression
+ * @param {Location} location
  */
 class UnaryExpression extends Node {
 
@@ -16,9 +16,9 @@ class UnaryExpression extends Node {
 
   }
 
-  transpile() {
+  transpile(o) {
 
-return `${this.op}${this.expression.transpile()}`;
+return `${this.op}${this.expression.transpile(o)}`;
 
   }
 

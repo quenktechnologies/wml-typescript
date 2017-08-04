@@ -6,23 +6,20 @@ import Node from './Node';
  */
 class Identifier extends Node {
 
-    constructor(name, location) {
+    constructor(name, hint, location) {
 
         super(location);
         this.type = 'identifier';
         this.name = name;
+        this.hint = hint;
 
     }
 
     transpile(o) {
 
-        return this.name;
-
-    }
-
-    compile(o) {
-
-        return this.sourceNode(o.fileName, this.name);
+        return o.typescript ?
+            (this.hint ? `${this.name} as ${this.hint}` : this.name):
+            this.name;
 
     }
 

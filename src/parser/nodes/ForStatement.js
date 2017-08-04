@@ -1,4 +1,5 @@
 import Node from './Node';
+import { flatten } from '../util';
 
 var count = 0;
 /**
@@ -21,22 +22,25 @@ class ForStatement extends Node {
 
     transpile(o) {
 
-        var variable = this.variable.transpile(o);
-        var index = this.index ? this.index.transpile(o) : '_';
-        var array = this.array ? this.array.transpile(o) : '__';
+        var args = [
+            this.variable.transpile(o),
+            this.index && this.index.transpile(o),
+            this.array && this.array.transpile(o)
+        ].filter(a => a).join(',');
+
         var src = this.src.transpile(o);
         var otherwise = this.otherwise.map(c => c.transpile(o));
 
         count = count + 1;
 
-        return `$$for(${src},` +
-            `function for${count} (${variable}, ${index}, ${array}) {` +
-            `return $$box([${this.children.map(c=>c.transpile(o)).join(',')}])}` +
-            `.bind(this), function otherwise${count}() {` +
-            `return $$box([${this.otherwise.map(c=>c.transpile(o)).join(',')}])}.bind(this))`;
+        return `$$for(${src}, function for${count} (${args})` +
+            `{ return ${flatten(this.children, o)} },` +
+            `function for_otherwise${count}()` +
+            `{ return ${flatten(this.otherwise, o)} })`;
+
+
 
     }
-
 }
 
 export default ForStatement

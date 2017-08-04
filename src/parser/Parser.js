@@ -45,14 +45,13 @@ let help = {
 
 class Parser {
 
-    /** 
+    /**
      * parse input and return an AST
-     * @param {string} input 
-     * @param {object} userAST 
+     * @param {string} input
+     * @param {object} userAST
      * @returns {object}
      */
     static parse(input, userAST) {
-
         ParserImpl.parser.yy = {};
         ParserImpl.parser.yy.help = help;
         ParserImpl.parser.yy.ast = (typeof userAST === 'object') ? userAST : nodes;

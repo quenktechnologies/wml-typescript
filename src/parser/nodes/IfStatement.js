@@ -1,4 +1,5 @@
 import Node from './Node';
+import { flatten } from '../util';
 
 var thenCount = 0;
 
@@ -24,11 +25,10 @@ class IfStatement extends Node {
 
     transpile(o) {
 
-        return `$$if(${this.expression.transpile()}, ` +
-            `function if${thenCount++}() {` +
-            `return $$box([${this.then.map(t =>t.transpile(o)).join(',')}])` +
-            `}.bind(this), ` +
-            ` ${this.else ? this.else.transpile(o) : '$$empty'})`;
+        return `$$if(${this.expression.transpile(o)}, ` +
+            `function if${thenCount++}()` +
+            `{ return ${flatten(this.then, o)} },` +
+            `${this.else ? this.else.transpile(o) : '$$empty'})`;
 
     }
 

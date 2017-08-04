@@ -53,7 +53,6 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 
 <INITIAL>'import'                                        return 'IMPORT';
 <INITIAL>'from'                                          return 'FROM';
-<INITIAL>'as'                                            return 'AS';
 <INITIAL>'</'                                            return '</';
 <INITIAL>'{%'                this.begin('CONTROL');      return '{%';
 <INITIAL>'<!--'              this.begin('COMMENT');      return;
@@ -75,12 +74,18 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <CONTROL>'default'                                       return 'DEFAULT';
 <CONTROL>'case'                                          return 'CASE';
 <CONTROL>'endcase'                                       return 'ENDCASE';
-<CONTROL>'include'                                       return 'INCLUDE';
+<CONTROL>'call'                                          return 'CALL';
 <CONTROL>'export'                                        return 'EXPORT';
 <CONTROL>'from'                                          return 'FROM';
 <CONTROL>'endexport'                                     return 'ENDEXPORT';
 <CONTROL>'view'                                          return 'VIEW';
 <CONTROL>'endview'                                       return 'ENDVIEW';
+<CONTROL>'match'                                         return 'MATCH';
+<CONTROL>'endmatch'                                      return 'ENDMATCH';
+<CONTROL>'otherwise'                                     return 'OTHERWISE';
+<CONTROL>'endotherwise'                                  return 'ENDOTHERWISE';
+<CONTROL>'instanceof'                                    return 'INSTANCEOF';
+<CONTROL>'typeof'                                        return 'TYPEOF';
 <CONTROL>'%}'                this.popState();            return '%}';
 
 <EXPRESSION>'new'                                        return 'NEW';
@@ -89,6 +94,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <EXPRESSION>'::'                                         return '::';
 <EXPRESSION>'->'                                         return '->';
 <EXPRESSION>'..'                                         return '..';
+<EXPRESSION>'instanceof'                                 return 'INSTANCEOF';
 <EXPRESSION>'}}'             this.popState();            return '}}';
 
 <CHILDREN>'{{'               this.begin('EXPRESSION');   return '{{';
@@ -132,6 +138,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <*>'{'                                                   return '{';
 <*>'}'                                                   return '}';
 <*>'@'                                                   return '@';
+<*>'as'                                                  return 'AS';
 <*>{Identifier}                                          return 'IDENTIFIER';
 
 <*><<EOF>>                                               return 'EOF';
@@ -226,13 +233,29 @@ view_statement
 macro_statement
 
           : '{%' MACRO IDENTIFIER '%}' children '{%' ENDMACRO '%}'
-            {$$ = new yy.ast.MacroStatement($3, [], $5, @$);    }
+            {$$ = new yy.ast.MacroStatement($3, [], [], $5, @$);    }
 
-          | '{%' MACRO IDENTIFIER arguments '%}'
+          | '{%' MACRO IDENTIFIER type_classes? parameters '%}'
             children
             '{%' ENDMACRO '%}'
-            {$$ = new yy.ast.MacroStatement($3, $4, $6, @$);    }
+            {$$ = new yy.ast.MacroStatement($3, $4||[], $5, $7, @$);    }
           ;
+
+type_classes
+          : '[' type_class_list ']' {$$ = $2; }
+          ;
+
+type_class_list
+          : type_class
+            {$$ = [$1];                     }
+
+          | type_class_list ',' type_class
+            {$$ = $1.concat($3);            }
+          ;
+
+type_class
+         : identifier
+         ;
 
 export_from_statement
 
@@ -309,39 +332,41 @@ children
           ;
 
 child
-          : tag
-          | control
-          | interpolation
-          | characters
+          : (tag | control | text_interpolation | characters)
+            {$$ = $1;}
           ;
 
+text_interpolation
+          : interpolation
+            {$$ = new yy.ast.TextInterpolation($1, @$);}
+          ;
 
 control
-          : (for_statement|if_statement|switch_statement|include_statement) 
+          : (for_statement|if_statement|match_statement|call_statement) 
             {$$ = $1;}
           ;
 
 for_statement
-          : '{%' FOR identifier IN expression '%}' children '{%' ENDFOR '%}'
+          : '{%' FOR typable_identifier IN expression '%}' children '{%' ENDFOR '%}'
             {$$ = new yy.ast.ForStatement($3, null, null, $5, $7, [], @$);}
 
-          | '{%' FOR identifier ',' identifier IN expression '%}' 
+          | '{%' FOR typable_identifier ',' typable_identifier IN expression '%}' 
             children '{%' ENDFOR '%}'
             {$$ = new yy.ast.ForStatement($3, $5, null, $7, $9, [], @$);}
 
-          | '{%' FOR identifier ',' identifier ',' identifier IN expression '%}'
+          | '{%' FOR typable_identifier ',' typable_identifier ',' typable_identifier IN expression '%}'
             children '{%' ENDFOR '%}'
             {$$ = new yy.ast.ForStatement($3, $5, $7, $9, $11, [], @$);}
 
-          | '{%' FOR identifier IN expression '%}' 
+          | '{%' FOR typable_identifier IN expression '%}' 
              children '{%' ELSE '%}' children '{%' ENDFOR '%}'
             {$$ = new yy.ast.ForStatement($3, null, null, $5, $7, $11, @$);}
 
-          | '{%' FOR identifier ',' identifier IN expression '%}' 
+          | '{%' FOR typable_identifier ',' typable_identifier IN expression '%}' 
             children '{%' ELSE '%}' children '{%' ENDFOR '%}'
             {$$ = new yy.ast.ForStatement($3, $5, null, $7, $9, $13, @$);}
 
-          | '{%' FOR identifier ',' identifier ',' identifier IN expression '%}'
+          | '{%' FOR typable_identifier ',' typable_identifier ',' typable_identifier IN expression '%}'
             children '{%' ELSE '%}' children '{%' ENDFOR '%}'
             {$$ = new yy.ast.ForStatement($3, $5, null, $7, $9, $15, @$);}
           ;
@@ -369,47 +394,54 @@ else_clause
 
          ;
 
-switch_statement
+match_statement
+         : '{%' MATCH identifier '%}' 
+           case_statements 
+           '{%' ELSE '%}'  
+           children
+           '{%' ENDMATCH '%}'
+            {$$ = new yy.ast.MatchStatement($3, $5, $9, @$);}
 
-         : '{%' SWITCH expression '%}' case_statements '{%' ENDSWITCH '%}'
-            {$$ = new yy.ast.SwitchStatement($3, $5, @$);}
-
+         | '{%' MATCH identifier '%}' 
+            case_statements
+           '{%' ENDMATCH '%}'
+            {$$ = new yy.ast.MatchStatement($3, $5, [], @$);}
          ;
 
 case_statements
-         : case_statement                  {$$ = [$1];          }
-         | case_statements case_statement  {$$ = $1.concat($2); }
+         : case_statement 
+           {$$ = [$1];         }
+
+         | case_statements case_statement 
+           {$$ = $1.concat($2);}
          ;
 
 case_statement
+         : '{%' CASE TYPEOF string_literal '%}' children '{%' ENDCASE '%}'
+           {$$ = new yy.ast.TypeOfCaseStatement($4, $6, @$);}
 
-         : '{%' CASE (string_literal|number_literal|boolean_literal) '%}'
-            children '{%' ENDCASE '%}'
-           {$$ = new yy.ast.CaseStatement($3, $5, @$);}
-
-         | '{%' DEFAULT CASE '%}'
-            children '{%' ENDCASE '%}'
-           {$$ = new yy.ast.CaseStatement(null, $5, @$);}
+         | '{%' CASE INSTANCEOF identifier '%}' children '{%' ENDCASE '%}'
+           {$$ = new yy.ast.InstanceOfCaseStatement($4, $6, @$);}
          ;
 
-include_statement
-         :'{%' INCLUDE identifier arguments  '%}'
-          {$$ = new yy.ast.IncludeStatement($3, $4, @$);}
+call_statement
+         :'{%' CALL identifier arguments  '%}'
+          {$$ = new yy.ast.CallStatement($3, $4, @$);}
 
-         |'{%' INCLUDE identifier '%}'
-          {$$ = new yy.ast.IncludeStatement($3, [], @$);}
+         |'{%' CALL identifier '%}'
+          {$$ = new yy.ast.CallStatement($3, [], @$);}
 
-         |'{%' INCLUDE member_expression arguments  '%}'
-          {$$ = new yy.ast.IncludeStatement($3, $4, @$);}
+         |'{%' CALL member_expression arguments  '%}'
+          {$$ = new yy.ast.CallStatement($3, $4, @$);}
 
-         |'{%' INCLUDE member_expression '%}'
-          {$$ = new yy.ast.IncludeStatement($3, [], @$);}
+         |'{%' CALL member_expression '%}'
+          {$$ = new yy.ast.CallStatement($3, [], @$);}
 
-         |'{%' INCLUDE '(' call_expression ')' arguments '%}'
-          {$$ = new yy.ast.IncludeStatement($4, $6, @$);}
+         |'{%' CALL '(' call_expression ')' arguments '%}'
+          {$$ = new yy.ast.CallStatement($4, $6, @$);}
 
-         |'{%' INCLUDE '(' call_expression ')' '%}'
-          {$$ = new yy.ast.IncludeStatement($4, [], @$);}        
+         |'{%' CALL '(' call_expression ')' '%}'
+          {$$ = new yy.ast.CallStatement($4, [], @$);}        
          ;
 
 characters
@@ -456,16 +488,22 @@ expression
          ;
 
 binary_operator
-          : ('>'|'>='|'<'|'<='|'=='|'!='|'+'|'/'|'-'|'='|'&&'|'||'|'^')
+          : ('>'|'>='|'<'|'<='|'=='|'!='|'+'|'/'|'-'|'='|'&&'|'||'|'^'|INSTANCEOF)
             { $$ = yy.help.convertOperator($1);}
           ;
 
 call_expression
           : identifier arguments
-            {$$ = new yy.ast.CallExpression($1, $2, @$);    }
+            {$$ = new yy.ast.CallExpression($1, [], $2, @$);    }
 
-          | member_expression arguments
-            {$$ = new yy.ast.CallExpression($1, $2, @$);    }
+          | identifier type_classes arguments
+            {$$ = new yy.ast.CallExpression($1, $2, $3, @$);    }
+
+          | member_expression  arguments
+            {$$ = new yy.ast.CallExpression($1, [], $2, @$);    }
+
+          | member_expression type_classes arguments
+            {$$ = new yy.ast.CallExpression($1, $2, $3, @$);    }
           ;
 
 bind_expression
@@ -494,14 +532,22 @@ function_expression
 
           : '\\' parameter_list '=>'  expression
             {$$ = new yy.ast.FunctionExpression($2, $4, @$);   }
+
+          | '=>' expression
+            {$$ = new yy.ast.FunctionExpression([], $2, @$);   }
+          ;
+
+parameters
+          : '(' ')'                  {$$ = [];}
+          | '(' parameter_list ')'   {$$ = $2;}
           ;
 
 parameter_list
 
-          : identifier
+          : typable_identifier
             {$$ = [$1];                                     }
 
-          | parameter_list ',' identifier
+          | parameter_list ',' typable_identifier
             {$$ = $1.concat($3);                            }
           ;
 
@@ -579,13 +625,30 @@ boolean_literal
           {$$ = new yy.ast.BooleanLiteral(yy.help.parseBoolean($1), @$);}
           ;
 
+typable_identifier
+         : identifier
+           {$$ = $1;                                                      }
+
+         | identifier ':' identifier
+           {$$ = new yy.ast.TypableIdentifier($1, $3, [], false, @$);     }
+
+         | identifier ':' identifier '[' ']'
+           {$$ = new yy.ast.TypableIdentifier($1, $3, [], true, @$);      }
+
+         | identifier ':' identifier type_classes
+           {$$ = new yy.ast.TypableIdentifier($1, $3, $4, false, @$);     }
+
+         | identifier ':' identifier type_classes '[' ']'
+           {$$ = new yy.ast.TypableIdentifier($1, $3, $4, true, @$);      }
+         ;
+
 identifier
           : IDENTIFIER
-            {$$ = new yy.ast.Identifier($1, @$); }
+            {$$ = new yy.ast.Identifier($1, '', @$);             }
 
           | '@'
-            {$$ = new yy.ast.Identifier('this.attributes', @$)}
+            {$$ = new yy.ast.Identifier('this.attributes','', @$)}
 
-          | IDENTIFIER ':::' IDENTIFIER
-            {$$ = new yy.ast.Identifier($1, @$); }
+          | IDENTIFIER AS IDENTIFIER
+            {$$ = new yy.ast.Identifier($1, $3, @$);             }
           ;

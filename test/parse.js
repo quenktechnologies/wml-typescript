@@ -140,10 +140,10 @@ tests = {
 
     },
 
-    'should parse includes': {
+    'should parse calls': {
 
         input: '<tr>{% for x,i in y %}' +
-            '{% include (this.getFrags()) (ctx1, ctx2) %}{% include val %}{% endfor %}</tr>'
+            '{% call (this.getFrags()) (ctx1, ctx2) %}{% call val %}{% endfor %}</tr>'
 
     },
     'should parse negative numbers': {
@@ -157,15 +157,15 @@ tests = {
         input: '<p>{{ this._::value | f1 | f2(2) | f3(this.value) }}</p>'
 
     },
-    'should parse switch statements': {
+    'should parse match statements': {
 
         input: 'import * as s from "statements"' +
             '<Tab>' +
-            '{% switch this.getValue() %}' +
-            '{% case 3 %}<s.Statement/>{% endcase %}' +
-            '{% case "copper" %}<s.Statement/>{% endcase %}' +
-            '{% default case %}<s.Statement.Default/>{% endcase %}' +
-            '{% endswitch %}</Tab>'
+            '{% match x %}' +
+            '{% case instanceof Statement %}<s.Statement/>{% endcase %}' +
+            '{% case typeof "string" %}<s.Statement/>{% endcase %}' +
+            '{% else %}<s.Statement.Default/>' +
+            '{% endmatch %}</Tab>'
 
     },
     'should parse if statements': {
@@ -218,12 +218,12 @@ tests = {
 
     'should allow for expression after macro': {
 
-        input:'{% macro sven %} {% for a in b %} {{b}} {% endfor %} {% endmacro %}'
+        input: '{% macro sven %} {% for a in b %} {{b}} {% endfor %} {% endmacro %}'
 
     },
     'should allow if expression after macro': {
 
-        input:'{% macro ate %} {% if a %} {{a}} {% endif %} {% endmacro %}'
+        input: '{% macro ate %} {% if a %} {{a}} {% endif %} {% endmacro %}'
 
     }
 
