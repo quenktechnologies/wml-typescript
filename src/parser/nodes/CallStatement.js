@@ -19,7 +19,7 @@ class IncludeStatement extends Node {
 
         var args = this.arguments.map(a => a.transpile(o)).join(',');
 
-        return `${this.template.transpile(o)}(view, ${args})`;
+        return `${this.template.transpile(o)}.call(this,view,${args})`;
 
     }
 

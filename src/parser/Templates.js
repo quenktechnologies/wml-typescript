@@ -14,6 +14,7 @@ import {
     ifE as $$if,
     forE as $$for,
     switchE as $$switch,
+    domify as $$domify,
     AppView} from "${path}";
 `;
 

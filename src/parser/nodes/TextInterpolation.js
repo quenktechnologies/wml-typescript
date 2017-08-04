@@ -16,7 +16,7 @@ class TextInterpolation extends Node {
 
     transpile(o) {
 
-        return `$$text(${this.interpolation.transpile(o)})`;
+        return `$$domify(${this.interpolation.transpile(o)})`;
 
     }
 

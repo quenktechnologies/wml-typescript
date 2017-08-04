@@ -522,7 +522,7 @@ bind_expression
           | member_expression '::' identifier
             {$$ = new yy.ast.BindExpression($1, $3, [], @$);}
 
-          | member_expression '::' IDENTIFIER arguments
+          | member_expression '::' identifier arguments
             {$$ = new yy.ast.BindExpression($1, $3, $4, @$);}
           ;
 
