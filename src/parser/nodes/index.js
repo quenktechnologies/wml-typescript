@@ -31,6 +31,7 @@ export MemberExpression from './MemberExpression';
 export MethodExpression from './MethodExpression';
 export CallExpression from './CallExpression';
 export BindExpression from './BindExpression';
+export TypeAssertion from './TypeAssertion';
 export ForStatement from './ForStatement';
 export IfStatement from './IfStatement';
 export ElseClause from './ElseClause';

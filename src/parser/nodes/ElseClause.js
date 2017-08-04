@@ -21,7 +21,7 @@ class ElseClause extends Node {
     transpile(o) {
 
         return `function else_clause${elses++}()` +
-            `{ return ${flatten(this.children, o)} }`;
+            `{ return ${flatten(this.children, o)} }.bind(this)`;
 
     }
 

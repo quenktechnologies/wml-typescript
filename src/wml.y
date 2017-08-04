@@ -431,17 +431,23 @@ call_statement
          |'{%' CALL identifier '%}'
           {$$ = new yy.ast.CallStatement($3, [], @$);}
 
-         |'{%' CALL member_expression arguments  '%}'
-          {$$ = new yy.ast.CallStatement($3, $4, @$);}
-
          |'{%' CALL member_expression '%}'
           {$$ = new yy.ast.CallStatement($3, [], @$);}
 
+         |'{%' CALL member_expression arguments '%}'
+          {$$ = new yy.ast.CallStatement($3, $4, @$);}
+          
+         |'{%' CALL '(' expression ')' arguments  '%}'
+          {$$ = new yy.ast.CallStatement($4, $6, @$);}
+
+         |'{%' CALL '(' expression ')' '%}'
+          {$$ = new yy.ast.CallStatement($4, [], @$);}
+/*
          |'{%' CALL '(' call_expression ')' arguments '%}'
           {$$ = new yy.ast.CallStatement($4, $6, @$);}
 
          |'{%' CALL '(' call_expression ')' '%}'
-          {$$ = new yy.ast.CallStatement($4, [], @$);}        
+          {$$ = new yy.ast.CallStatement($4, [], @$);}        */
          ;
 
 characters
@@ -467,7 +473,7 @@ argument_list
           ;
 
 expression
-         : '(' expression ')'
+          : '(' expression ')'
             { $$ = $2;                                         }
 
           | expression  '?' expression ':' expression
@@ -483,7 +489,7 @@ expression
              function_expression | bind_expression | 
              object_literal | array_literal | string_literal | 
              number_literal | boolean_literal number_literal |
-             identifier)
+             type_assertion|identifier)
             {$$ = $1;                                          } 
          ;
 
@@ -570,6 +576,12 @@ member_expression
           | bind_expression '.' identifier
             {$$ = new yy.ast.MemberExpression($1, $3, @$); }
 
+          |'(' expression ')' '.' identifier
+            {$$ = new yy.ast.MemberExpression($2, $5, @$); }
+
+          | type_assertion '.' identifier
+            {$$ = new yy.ast.MemberExpression($1, $3, @$); }
+
           | member_expression '.' identifier
             {$$ = new yy.ast.MemberExpression($1, $3, @$); }
           ;
@@ -642,13 +654,16 @@ typable_identifier
            {$$ = new yy.ast.TypableIdentifier($1, $3, $4, true, @$);      }
          ;
 
+type_assertion
+         : '(' expression AS identifier ')'
+            {$$ = new yy.ast.TypeAssertion($2, $4, @$);          }
+
+         ;
+
 identifier
           : IDENTIFIER
             {$$ = new yy.ast.Identifier($1, '', @$);             }
 
           | '@'
             {$$ = new yy.ast.Identifier('this.attributes','', @$)}
-
-          | IDENTIFIER AS IDENTIFIER
-            {$$ = new yy.ast.Identifier($1, $3, @$);             }
           ;

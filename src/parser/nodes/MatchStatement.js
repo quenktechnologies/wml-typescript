@@ -25,7 +25,7 @@ class MatchStatement extends Node {
         var cases = this.cases.reduceRight((p, c) =>
             c.toExpression(this.identifier.transpile(o), p, o), otherwise);
 
-        return `(function() { return ${cases}; })()`;
+        return `(function() { return ${cases}; }).call(this)`;
 
     }
 
