@@ -168,7 +168,7 @@ imports
           ;
 
 import_statement
-          : IMPORT import_member FROM string_literal
+          : IMPORT import_member FROM string_literal ';'?
             {$$ = new yy.ast.ImportStatement($2, $4, @$);}
 
           ;
