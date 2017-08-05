@@ -225,6 +225,11 @@ tests = {
 
         input: '{% macro ate %} {% if a %} {{a}} {% endif %} {% endmacro %}'
 
+    },
+    'should allow for booleans in interpolations': {
+
+        input:'<bool active={{true}}>{{false}}</bool>'
+
     }
 
 

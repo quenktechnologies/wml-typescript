@@ -106,7 +106,8 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 
 <COMMENT>(.|\r|\n)*?'-->'    this.popState();            return;
 
-<*>'true'|'false'                                        return 'BOOLEAN';
+<*>'true'                                                return 'TRUE';
+<*>'false'                                               return 'FALSE';
 <*>{NumberLiteral}                                       return 'NUMBER_LITERAL';
 <*>{StringLiteral}                                       return 'STRING_LITERAL';
 <*>'>'                                                   return '>';
@@ -485,11 +486,18 @@ expression
           | '!' expression
             {$$ = new yy.ast.UnaryExpression($1, $2, @$);      }
 
-          | (new_expression | call_expression | member_expression | 
-             function_expression | bind_expression | 
-             object_literal | array_literal | string_literal | 
-             number_literal | boolean_literal number_literal |
-             type_assertion|identifier)
+          | (new_expression | 
+             call_expression | 
+             member_expression | 
+             function_expression | 
+             bind_expression | 
+             object_literal |
+             array_literal | 
+             string_literal | 
+             boolean_literal | 
+             number_literal |
+             type_assertion|
+             identifier)
             {$$ = $1;                                          } 
          ;
 
@@ -586,14 +594,6 @@ member_expression
             {$$ = new yy.ast.MemberExpression($1, $3, @$); }
           ;
 
-literal
-          : object_literal
-          | array_literal
-          | string_literal
-          | number_literal
-          | boolean_literal
-          ;
-
 object_literal
           : '{' '}'
             {$$ = new yy.ast.ObjectLiteral([], @$); }
@@ -633,7 +633,7 @@ number_literal
           ;
 
 boolean_literal
-          : BOOLEAN
+          : (TRUE|FALSE)
           {$$ = new yy.ast.BooleanLiteral(yy.help.parseBoolean($1), @$);}
           ;
 
