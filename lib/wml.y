@@ -518,6 +518,10 @@ call_expression
 
           | member_expression type_classes arguments
             {$$ = new yy.ast.CallExpression($1, $2, $3, @$);    }
+
+          | '(' expression ')' arguments
+            {$$ = new yy.ast.CallExpression($2, [], $4, @$);    }
+
           ;
 
 bind_expression

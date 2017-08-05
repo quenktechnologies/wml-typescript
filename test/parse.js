@@ -228,7 +228,13 @@ tests = {
     },
     'should allow for booleans in interpolations': {
 
-        input:'<bool active={{true}}>{{false}}</bool>'
+        input: '<bool active={{true}}>{{false}}</bool>'
+
+    },
+
+    'should allow calls on expressions': {
+
+        input: '<div>{{((this.content() || bar))(foo)}}</div>'
 
     }
 
