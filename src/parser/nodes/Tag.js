@@ -51,10 +51,11 @@ class Tag extends Node {
             html: [],
             wml: []
         };
+        var name = this.name.transpile(o);
         var spreads = this.attributes.filter(a => a.type === 'attribute-spread');
 
-        var tag = (this.name[0] === this.name[0].toUpperCase()) ?
-            `$$widget(${this.name}` : `$$node('${this.name}'`;
+        var tag = (name[0] === name[0].toUpperCase()) ?
+            `$$widget(${name}` : `$$node('${name}'`;
 
         this.attributes.forEach(a => a.pushStringOnNamespace(butes, o));
 

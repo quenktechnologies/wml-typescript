@@ -131,7 +131,7 @@ tests = {
     },
     'should parse ternary expressions': {
 
-        input: '<Html.div id={{this.id}}>{{this.check() ? a : b }}</div>'
+        input: '<Html id={{this.id}}>{{this.check() ? a : b }}</div>'
 
     },
     'should parse function expressions': {
@@ -162,9 +162,9 @@ tests = {
         input: 'import * as s from "statements"' +
             '<Tab>' +
             '{% match x %}' +
-            '{% case instanceof Statement %}<s.Statement/>{% endcase %}' +
-            '{% case typeof "string" %}<s.Statement/>{% endcase %}' +
-            '{% else %}<s.Statement.Default/>' +
+            '{% case instanceof Statement %}<Statement/>{% endcase %}' +
+            '{% case typeof "string" %}<Statement/>{% endcase %}' +
+            '{% else %}<Default/>' +
             '{% endmatch %}</Tab>'
 
     },
@@ -236,9 +236,12 @@ tests = {
 
         input: '<div>{{((this.content() || bar))(foo)}}</div>'
 
+    },
+    'should allow for namespaced tags': {
+
+        input: '<my:Tag/>'
+
     }
-
-
 
 };
 

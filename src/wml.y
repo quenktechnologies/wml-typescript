@@ -266,20 +266,17 @@ export_from_statement
 
 tag
           : '<' tagname attributes '>' children? '</' tagname '>'
-             {
-             yy.help.ensureTagsMatch($2, $8);
-             $$ = new yy.ast.Tag($2, $3, $5?$5:[], @$);
-             }
+             {$$ = new yy.ast.Tag($2, $3, $5?$5:[], @$);}
 
           | '<' tagname attributes '/>'
             { $$ = new yy.ast.Tag($2, $3, [], @$); }
           ;
 tagname
-          : IDENTIFIER
-            {$$ = $1;                      }
+          : identifier
+            {$$ = $1;                                           }
 
-          | tagname '.' IDENTIFIER  
-            {$$ = [$1, $3].join('.');      }
+          | identifier ':' identifier
+            {$$ = new yy.ast.MemberExpression($1, $3, @$);      }
           ;
 
 attributes
