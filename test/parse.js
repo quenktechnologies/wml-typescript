@@ -228,7 +228,7 @@ tests = {
     },
     'should allow for booleans in interpolations': {
 
-        input: '<bool active={{true}}>{{false}}</bool>'
+        input: '<bool active={{true}}>{{(fun())?false:true}}</bool>'
 
     },
 
