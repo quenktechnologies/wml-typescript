@@ -241,6 +241,11 @@ tests = {
 
         input: '<my:Tag/>'
 
+    },
+    'should allow boolean attribute values': {
+
+        input: '<tag on=true off=false/>'
+
     }
 
 };

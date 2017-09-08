@@ -299,7 +299,7 @@ attribute_name
           ;
 
 attribute_value
-          : (interpolation|string_literal|number_literal) 
+          : (interpolation|string_literal|number_literal|boolean_literal) 
             {$$ = $1;}
           ;
 
