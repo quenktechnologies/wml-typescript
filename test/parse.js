@@ -246,6 +246,22 @@ tests = {
 
         input: '<tag on=true off=false/>'
 
+    },
+    'should parse typed views': {
+
+        input: '{% view Main in Context %} <p>{{this.value}}</p>{% endview %}'
+
+    },
+
+    'should parse typed views with generics': {
+
+        input: '{% view Main in Context[string] %} <p>{{this.value}}</p>{% endview %}'
+
+    },
+    'should parse typed views with type classes': {
+
+        input: '{% view [A,B] Main in Context[A,B] %} <p>{{this.values}}</p> {% endview %}'
+
     }
 
 };

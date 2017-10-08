@@ -1,22 +1,21 @@
 import Node from './Node';
-import {view as viewFn
+import {viewT as viewFn
 } from '../Templates';
 
 /**
  * ViewStatement
- * @param {array<Import>} imports
- * @param {array<string>} uses
- * @param {Tag} root
  * @param {Location} location
  */
 class ViewStatement extends Node {
 
-  constructor(name, tag, location) {
+  constructor(id, hint, classes, tag, location) {
 
     super();
 
-    this.type = 'view-expression';
-    this.name = name;
+    this.type = 'typed-view-expression';
+    this.id = id;
+    this.hint = hint;
+    this.classes = classes;
     this.tag = tag;
     this.location = location;
 
@@ -24,7 +23,12 @@ class ViewStatement extends Node {
 
   transpile(o) {
 
-    return viewFn(this.name, this.tag, o);
+    return viewFn(
+        this.id.transpile(o),
+        this.hint.transplie(o),
+        this.classes.map(c=>c.transpile(o)).join(','),
+        this.tag,
+        o);
 
   }
 

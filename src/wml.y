@@ -225,10 +225,15 @@ export
 
 view_statement
 
-          : '{%' VIEW IDENTIFIER '%}'
+          : '{%' VIEW identifier IN type '%}'
             tag
             '{%' ENDVIEW '%}'
-            {$$ = new yy.ast.ViewStatement($3, $5, @$);     }
+            {$$ = new yy.ast.ViewStatement($3, $5, [],$7, @$);     }
+
+          | '{%' VIEW type_classes identifier IN type '%}'
+            tag
+            '{%' ENDVIEW '%}'
+            {$$ = new yy.ast.ViewStatement($4, $6, $3, $8, @$);     }
           ;
 
 macro_statement
@@ -256,6 +261,10 @@ type_class_list
 
 type_class
          : identifier
+           {$$ = $1;}
+
+         | identifier type_class
+           {$$ = new yy.ast.TypedIdentifier($1, $2, @$);}
          ;
 
 export_from_statement
@@ -518,7 +527,6 @@ call_expression
 
           | '(' expression ')' arguments
             {$$ = new yy.ast.CallExpression($2, [], $4, @$);    }
-
           ;
 
 bind_expression
@@ -655,10 +663,17 @@ typable_identifier
            {$$ = new yy.ast.TypableIdentifier($1, $3, $4, true, @$);      }
          ;
 
+type 
+         : identifier
+           {$$ = new yy.ast.Type($1, [], @$);                             }
+
+         | identifier type_classes
+           {$$ = new yy.ast.Type($1, $2, @$);                             }
+         ;
+
 type_assertion
          : '(' expression AS identifier ')'
             {$$ = new yy.ast.TypeAssertion($2, $4, @$);          }
-
          ;
 
 identifier

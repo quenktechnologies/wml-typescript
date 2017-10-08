@@ -1,6 +1,6 @@
 import Node from './Node';
 import {
-    view as viewFn,
+    main as viewFn,
     runtime as runtimeFn
 } from '../Templates';
 import * as babel from 'babel-core';
@@ -47,7 +47,7 @@ class Module extends Node {
         let runtime = runtimeFn(o.module);
         let imports = this.imports.map(i => i.transpile(o)).join('');
         let exports = this.exports.map(e => e.transpile(o)).join('');
-        let view = this.root ? viewFn('Main', this.root, o) : '';
+        let view = this.root ? viewFn(this.root,o) : '';
         let output = code => pipeline.reduce((p, c) => c(p), code);
 
         if (o.es5)

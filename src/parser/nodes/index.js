@@ -40,4 +40,5 @@ export MatchStatement from './MatchStatement';
 export TypeOfCaseStatement from './TypeOfCaseStatement';
 export InstanceOfCaseStatement from './InstanceOfCaseStatement';
 export CallStatement from './CallStatement';
+export Type from './Type';
 /* jshint ignore:end */
