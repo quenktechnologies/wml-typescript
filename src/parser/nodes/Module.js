@@ -56,7 +56,7 @@ class Module extends Node {
             `<${this.generics.map(g=>g.transpile(o)).join(',')}>` :
             '';
 
-        let context = this.context.transpile(o);
+        let context = this.context ? this.context.transpile(o) : 'void';
         let root = this.root ? this.root.transpile(o) : '';
         let view = root ? viewFn('Main', classes, context,  root, o) : root;
         let output = code => pipeline.reduce((p, c) => c(p), code);
