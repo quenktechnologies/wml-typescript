@@ -158,12 +158,59 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 %%
 
 module
-          : imports? exports? type_classes? type? tag? EOF
+
+          : imports USING type tag EOF
             {$$ =
-            new yy.ast.Module(
-            $1 || [],
-            $2 || [],
-            $3 || [], $4||null, $5||null, @$); return $$;
+            new yy.ast.Module($1,[],[], $3, $4, @$); 
+            return $$;
+            }
+
+          | imports exports USING type tag EOF
+            {$$ =
+            new yy.ast.Module($1, $2, [], $4, $5, @$); 
+            return $$;
+            }
+
+          | imports exports USING type_classes type tag EOF
+            {$$ =
+            new yy.ast.Module($1, $2, $4, $5, $6, @$); 
+            return $$;
+            }
+
+          | imports exports EOF
+            {$$ =
+            new yy.ast.Module($1, $2, [], null, null, @$); 
+            return $$;
+            }
+
+          | exports EOF
+            {$$ =
+            new yy.ast.Module([], $1, [], null, null, @$); 
+            return $$;
+            }
+
+          | exports USING type tag EOF
+            {$$ =
+            new yy.ast.Module([], $1, [], $3, $4, @$); 
+            return $$;
+            }
+
+          | exports USING type_classes type tag EOF
+            {$$ =
+            new yy.ast.Module([], $1, $3, $4, $5, @$); 
+            return $$;
+            }
+
+          | USING type tag EOF
+            {$$ =
+            new yy.ast.Module([], [],[], $2, $3, @$); 
+            return $$;
+            }
+
+          | USING type_classes type tag EOF
+            {$$ =
+            new yy.ast.Module([], [],$2, $3, $4, @$); 
+            return $$;
             }
           ;
 

@@ -59,6 +59,12 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <INITIAL>'>'                 this.begin('CHILDREN');     return '>';
 <INITIAL>'/>'                this.begin('CHILDREN');     return '/>';
 <INITIAL>'{{'                this.begin('EXPRESSION');   return '{{';
+<INITIAL>'using'                                         return 'USING';
+<INITIAL>'as'                                            return 'AS';
+<INITIAL>'true'                                          return 'TRUE';
+<INITIAL>'false'                                         return 'FALSE';
+<INITIAL>'@'{Identifier}                                 return 'CONTEXT_PROP';
+<INITIAL>{Identifier}                                    return 'IDENTIFIER';
 
 <CONTROL>'macro'                                         return 'MACRO';
 <CONTROL>'endmacro'                                      return 'ENDMACRO';
@@ -89,6 +95,8 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <CONTROL>'endotherwise'                                  return 'ENDOTHERWISE';
 <CONTROL>'instanceof'                                    return 'INSTANCEOF';
 <CONTROL>'typeof'                                        return 'TYPEOF';
+<CONTROL>'@'{Identifier}                                 return 'CONTEXT_PROP';
+<CONTROL>{Identifier}                                    return 'IDENTIFIER';
 <CONTROL>'%}'                this.popState();            return '%}';
 
 <EXPRESSION>'new'                                        return 'NEW';
@@ -97,6 +105,10 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <EXPRESSION>'::'                                         return '::';
 <EXPRESSION>'->'                                         return '->';
 <EXPRESSION>'instanceof'                                 return 'INSTANCEOF';
+<EXPRESSION>'true'                                       return 'TRUE';
+<EXPRESSION>'false'                                      return 'FALSE';
+<EXPRESSION>'@'{Identifier}                              return 'CONTEXT_PROP';
+<EXPRESSION>{Identifier}                                 return 'IDENTIFIER';
 <EXPRESSION>'@@'                                         return '@@';
 <EXPRESSION>'}}'             this.popState();            return '}}';
 
@@ -109,8 +121,6 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 
 <COMMENT>(.|\r|\n)*?'-->'    this.popState();            return;
 
-<*>'true'                                                return 'TRUE';
-<*>'false'                                               return 'FALSE';
 <*>{NumberLiteral}                                       return 'NUMBER_LITERAL';
 <*>{StringLiteral}                                       return 'STRING_LITERAL';
 <*>'>'                                                   return '>';
@@ -142,9 +152,6 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <*>'{'                                                   return '{';
 <*>'}'                                                   return '}';
 <*>'@'                                                   return '@';
-<*>'as'                                                  return 'AS';
-<*>{Identifier}                                          return 'IDENTIFIER';
-<*>'@'{Identifier}                                       return 'CONTEXT_PROP';
 
 <*><<EOF>>                                               return 'EOF';
 
@@ -158,13 +165,84 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 %%
 
 module
-          : imports? exports? type_classes? type? tag? EOF
+
+          : imports exports USING type_classes type tag EOF
             {$$ =
-            new yy.ast.Module(
-            $1 || [],
-            $2 || [],
-            $3 || [], $4||null, $5||null, @$); return $$;
+            new yy.ast.Module($1, $2, $4, $5, $6, @$); 
+            return $$;
             }
+
+          | imports exports USING type tag EOF
+            {$$ =
+            new yy.ast.Module($1, $2, [], $4, $5, @$); 
+            return $$;
+            }
+
+          | imports exports tag EOF
+            {$$ =
+            new yy.ast.Module($1,$2,[], null, $3, @$); 
+            return $$;
+            }
+
+          | imports exports EOF
+            {$$ =
+            new yy.ast.Module($1, $2, [], null, null, @$); 
+            return $$;
+            }
+
+          | imports tag EOF
+            {$$ =
+            new yy.ast.Module($1,[],[], null, $2, @$); 
+            return $$;
+            }
+
+          | imports EOF
+            {$$ =
+            new yy.ast.Module($1,[],[], null, null, @$); 
+            return $$;
+            }
+
+          | exports USING type_classes type tag EOF
+            {$$ =
+            new yy.ast.Module([], $1, $3, $4, $5, @$); 
+            return $$;
+            }
+
+          | exports USING type tag EOF
+            {$$ =
+            new yy.ast.Module([], $1, [], $3, $4, @$); 
+            return $$;
+            }
+
+          | exports tag EOF
+            {$$ =
+            new yy.ast.Module([], $1, [], null, $2, @$); 
+            return $$;
+            }
+
+          | exports EOF
+            {$$ =
+            new yy.ast.Module([], $1, [], null, null, @$); 
+            return $$;
+            }
+
+          | USING type_classes type tag EOF
+            {$$ =
+            new yy.ast.Module([],[],$2, $3, $4, @$); 
+            return $$;
+            }
+
+          | USING type tag EOF
+            {$$ =
+            new yy.ast.Module([],[],[], $2, $3, @$); 
+            return $$;
+            }
+
+          | tag EOF
+            {$$ =
+            new yy.ast.Module([],[],[], null, $1, @$);          ;
+            return $$;
+            }  
           ;
 
 imports
