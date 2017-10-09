@@ -1,5 +1,5 @@
 import Node from './Node';
-import {viewT as viewFn
+import {view as viewFn
 } from '../Templates';
 
 /**
@@ -25,7 +25,7 @@ class ViewStatement extends Node {
 
     return viewFn(
         this.id.transpile(o),
-        this.context.transplie(o),
+        this.context.transpile(o),
         this.generics.map(g=>g.generics(o)).join(','),
         this.tag,
         o);
