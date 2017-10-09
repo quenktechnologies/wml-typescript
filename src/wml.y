@@ -310,7 +310,7 @@ view_statement
           : '{%' VIEW identifier USING type '%}'
             tag
             '{%' ENDVIEW '%}'
-            {$$ = new yy.ast.ViewStatement($3, [],$5, $7, @$);     }
+            {$$ = new yy.ast.ViewStatement($3, [], $5, $7, @$);     }
 
           | '{%' VIEW identifier type_classes USING type '%}'
             tag

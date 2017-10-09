@@ -198,7 +198,7 @@ case 29: case 46:
 this.$ = $$[$0];                                           
 break;
 case 30:
-this.$ = new yy.ast.ViewStatement($$[$0-7], [],$$[$0-5], $$[$0-3], this._$);     
+this.$ = new yy.ast.ViewStatement($$[$0-7], [], $$[$0-5], $$[$0-3], this._$);     
 break;
 case 31:
 this.$ = new yy.ast.ViewStatement($$[$0-8], $$[$0-7], $$[$0-5], $$[$0-3], this._$);     

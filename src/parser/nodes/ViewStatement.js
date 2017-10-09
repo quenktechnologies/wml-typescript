@@ -8,7 +8,7 @@ import {view as viewFn
  */
 class ViewStatement extends Node {
 
-  constructor(id, context, generics, tag, location) {
+  constructor(id, generics, context, tag, location) {
 
     super();
 
