@@ -18,22 +18,19 @@ import {
     AppView} from "${path}";
 `;
 
-export const _typeClasses = (classes, o) =>
-classes ? '<' + classes.map(c=>c.transpile(o)) + '>' : '<C>';
-
 export const _hint = (name, o) =>
     name.hint ? name.hint.transpile(o) : 'C';
 
-export const view = (id,hint,classes,tag,o) => `
-export class ${id}${_typeClasses(classes, o)} extends AppView<${hint}> {
+export const view = (id,classes,context,tag,o) => `
+export class ${id}${classes} extends AppView<${context}> {
 
-    constructor(context: ${hint}) {
+    constructor(context: ${context}) {
 
         super(context);
 
         let view = this;
 
-        this.template = function($$ctx:${hint}) {
+        this.template = function($$ctx:${context}) {
             return ${_rootElement(tag, o)}
         }
 
@@ -41,22 +38,4 @@ export class ${id}${_typeClasses(classes, o)} extends AppView<${hint}> {
 
      }
 
-`;
-
-export const main = (tag, o) => `
-export class Main<C> extends AppView<C> {
-
-    constructor(context:C) {
-
-        super(context);
-
-        let view = this;
-
-        this.template = function($$ctx:C) {
-            return ${_rootElement(tag, o)}
-        }
-
-       }
-
-     }
 `;

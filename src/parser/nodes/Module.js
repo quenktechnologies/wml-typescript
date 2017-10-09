@@ -23,19 +23,23 @@ const pretty = js_beautify;
 /**
  * Module
  * @param {array<Import>} imports
- * @param {array<string>} uses
+ * @param {ExportStatement[]} exports
+ * @param {TypeClass[]} generics
+ * @param {Type} context
  * @param {Tag} root
  * @param {Location} location
  */
 class Module extends Node {
 
-    constructor(imports, exports, root, location) {
+    constructor(imports, exports, generics, context, root, location) {
 
         super();
 
         this.type = 'module';
         this.imports = imports;
         this.exports = exports;
+        this.generics = generics;
+        this.context = context;
         this.root = root;
         this.location = location;
 
@@ -47,7 +51,14 @@ class Module extends Node {
         let runtime = runtimeFn(o.module);
         let imports = this.imports.map(i => i.transpile(o)).join('');
         let exports = this.exports.map(e => e.transpile(o)).join('');
-        let view = this.root ? viewFn(this.root,o) : '';
+
+        let classes = this.generics.length.length > 0 ?
+            `<${this.generics.map(g=>g.transpile(o)).join(',')}>` :
+            '';
+
+        let context = this.context.transpile(o);
+        let root = this.root ? this.root.transpile(o) : '';
+        let view = root ? viewFn('Main', classes, context,  root, o) : root;
         let output = code => pipeline.reduce((p, c) => c(p), code);
 
         if (o.es5)

@@ -12,10 +12,10 @@ class ViewStatement extends Node {
 
     super();
 
-    this.type = 'typed-view-expression';
+    this.type = 'view-statement';
     this.id = id;
-    this.context = context;
     this.generics = generics;
+    this.context = context;
     this.tag = tag;
     this.location = location;
 
@@ -23,10 +23,14 @@ class ViewStatement extends Node {
 
   transpile(o) {
 
+        let g = this.generics.length > 0 ?
+          `<${this.generics.map(g=>g.generics(o)).join(',')}>` :
+          '';
+
     return viewFn(
         this.id.transpile(o),
+        g,
         this.context.transpile(o),
-        this.generics.map(g=>g.generics(o)).join(','),
         this.tag,
         o);
 

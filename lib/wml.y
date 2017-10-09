@@ -158,12 +158,12 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 %%
 
 module
-          : imports? exports? tag? EOF
+          : imports? exports? type_classes? type? tag? EOF
             {$$ =
             new yy.ast.Module(
             $1 || [],
             $2 || [],
-            $3 || null, @$); return $$;
+            $3 || [], $4||null, $5||null, @$); return $$;
             }
           ;
 
@@ -232,12 +232,12 @@ view_statement
           : '{%' VIEW identifier USING type '%}'
             tag
             '{%' ENDVIEW '%}'
-            {$$ = new yy.ast.ViewStatement($3, $5, [],$7, @$);     }
+            {$$ = new yy.ast.ViewStatement($3, [],$5, $7, @$);     }
 
           | '{%' VIEW identifier type_classes USING type '%}'
             tag
             '{%' ENDVIEW '%}'
-            {$$ = new yy.ast.ViewStatement($4, $6, $3, $8, @$);     }
+            {$$ = new yy.ast.ViewStatement($3, $4, $6, $8, @$);     }
           ;
 
 frag_statement
