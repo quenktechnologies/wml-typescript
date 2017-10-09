@@ -1,15 +1,15 @@
 import Node from './Node';
 
 /**
- * ContextVariable
+ * ContextProperty
  * @param {string} id
  */
-class ContextVariable extends Node {
+class ContextProperty extends Node {
 
     constructor(id, location) {
 
         super();
-        this.type = 'context-variable';
+        this.type = 'context-property';
         this.id = id;
         this.location = location;
 
@@ -17,10 +17,10 @@ class ContextVariable extends Node {
 
     transpile(o) {
 
-       return `$1.${this.id}`;
+       return `$$ctx.${this.id}`;
 
     }
 
 }
 
-export default ContextVariable
+export default ContextProperty

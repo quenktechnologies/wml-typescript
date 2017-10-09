@@ -21,7 +21,7 @@ class ReadExpression extends Node {
     transpile(o) {
 
         let d = this.defaults ?  this.defaults.transpile(o) : `''`;
-        return `that.attributes.read(${this.path.transpile(o)}, ${d}),`
+        return `$$ctx.attributes.read(${this.path.transpile(o)}, ${d}),`
 
     }
 

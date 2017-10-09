@@ -25,7 +25,7 @@ class FunctionExpression extends Node {
         count = count + 1;
 
         return `function function_literal_${count}(${params})` +
-            `{ return ${this.expression.transpile(o)}; }.bind(this)`;
+            `{ return ${this.expression.transpile(o)}; }`;
 
     }
 

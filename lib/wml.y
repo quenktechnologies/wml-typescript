@@ -62,6 +62,8 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 
 <CONTROL>'macro'                                         return 'MACRO';
 <CONTROL>'endmacro'                                      return 'ENDMACRO';
+<CONTROL>'frag'                                          return 'FRAG';
+<CONTROL>'endfrag'                                       return 'ENDFRAG';
 <CONTROL>'for'                                           return 'FOR';
 <CONTROL>'endfor'                                        return 'ENDFOR';
 <CONTROL>'if'                                            return 'IF';
@@ -94,7 +96,6 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <EXPRESSION>'=>'                                         return '=>';
 <EXPRESSION>'::'                                         return '::';
 <EXPRESSION>'->'                                         return '->';
-<EXPRESSION>'..'                                         return '..';
 <EXPRESSION>'instanceof'                                 return 'INSTANCEOF';
 <EXPRESSION>'@@'                                         return '@@';
 <EXPRESSION>'}}'             this.popState();            return '}}';
@@ -143,7 +144,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <*>'@'                                                   return '@';
 <*>'as'                                                  return 'AS';
 <*>{Identifier}                                          return 'IDENTIFIER';
-<*>'@'{Identifier}                                       return 'CONTEXT_VAR';
+<*>'@'{Identifier}                                       return 'CONTEXT_PROP';
 
 <*><<EOF>>                                               return 'EOF';
 
@@ -222,7 +223,7 @@ exports
           ;
 
 export
-          : (view_statement | macro_statement | export_from_statement)
+          : (view_statement | frag_statement | export_from_statement)
             {$$ = $1;                                           }
           ;
 
@@ -233,21 +234,25 @@ view_statement
             '{%' ENDVIEW '%}'
             {$$ = new yy.ast.ViewStatement($3, $5, [],$7, @$);     }
 
-          | '{%' VIEW type_classes identifier USING type '%}'
+          | '{%' VIEW identifier type_classes USING type '%}'
             tag
             '{%' ENDVIEW '%}'
             {$$ = new yy.ast.ViewStatement($4, $6, $3, $8, @$);     }
           ;
 
-macro_statement
+frag_statement
 
-          : '{%' MACRO IDENTIFIER '%}' children '{%' ENDMACRO '%}'
-            {$$ = new yy.ast.MacroStatement($3, [], [], $5, @$);    }
+          : '{%' FRAG identifier USING type '%}' children '{%' ENDFRAG '%}'
+            {$$ = new yy.ast.FragmentStatement($3, [], [], $5, $7, @$);   }
 
-          | '{%' MACRO IDENTIFIER type_classes? parameters '%}'
-            children
-            '{%' ENDMACRO '%}'
-            {$$ = new yy.ast.MacroStatement($3, $4||[], $5, $7, @$);    }
+          | '{%' FRAG identifier type_classes USING type '%}' children '{%' ENDFRAG '%}'
+            {$$ = new yy.ast.FragmentStatement($3, $4, [], $6, $8, @$);   }
+
+          | '{%' FRAG identifier parameters USING type '%}' children '{%' ENDFRAG '%}'
+            {$$ = new yy.ast.FragmentStatement($3, [], $4, $6, $8, @$);   }
+
+          | '{%' FRAG identifier type_classes parameters USING type '%}' children '{%' ENDFRAG '%}'
+            {$$ = new yy.ast.FragmentStatement($3, $4, $5, $7, $9, @$);   }
           ;
 
 type_classes
@@ -264,10 +269,18 @@ type_class_list
 
 type_class
          : identifier
-           {$$ = $1;}
+           {$$ = new yy.ast.TypeClass($1, null, @$);}
 
-         | identifier type_class
-           {$$ = new yy.ast.TypedIdentifier($1, $2, @$);}
+         | identifier ':' type
+           {$$ = new yy.ast.TypeClass($1, $3, @$);}
+         ;
+
+type 
+         : identifier
+           {$$ = new yy.ast.Type($1, [], @$);                             }
+
+         | identifier type_classes
+           {$$ = new yy.ast.Type($1, $2, @$);                             }
          ;
 
 export_from_statement
@@ -581,7 +594,10 @@ member_expression
           : identifier '.' identifier   
             {$$ = new yy.ast.MemberExpression($1, $3, @$); }
 
-          | context_variable '.' identifier 
+          | context_property '.' identifier 
+            {$$ = new yy.ast.MemberExpression($1, $3, @$); }
+
+          | context_variable '.' identifier
             {$$ = new yy.ast.MemberExpression($1, $3, @$); }
 
           | array_literal '.' identifier   
@@ -669,21 +685,13 @@ typable_identifier
            {$$ = new yy.ast.TypableIdentifier($1, $3, $4, true, @$);      }
          ;
 
-type 
-         : identifier
-           {$$ = new yy.ast.Type($1, [], @$);                             }
-
-         | identifier type_classes
-           {$$ = new yy.ast.Type($1, $2, @$);                             }
-         ;
-
 type_assertion
          : '(' expression AS identifier ')'
             {$$ = new yy.ast.TypeAssertion($2, $4, @$);          }
          ;
 
 variable
-         : (identifier|context_variable)
+         : (identifier|context_property|context_variable)
           {$$ = $1; }
          ;
 
@@ -692,7 +700,12 @@ identifier
             {$$ = new yy.ast.Identifier($1, '', @$);             }
           ;
 
-context_variable
-          : CONTEXT_VAR
-            {$$ = new yy.ast.ContextVariable($1.slice(1), @$)    }
+context_property
+          : CONTEXT_PROP
+            {$$ = new yy.ast.ContextProperty($1.slice(1), @$)    }
           ;
+
+context_variable
+          : ('@'|THIS) {$$ = new yy.ast.ContextVariable(@$);}
+          ;
+            

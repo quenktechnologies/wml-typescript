@@ -24,17 +24,6 @@ class TernaryExpression extends Node {
 
     }
 
-    compile(o) {
-
-      return this.sourceNode(o.fileName, '(').
-        add(this.logic.compile(o)).
-        add(')?').
-        add(this.iftrue.compile(o)).
-        add(':').
-        add(this.iffalse.compile(o));
-
-    }
-
 }
 
 export default TernaryExpression

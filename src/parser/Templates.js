@@ -33,7 +33,7 @@ export class ${id}${_typeClasses(classes, o)} extends AppView<${hint}> {
 
         let view = this;
 
-        this.template = function() {
+        this.template = function($$ctx:${hint}) {
             return ${_rootElement(tag, o)}
         }
 
@@ -52,7 +52,7 @@ export class Main<C> extends AppView<C> {
 
         let view = this;
 
-        this.template = function() {
+        this.template = function($$ctx:C) {
             return ${_rootElement(tag, o)}
         }
 

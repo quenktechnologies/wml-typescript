@@ -34,9 +34,9 @@ class ForStatement extends Node {
         count = count + 1;
 
         return `$$for(${src}, function for${count} (${args})` +
-            `{ return ${flatten(this.children, o)} }.bind(this),` +
+            `{ return ${flatten(this.children, o)} },` +
             `function for_otherwise${count}()` +
-            `{ return ${flatten(this.otherwise, o)} }.bind(this))`;
+            `{ return ${flatten(this.otherwise, o)} })`;
 
 
 

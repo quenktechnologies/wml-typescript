@@ -27,7 +27,7 @@ class IfStatement extends Node {
 
         return `$$if(${this.expression.transpile(o)}, ` +
             `function if${thenCount++}()` +
-            `{ return ${flatten(this.then, o)} }.bind(this),` +
+            `{ return ${flatten(this.then, o)} },` +
             `${this.else ? this.else.transpile(o) : '$$empty'})`;
 
     }

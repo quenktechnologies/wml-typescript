@@ -30,8 +30,8 @@ class ElseIfClause extends Node {
         return `function elseif${elseifs++}()` +
             `{ return $$if(${this.expression.transpile(o)},` +
             `function if${elseififs++}() ` +
-            `{ return ${flatten(this.then, o)}; }.bind(this), ` +
-            `${this.else.transpile(o)});}.bind(this)`;
+            `{ return ${flatten(this.then, o)}; }, ` +
+            `${this.else.transpile(o)});}`;
 
     }
 

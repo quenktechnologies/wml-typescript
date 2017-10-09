@@ -24,16 +24,5 @@ class MemberExpression extends Node {
 
     }
 
-    compile(o) {
-
-        var parts = this.path.split('.');
-        var head = parts.shift();
-
-        parts = parts.join('.');
-
-        return this.sourceNode(o.fileName, `$$resolve(${head}, '${parts}')`);
-
-    }
-
 }
 export default MemberExpression

@@ -23,17 +23,5 @@ class MethodExpression extends Node {
 
     }
 
-    compile(o) {
-
-        var node = this.sourceNode(o.fileName, this.path);
-
-        node.add('(');
-
-        return this.compileList(this.arguments, node, o).
-        add(')');
-
-
-    }
-
 }
 export default MethodExpression

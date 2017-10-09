@@ -8,7 +8,7 @@ class CallStatement extends Node {
     constructor(tmpl, args, location) {
 
         super();
-        this.type = 'include-statement';
+        this.type = 'call-statement';
         this.template = tmpl;
         this.arguments = args;
         this.location = location;
@@ -17,9 +17,11 @@ class CallStatement extends Node {
 
     transpile(o) {
 
-        var args = this.arguments.map(a => a.transpile(o)).join(',');
+        var args = args.length > 0 ?
+            `,${this.arguments.map(a => a.transpile(o)).join(',')}` :
+            '';
 
-        return `${this.template.transpile(o)}.call(this,view,${args})`;
+        return `${this.template.transpile(o)}($$ctx,view${args})`;
 
     }
 

@@ -1,7 +1,7 @@
 /* jshint ignore:start */
 export Module from './Module';
 export ImportStatement from './ImportStatement';
-export MacroStatement from './MacroStatement';
+export FragmentStatement from './FragmentStatement';
 export ExportFromStatement from './ExportFromStatement';
 export DefaultMember from './DefaultMember';
 export AliasMember from './AliasMember';
@@ -10,7 +10,6 @@ export CompositeMember from './CompositeMember';
 export ViewStatement from './ViewStatement';
 export Tag from './Tag';
 export Attribute from './Attribute';
-export AttributeSpread from './AttributeSpread';
 export Interpolation from './Interpolation';
 export TextInterpolation from './TextInterpolation';
 export FunctionExpression from './FunctionExpression';
@@ -41,5 +40,8 @@ export TypeOfCaseStatement from './TypeOfCaseStatement';
 export InstanceOfCaseStatement from './InstanceOfCaseStatement';
 export CallStatement from './CallStatement';
 export Type from './Type';
+export TypeClass from './TypeClass';
 export ContextVariable from './ContextVariable';
+export ContextProperty from './ContextProperty';
+export ReadExpression from './ReadExpression';
 /* jshint ignore:end */

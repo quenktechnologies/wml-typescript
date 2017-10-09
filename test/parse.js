@@ -186,15 +186,21 @@ tests = {
 
     },
 
-    'should parse macro statements': {
+    'should parse frag statements': {
 
-        input: '{% macro _view %}<View/>{% endmacro %}'
+        input: '{% frag vu using T %}<View/>{% endfrag %}'
 
     },
 
-    'should parse macro statements with args': {
+    'should parse frag statements with args': {
 
-        input: '{% macro _view(a,b,c) %} <View a={{a}} b={{b}} c={{c}}/> {% endmacro %}'
+        input: '{% frag _view(a,b,c) using void %} <View a={{a}} b={{b}} c={{c}}/> {% endfrag %}'
+
+    },
+
+    'should parse frag statements with type classes': {
+
+        input: '{% frag vu [A,B:C,C] (a:A, b:B) using void %} <View/> {% endfrag %}'
 
     },
 
@@ -216,14 +222,14 @@ tests = {
         input: '<div class={{((Styles.A + " ") + Style.B)}}/>'
     },
 
-    'should allow for expression after macro': {
+    'should allow for expression after frag': {
 
-        input: '{% macro sven %} {% for a in b %} {{b}} {% endfor %} {% endmacro %}'
+        input: '{% frag sven using T %} {% for a in b %} {{b}} {% endfor %} {% endfrag %}'
 
     },
-    'should allow if expression after macro': {
+    'should allow if expression after frag': {
 
-        input: '{% macro ate %} {% if a %} {{a}} {% endif %} {% endmacro %}'
+        input: '{% frag ate using object %} {% if a %} {{a}} {% endif %} {% endfrag %}'
 
     },
     'should allow for booleans in interpolations': {
@@ -260,9 +266,20 @@ tests = {
     },
     'should parse typed views with type classes': {
 
-        input: '{% view [A,B] Main using Context[A,B] %} <p>{{this.values}}</p> {% endview %}'
+        input: '{% view Main [A,B] using Context[A,B] %} <p>{{this.values}}</p> {% endview %}'
+
+    },
+    'should parse attribute reads': {
+
+        input: `<p class={{concat([x, @@['ww:class'], @@['ww:variant'?'default']])}}/>`
+
+    },
+    'should parse context variables': {
+
+        input: '<Input name={{@level.name}}/>'
 
     }
+
 
 };
 
