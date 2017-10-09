@@ -278,6 +278,12 @@ tests = {
 
         input: '<Input name={{@level.name}}/>'
 
+    },
+    'should allow @@ in if expressions': {
+
+        input: `<p>{% if @@['attr'] %}x {% else %} yz fefd {% endif %}</p>`
+
+
     }
 
 

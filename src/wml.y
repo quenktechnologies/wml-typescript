@@ -95,8 +95,9 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <CONTROL>'endotherwise'                                  return 'ENDOTHERWISE';
 <CONTROL>'instanceof'                                    return 'INSTANCEOF';
 <CONTROL>'typeof'                                        return 'TYPEOF';
-<CONTROL>'@'                                             return '@';
+<CONTROL>'@@'                                            return '@@';
 <CONTROL>'this'                                          return 'THIS';
+<CONTROL>'@'                                             return '@';
 <CONTROL>'@'{Identifier}                                 return 'CONTEXT_PROP';
 <CONTROL>{Identifier}                                    return 'IDENTIFIER';
 <CONTROL>'%}'                this.popState();            return '%}';
@@ -449,7 +450,7 @@ children
           ;
 
 child
-          : (tag | control | text_interpolation | characters)
+          : (tag | control | text_interpolation | characters | identifier)
             {$$ = $1;}
           ;
 
@@ -644,6 +645,12 @@ bind_expression
             {$$ = new yy.ast.BindExpression($1, $3, [] , @$);}
 
           | identifier '::' 'identifier' arguments 
+            {$$ = new yy.ast.BindExpression($1, $3, $4 , @$);}
+
+          | context_variable '::' 'identifier'
+            {$$ = new yy.ast.BindExpression($1, $3, [] , @$);}
+
+          | context_variable '::' 'identifier' arguments 
             {$$ = new yy.ast.BindExpression($1, $3, $4 , @$);}
 
           | member_expression '::' identifier
