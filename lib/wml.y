@@ -79,6 +79,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <CONTROL>'from'                                          return 'FROM';
 <CONTROL>'endexport'                                     return 'ENDEXPORT';
 <CONTROL>'view'                                          return 'VIEW';
+<CONTROL>'using'                                         return 'USING';
 <CONTROL>'endview'                                       return 'ENDVIEW';
 <CONTROL>'match'                                         return 'MATCH';
 <CONTROL>'endmatch'                                      return 'ENDMATCH';
@@ -225,12 +226,12 @@ export
 
 view_statement
 
-          : '{%' VIEW identifier IN type '%}'
+          : '{%' VIEW identifier USING type '%}'
             tag
             '{%' ENDVIEW '%}'
             {$$ = new yy.ast.ViewStatement($3, $5, [],$7, @$);     }
 
-          | '{%' VIEW type_classes identifier IN type '%}'
+          | '{%' VIEW type_classes identifier USING type '%}'
             tag
             '{%' ENDVIEW '%}'
             {$$ = new yy.ast.ViewStatement($4, $6, $3, $8, @$);     }
