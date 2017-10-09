@@ -96,6 +96,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <EXPRESSION>'->'                                         return '->';
 <EXPRESSION>'..'                                         return '..';
 <EXPRESSION>'instanceof'                                 return 'INSTANCEOF';
+<EXPRESSION>'@@'                                         return '@@';
 <EXPRESSION>'}}'             this.popState();            return '}}';
 
 <CHILDREN>'{{'               this.begin('EXPRESSION');   return '{{';
@@ -142,6 +143,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <*>'@'                                                   return '@';
 <*>'as'                                                  return 'AS';
 <*>{Identifier}                                          return 'IDENTIFIER';
+<*>'@'{Identifier}                                       return 'CONTEXT_VAR';
 
 <*><<EOF>>                                               return 'EOF';
 
@@ -450,12 +452,6 @@ call_statement
 
          |'{%' CALL '(' expression ')' '%}'
           {$$ = new yy.ast.CallStatement($4, [], @$);}
-/*
-         |'{%' CALL '(' call_expression ')' arguments '%}'
-          {$$ = new yy.ast.CallStatement($4, $6, @$);}
-
-         |'{%' CALL '(' call_expression ')' '%}'
-          {$$ = new yy.ast.CallStatement($4, [], @$);}        */
          ;
 
 characters
@@ -493,6 +489,12 @@ expression
           | '!' expression
             {$$ = new yy.ast.UnaryExpression($1, $2, @$);      }
 
+          | '@@' '[' expression ']'
+            {$$ = new yy.ast.ReadExpression($3,null, @$);      } 
+
+          | '@@' '[' expression '?' expression ']'
+            {$$ = new yy.ast.ReadExpression($3, $5, @$);       }
+
           | (new_expression | 
              call_expression | 
              member_expression | 
@@ -504,7 +506,7 @@ expression
              boolean_literal | 
              number_literal |
              type_assertion|
-             identifier)
+             variable)
             {$$ = $1;                                          } 
          ;
 
@@ -577,6 +579,9 @@ parameter_list
 
 member_expression
           : identifier '.' identifier   
+            {$$ = new yy.ast.MemberExpression($1, $3, @$); }
+
+          | context_variable '.' identifier 
             {$$ = new yy.ast.MemberExpression($1, $3, @$); }
 
           | array_literal '.' identifier   
@@ -677,10 +682,17 @@ type_assertion
             {$$ = new yy.ast.TypeAssertion($2, $4, @$);          }
          ;
 
+variable
+         : (identifier|context_variable)
+          {$$ = $1; }
+         ;
+
 identifier
           : IDENTIFIER
             {$$ = new yy.ast.Identifier($1, '', @$);             }
+          ;
 
-          | '@'
-            {$$ = new yy.ast.Identifier('this.attributes','', @$)}
+context_variable
+          : CONTEXT_VAR
+            {$$ = new yy.ast.ContextVariable($1.slice(1), @$)    }
           ;

@@ -1,9 +1,9 @@
 import Node from './Node';
 
 /*
- * IncludeStatement
+ * CallStatement
  */
-class IncludeStatement extends Node {
+class CallStatement extends Node {
 
     constructor(tmpl, args, location) {
 
@@ -25,4 +25,4 @@ class IncludeStatement extends Node {
 
 }
 
-export default IncludeStatement
+export default CallStatement

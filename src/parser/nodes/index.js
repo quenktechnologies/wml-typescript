@@ -41,4 +41,5 @@ export TypeOfCaseStatement from './TypeOfCaseStatement';
 export InstanceOfCaseStatement from './InstanceOfCaseStatement';
 export CallStatement from './CallStatement';
 export Type from './Type';
+export ContextVariable from './ContextVariable';
 /* jshint ignore:end */
