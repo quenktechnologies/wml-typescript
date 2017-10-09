@@ -1,6 +1,6 @@
 import Node from './Node';
 import {
-    main as viewFn,
+    view as viewFn,
     runtime as runtimeFn
 } from '../Templates';
 import * as babel from 'babel-core';
