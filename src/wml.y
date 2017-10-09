@@ -95,6 +95,8 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <CONTROL>'endotherwise'                                  return 'ENDOTHERWISE';
 <CONTROL>'instanceof'                                    return 'INSTANCEOF';
 <CONTROL>'typeof'                                        return 'TYPEOF';
+<CONTROL>'@'                                             return '@';
+<CONTROL>'this'                                          return 'THIS';
 <CONTROL>'@'{Identifier}                                 return 'CONTEXT_PROP';
 <CONTROL>{Identifier}                                    return 'IDENTIFIER';
 <CONTROL>'%}'                this.popState();            return '%}';
@@ -107,9 +109,11 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <EXPRESSION>'instanceof'                                 return 'INSTANCEOF';
 <EXPRESSION>'true'                                       return 'TRUE';
 <EXPRESSION>'false'                                      return 'FALSE';
+<EXPRESSION>'this'                                       return 'THIS';
+<EXPRESSION>'@@'                                         return '@@';
+<EXPRESSION>'@'                                          return '@';
 <EXPRESSION>'@'{Identifier}                              return 'CONTEXT_PROP';
 <EXPRESSION>{Identifier}                                 return 'IDENTIFIER';
-<EXPRESSION>'@@'                                         return '@@';
 <EXPRESSION>'}}'             this.popState();            return '}}';
 
 <CHILDREN>'{{'               this.begin('EXPRESSION');   return '{{';
@@ -151,7 +155,6 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <*>'.'                                                   return '.';
 <*>'{'                                                   return '{';
 <*>'}'                                                   return '}';
-<*>'@'                                                   return '@';
 
 <*><<EOF>>                                               return 'EOF';
 
