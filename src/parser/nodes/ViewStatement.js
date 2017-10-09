@@ -8,14 +8,14 @@ import {viewT as viewFn
  */
 class ViewStatement extends Node {
 
-  constructor(id, hint, classes, tag, location) {
+  constructor(id, context, generics, tag, location) {
 
     super();
 
     this.type = 'typed-view-expression';
     this.id = id;
-    this.hint = hint;
-    this.classes = classes;
+    this.context = context;
+    this.generics = generics;
     this.tag = tag;
     this.location = location;
 
@@ -25,8 +25,8 @@ class ViewStatement extends Node {
 
     return viewFn(
         this.id.transpile(o),
-        this.hint.transplie(o),
-        this.classes.map(c=>c.transpile(o)).join(','),
+        this.context.transplie(o),
+        this.generics.map(g=>g.generics(o)).join(','),
         this.tag,
         o);
 
