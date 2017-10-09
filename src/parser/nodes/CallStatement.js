@@ -17,7 +17,7 @@ class CallStatement extends Node {
 
     transpile(o) {
 
-        var args = this.arguments.args.length > 0 ?
+        var args = this.arguments.length > 0 ?
             `,${this.arguments.map(a => a.transpile(o)).join(',')}` :
             '';
 

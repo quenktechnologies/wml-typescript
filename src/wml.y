@@ -172,12 +172,13 @@ module
             return $$;
             }
 
-          | imports exports USING type tag EOF
+         | imports exports USING type tag EOF
             {$$ =
             new yy.ast.Module($1, $2, [], $4, $5, @$); 
             return $$;
             }
 
+         
           | imports exports tag EOF
             {$$ =
             new yy.ast.Module($1,$2,[], null, $3, @$); 
@@ -187,6 +188,18 @@ module
           | imports exports EOF
             {$$ =
             new yy.ast.Module($1, $2, [], null, null, @$); 
+            return $$;
+            }
+
+          | imports USING type_classes type tag EOF
+            {$$ =
+            new yy.ast.Module($1, [], $3, $4, $5, @$); 
+            return $$;
+            }
+
+          | imports USING type tag EOF
+            {$$ =
+            new yy.ast.Module($1, [], [], $3, $4, @$); 
             return $$;
             }
 
