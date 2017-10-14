@@ -554,7 +554,13 @@ call_statement
 
          |'{%' CALL member_expression arguments '%}'
           {$$ = new yy.ast.CallStatement($3, $4, @$);}
-          
+
+         |'{%' CALL context_property '%}'
+          {$$ = new yy.ast.CallStatement($3, [], @$);}
+
+         |'{%' CALL context_property arguments '%}'
+          {$$ = new yy.ast.CallStatement($3, $4, @$);}
+        
          |'{%' CALL '(' expression ')' arguments  '%}'
           {$$ = new yy.ast.CallStatement($4, $6, @$);}
 
@@ -606,6 +612,7 @@ expression
           | (new_expression | 
              call_expression | 
              member_expression | 
+             context_property |
              function_expression | 
              bind_expression | 
              object_literal |
@@ -614,7 +621,8 @@ expression
              boolean_literal | 
              number_literal |
              type_assertion|
-             variable)
+             identifier |
+             context_variable)
             {$$ = $1;                                          } 
          ;
 
@@ -695,10 +703,10 @@ member_expression
           : identifier '.' identifier   
             {$$ = new yy.ast.MemberExpression($1, $3, @$); }
 
-          | context_property '.' identifier 
+          | context_variable '.' identifier
             {$$ = new yy.ast.MemberExpression($1, $3, @$); }
 
-          | context_variable '.' identifier
+          | context_property '.' identifier
             {$$ = new yy.ast.MemberExpression($1, $3, @$); }
 
           | array_literal '.' identifier   
