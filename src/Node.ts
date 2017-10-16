@@ -119,9 +119,9 @@ export class CompositeMember {
 }
 
 export type Main
-  = TypedMain
-  | UntypedMain
-  ;
+    = TypedMain
+    | UntypedMain
+    ;
 
 export class TypedMain {
 
@@ -137,11 +137,11 @@ export class TypedMain {
 
 export class UntypedMain {
 
-  type = 'untyped-main';
+    type = 'untyped-main';
 
-  constructor(
-    public tag : Tag,
-    public location: Location) {}
+    constructor(
+        public tag: Tag,
+        public location: Location) { }
 
 }
 
@@ -388,7 +388,10 @@ export class Characters {
 }
 
 export type Expression
-    = ConstructExpression
+    = IfThenExpression
+    | BinaryExpression
+    | UnaryExpression
+    | ConstructExpression
     | CallExpression
     | MemberExpression
     | ReadExpression
@@ -399,6 +402,40 @@ export type Expression
     | Identifier
     | ContextVariable
     ;
+
+export class IfThenExpression {
+
+  type = 'if-then-expression';
+
+  constructor(
+    public condition:Expression,
+    public iftrue : Expression,
+    public iffalse : Expression,
+    public location:Location){}
+
+}
+
+export class BinaryExpression {
+
+  type = 'binary-expression';
+
+  constructor(
+    public left:Expression,
+    public operator: string,
+    public right:Expression,
+    public location:Location){}
+
+}
+
+export class UnaryExpression {
+
+  type = 'unary-expression';
+
+  constructor(
+    public operator:string,
+    public expression:Expression) {}
+
+}
 
 export class ConstructExpression {
 

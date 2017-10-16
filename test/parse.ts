@@ -103,9 +103,9 @@ tests = {
         '</root>'
 
     },
-    'should parse ternary expressions': {
+    'should parse if then expressions': {
 
-        input: '<Html id={{@id}}>{{@check() ? a : b }}</div>'
+        input: '<Html id={{@id}}>{{ if @check() then a else b }}</Html>'
 
     },
     'should parse function expressions': {
@@ -116,8 +116,7 @@ tests = {
 
     'should parse calls': {
 
-        input: '<tr>{% for x,i in y %}' +
-        '{% call (@getFrags()) (ctx1, ctx2) %}{% call val %}{% endfor %}</tr>'
+        input: '<tr>{% for x,i in y %} {{ f(x,i) }} {% endfor %} </tr>'
 
     },
     'should parse negative numbers': {
@@ -128,23 +127,12 @@ tests = {
 
     'should allow filter chaining': {
 
-        input: '<p>{{ @_::value | f1 | f2(2) | f3(@value) }}</p>'
-
-    },
-    'should parse match statements': {
-
-        input: 'import * as s from "statements"' +
-        '<Tab>' +
-        '{% match x %}' +
-        '{% case instanceof Statement %}<Statement/>{% endcase %}' +
-        '{% case typeof "string" %}<Statement/>{% endcase %}' +
-        '{% else %}<Default/>' +
-        '{% endmatch %}</Tab>'
+        input: '<p>{{ @value | f1 | f2(2) | f3(@value) }}</p>'
 
     },
     'should parse if statements': {
 
-        input: '<Tag>{% if value %} <text>Text</text> {% endif %}</Tag>'
+        input: '<Tag>{% if value %} <text>Text</text> {% else %} no text {% endif %}</Tag>'
 
     },
 
@@ -160,21 +148,39 @@ tests = {
 
     },
 
-    'should parse frag statements': {
+    'should parse short fun statements': {
 
-        input: '{% frag vu using T %}<View/>{% endfrag %}'
-
-    },
-
-    'should parse frag statements with args': {
-
-        input: '{% frag _view(a,b,c) using void %} <View a={{a}} b={{b}} c={{c}}/> {% endfrag %}'
+        input: '{% fun vue = <View/> %}'
 
     },
 
-    'should parse frag statements with type classes': {
+    'should parse short fun statements with arguments': {
 
-        input: '{% frag vu [A,B:C,C] (a:A, b:B) using void %} <View/> {% endfrag %}'
+        input: '{% fun vue(a,b,c:string) = <View a={{a}} b={{b}} c={{c}}/> %}'
+
+    },
+
+    'should parse short fun statements with type classes': {
+
+        input: '{% fun vue [A,B:C,C] (a:A, b:B) = {{ (a + b) + c }} %}'
+
+    },
+
+    'should parse extended fun statements': {
+
+        input: '{% fun vue %} <View/> {% endfun %}'
+
+    },
+
+    'should parse extended fun statements with arguments': {
+
+        input: '{% fun vue(a,b,c:string) %}<View a={{a}} b={{b}} c={{c}}/> {% endfun %}'
+
+    },
+
+    'should parse extended fun statements with type classes': {
+
+        input: '{% fun vue [A,B:C,C] (a:A, b:B) %} {{ (a + b) + c }} {% endfun %}'
 
     },
 
@@ -196,30 +202,25 @@ tests = {
         input: '<div class={{((Styles.A + " ") + Style.B)}}/>'
     },
 
-    'should allow for expression after frag': {
+    'should allow for expression after fun': {
 
-        input: '{% frag sven using T %} {% for a in b %} {{b}} {% endfor %} {% endfrag %}'
+        input: '{% fun sven %} {% for a in b %} {{b}} {% endfor %} {% endfun %}'
 
     },
-    'should allow if expression after frag': {
+    'should allow if expression after fun': {
 
-        input: '{% frag ate using object %} {% if a %} {{a}} {% endif %} {% endfrag %}'
+        input: '{% fun ate (o:object) %} {% if a %} {{a}} {% else %} {{a}} {% endif %} {% endfun %}'
 
     },
     'should allow for booleans in interpolations': {
 
-        input: '<bool active={{true}}>{{(fun())?false:true}}</bool>'
+        input: '<bool active={{true}}>{{if fun() then false else true}}</bool>'
 
     },
 
     'should allow calls on expressions': {
 
         input: '<div>{{((@content() || bar))(foo)}}</div>'
-
-    },
-    'should allow for namespaced tags': {
-
-        input: '<my:Tag/>'
 
     },
     'should allow boolean attribute values': {
@@ -245,7 +246,7 @@ tests = {
     },
     'should parse attribute reads': {
 
-        input: `<p class={{concat([x, someValue['ww:class'], some.other.value['ww:variant'?'default']])}}/>`
+        input: `<p class={{concat([x, someValue['ww:class' as string ], some.other.value['ww:variant' as string ?'default']])}}/>`
 
     },
     'should parse context variables': {
@@ -253,16 +254,13 @@ tests = {
         input: '<Input name={{@level.name}}/>'
 
     },
-    'should allow @@ in if expressions': {
+    'should allow read expressions in if expressions': {
 
-        input: `<p>{% if @@['attr'] %}x {% else %} yz fefd {% endif %}</p>`
-
+        input: `<p>{% if @taggin['attr' as string] %}x{% else %} yz fefd {% endif %}</p>`
 
     }
 
-
 };
-
 
 describe('Parser', function() {
 
