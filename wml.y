@@ -2,6 +2,11 @@
  Grammar for the Widget Markup Language
 */
 
+/*
+ This is the Lexer portion, the syntax here corresponds to
+ [flex](http://flex.sourceforge.net/manual)
+*/
+
 %lex
 
 /* Definitions */
@@ -18,7 +23,8 @@ OctalIntegerLiteral [0]{OctalDigit}+
 HexIntegerLiteral [0][xX]{HexDigit}+
 DecimalLiteral ([-]?{DecimalIntegerLiteral}\.{DecimalDigits}*{ExponentPart}?)|(\.{DecimalDigits}{ExponentPart}?)|({DecimalIntegerLiteral}{ExponentPart}?)
 NumberLiteral {DecimalLiteral}|{HexIntegerLiteral}|{OctalIntegerLiteral}
-Identifier [a-z$_][a-zA-Z$_0-9-]*
+Identifier [a-zA-Z$_][a-zA-Z$_0-9-]*
+DotIdentifier [a-zA-Z$_][a-zA-Z$_0-9.-]*
 LineContinuation \\(\r\n|\r|\n)
 OctalEscapeSequence (?:[1-7][0-7]{0,2}|[0-7]{2,3})
 HexEscapeSequence [x]{HexDigit}{2}
@@ -57,8 +63,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <INITIAL>'as'                                            return 'AS';
 <INITIAL>'true'                                          return 'TRUE';
 <INITIAL>'false'                                         return 'FALSE';
-<INITIAL>[A-Z]{Identifier}                               return 'CONSTRUCTOR';
-<INITIAL>'@'{Identifier}                                 return 'CONTEXT_PROPERTY';
+<INITIAL>'@'{Identifier}                                 return 'CONTEXT_PROP';
 <INITIAL>{Identifier}                                    return 'IDENTIFIER';
 
 <CONTROL>'macro'                                         return 'MACRO';
@@ -77,39 +82,40 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <CONTROL>'default'                                       return 'DEFAULT';
 <CONTROL>'case'                                          return 'CASE';
 <CONTROL>'endcase'                                       return 'ENDCASE';
+<CONTROL>'call'                                          return 'CALL';
 <CONTROL>'export'                                        return 'EXPORT';
 <CONTROL>'from'                                          return 'FROM';
+<CONTROL>'endexport'                                     return 'ENDEXPORT';
 <CONTROL>'view'                                          return 'VIEW';
 <CONTROL>'using'                                         return 'USING';
 <CONTROL>'endview'                                       return 'ENDVIEW';
 <CONTROL>'match'                                         return 'MATCH';
 <CONTROL>'endmatch'                                      return 'ENDMATCH';
+<CONTROL>'otherwise'                                     return 'OTHERWISE';
+<CONTROL>'endotherwise'                                  return 'ENDOTHERWISE';
 <CONTROL>'instanceof'                                    return 'INSTANCEOF';
 <CONTROL>'typeof'                                        return 'TYPEOF';
+<CONTROL>'as'                                            return 'AS';
+<CONTROL>'@@'                                            return '@@';
 <CONTROL>'this'                                          return 'THIS';
-<CONTROL>'fun'                                           return 'FUN';
-<CONTROL>'endfun'                                        return 'ENDFUN';
-<CONTROL>'::'                                            return '::';
 <CONTROL>'@'                                             return '@';
-<CONTROL>'()'                                            return '()';
-<CONTROL>'='                 this.begin('CHILDREN');      return '=';
-<CONTROL>[A-Z]{Identifier}                               return 'CONSTRUCTOR';
-<CONTROL>'@'{Identifier}                                 return 'CONTEXT_PROPERTY';
+<CONTROL>'@'{Identifier}                                 return 'CONTEXT_PROP';
 <CONTROL>{Identifier}                                    return 'IDENTIFIER';
 <CONTROL>'%}'                this.popState();            return '%}';
 
+<EXPRESSION>'new'                                        return 'NEW';
 <EXPRESSION>'|'                                          return '|';
 <EXPRESSION>'=>'                                         return '=>';
+<EXPRESSION>'::'                                         return '::';
 <EXPRESSION>'->'                                         return '->';
 <EXPRESSION>'instanceof'                                 return 'INSTANCEOF';
 <EXPRESSION>'true'                                       return 'TRUE';
 <EXPRESSION>'false'                                      return 'FALSE';
 <EXPRESSION>'this'                                       return 'THIS';
-<EXPRESSION>'if'                                         return 'IF';
-<EXPRESSION>'then'                                       return 'THEN';
+<EXPRESSION>'as'                                            return 'AS';
+<EXPRESSION>'@@'                                         return '@@';
 <EXPRESSION>'@'                                          return '@';
-<CONTROL>[A-Z]{Identifier}                               return 'CONSTRUCTOR';
-<EXPRESSION>'@'{Identifier}                              return 'CONTEXT_PROPERTY';
+<EXPRESSION>'@'{Identifier}                              return 'CONTEXT_PROP';
 <EXPRESSION>{Identifier}                                 return 'IDENTIFIER';
 <EXPRESSION>'}}'             this.popState();            return '}}';
 
@@ -132,6 +138,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <*>']'                                                   return ']';
 <*>';'                                                   return ';'
 <*>':'                                                   return ':';
+<*>':::'                                                 return ':::';
 <*>'='                                                   return '='
 <*>'=='                                                  return '==';
 <*>'!='                                                  return '!=';
@@ -165,48 +172,97 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 
 module
 
-          : imports exports main EOF
+          : imports exports USING type_classes type tag EOF
             {$$ =
-            new yy.ast.Module($1, $2, $3, @$); 
+            new yy.ast.Module($1, $2, $4, $5, $6, @$); 
+            return $$;
+            }
+
+         | imports exports USING type tag EOF
+            {$$ =
+            new yy.ast.Module($1, $2, [], $4, $5, @$); 
+            return $$;
+            }
+
+         
+          | imports exports tag EOF
+            {$$ =
+            new yy.ast.Module($1,$2,[], null, $3, @$); 
             return $$;
             }
 
           | imports exports EOF
             {$$ =
-            new yy.ast.Module($1, $2, null, @$); 
+            new yy.ast.Module($1, $2, [], null, null, @$); 
             return $$;
             }
 
-          | imports main EOF
+          | imports USING type_classes type tag EOF
             {$$ =
-            new yy.ast.Module($1, [], $2, @$); 
+            new yy.ast.Module($1, [], $3, $4, $5, @$); 
+            return $$;
+            }
+
+          | imports USING type tag EOF
+            {$$ =
+            new yy.ast.Module($1, [], [], $3, $4, @$); 
+            return $$;
+            }
+
+          | imports tag EOF
+            {$$ =
+            new yy.ast.Module($1,[],[], null, $2, @$); 
             return $$;
             }
 
           | imports EOF
             {$$ =
-            new yy.ast.Module($1, [], null, @$); 
+            new yy.ast.Module($1,[],[], null, null, @$); 
             return $$;
             }
 
-          | exports main EOF
+          | exports USING type_classes type tag EOF
             {$$ =
-            new yy.ast.Module([], $1, $2, @$); 
+            new yy.ast.Module([], $1, $3, $4, $5, @$); 
+            return $$;
+            }
+
+          | exports USING type tag EOF
+            {$$ =
+            new yy.ast.Module([], $1, [], $3, $4, @$); 
+            return $$;
+            }
+
+          | exports tag EOF
+            {$$ =
+            new yy.ast.Module([], $1, [], null, $2, @$); 
             return $$;
             }
 
           | exports EOF
             {$$ =
-            new yy.ast.Module([], $1, null, @$); 
+            new yy.ast.Module([], $1, [], null, null, @$); 
             return $$;
             }
 
-          | main EOF
+          | USING type_classes type tag EOF
             {$$ =
-            new yy.ast.Module([], [], $1, @$); 
+            new yy.ast.Module([],[],$2, $3, $4, @$); 
             return $$;
             }
-         ;
+
+          | USING type tag EOF
+            {$$ =
+            new yy.ast.Module([],[],[], $2, $3, @$); 
+            return $$;
+            }
+
+          | tag EOF
+            {$$ =
+            new yy.ast.Module([],[],[], null, $1, @$);          ;
+            return $$;
+            }  
+          ;
 
 imports
           : import_statement          {$$ =  [$1];         }
@@ -214,30 +270,31 @@ imports
           ;
 
 import_statement
-          : IMPORT import_member FROM string_literal (';')?
+          : IMPORT import_member FROM string_literal ';'?
             {$$ = new yy.ast.ImportStatement($2, $4, @$);}
+
           ;
 
 import_member
           : default_member
-          | qualified_member
-          | aliased_member
+          | alias_member
+          | aggregate_member
           | composite_member
           ;
 
 default_member
-          : unqualified_identifier
+          : IDENTIFIER
             {$$ = new yy.ast.DefaultMember($1, @$);}
           ;
 
-aliased_member
-          : unqualified_identifier AS unqualified_identifier
-            {$$ = new yy.ast.AliasedMember($1, $3, @$);}
+alias_member
+          : IDENTIFIER AS IDENTIFIER
+            {$$ = new yy.ast.AliasMember($1, $3, @$);}
           ;
 
-qualified_member
-          : '*' AS unqualified_identifier
-            {$$ = new yy.ast.QualifiedMember($3, @$);}
+aggregate_member
+          : '*' AS IDENTIFIER
+            {$$ = new yy.ast.AggregateMember($3, @$);}
           ;
 
 composite_member
@@ -246,16 +303,11 @@ composite_member
           ;
 
 member_list
-          : (unqualified_identifier | aliased_member)
+          : (default_member | alias_member)
             {$$ = [$1];}
 
-          | member_list ',' (unqualified_identifier | aliased_member)
+          | member_list ',' (default_member | alias_member)
             {$$ = $1.concat($3);}
-          ;
-
-main
-          : '{%' USING type_classes? type '%}' tag
-            { $$ = new yy.ast.Main($3||[], $4, $6, @$); }
           ;
 
 exports
@@ -268,44 +320,36 @@ exports
           ;
 
 export
-          : export_statement 
-          | view_statement 
-          | fun_statement 
-            {$$ = $1; }
-          ;
-
-export_statement
-          : '{%' EXPORT unqualified_identifier FROM string_literal   '%}'
-            {$$ = new yy.ast.ExportStatement($3, $5, @$);  }
+          : (view_statement | frag_statement | export_from_statement)
+            {$$ = $1;                                           }
           ;
 
 view_statement
-          : '{%' VIEW unqualified_constructor type_classes? USING type '%}'
+
+          : '{%' VIEW identifier USING type '%}'
             tag
             '{%' ENDVIEW '%}'
-            {$$ = new yy.ast.ViewStatement($3, $4||[], $6, @$);     }
+            {$$ = new yy.ast.ViewStatement($3, [], $5, $7, @$);     }
+
+          | '{%' VIEW identifier type_classes USING type '%}'
+            tag
+            '{%' ENDVIEW '%}'
+            {$$ = new yy.ast.ViewStatement($3, $4, $6, $8, @$);     }
           ;
 
-fun_statement
-          : '{%' FUN unqualified_identifier type_classes parameters '=' child '%}'
-            {$$ = new yy.ast.FunStatement($3, $4, $5, $7, @$);    }
+frag_statement
 
-          | '{%' FUN unqualified_identifier parameters '=' child '%}'
-            {$$ = new yy.ast.FunStatement($3, [], $4, $6, @$);    }
+          : '{%' FRAG identifier USING type '%}' children '{%' ENDFRAG '%}'
+            {$$ = new yy.ast.FragmentStatement($3, [], [], $5, $7, @$);   }
 
-          | '{%' FUN unqualified_identifier '=' child '%}' 
-            {$$ = new yy.ast.FunStatement($3, [], [], $5, @$);        }
+          | '{%' FRAG identifier type_classes USING type '%}' children '{%' ENDFRAG '%}'
+            {$$ = new yy.ast.FragmentStatement($3, $4, [], $6, $8, @$);   }
 
-          | '{%' FUN unqualified_identifier '%}' child '{%' endfun '%}'
-            {$$ = new yy.ast.FunStatement($3, [], [], $5, @$);        }
+          | '{%' FRAG identifier parameters USING type '%}' children '{%' ENDFRAG '%}'
+            {$$ = new yy.ast.FragmentStatement($3, [], $4, $6, $8, @$);   }
 
-          | '{%' FUN unqualified_identifier type_classes parameters '%}' 
-            child '{%' endfun '%}'
-            {$$ = new yy.ast.FunStatement($3, $4, $5, $7, @$);    }
-
-          | '{%' FUN unqualified_identifier parameters '%}' 
-            child '{%' endfun '%}'
-            {$$ = new yy.ast.FunStatement($3, [], $4, $6, @$);    }
+          | '{%' FRAG identifier type_classes parameters USING type '%}' children '{%' ENDFRAG '%}'
+            {$$ = new yy.ast.FragmentStatement($3, $4, $5, $7, $9, @$);   }
           ;
 
 type_classes
@@ -321,102 +365,63 @@ type_class_list
           ;
 
 type_class
-          : unqualified_identifier 
+         : identifier
            {$$ = new yy.ast.TypeClass($1, null, @$);}
 
-          | unqualified_identifier ':' type
+         | identifier ':' type
            {$$ = new yy.ast.TypeClass($1, $3, @$);}
-          ;
+         ;
 
 type 
-          : (unqualified_identifier|cons) type_classes?
-            {$$ = new yy.ast.Type($1, $2||[], @$);                             }
-          ;
+         : identifier
+           {$$ = new yy.ast.Type($1, [], @$);                             }
 
-parameters
-          : '(' ')'                  {$$ = [];}
-          | '(' parameter_list ')'   {$$ = $2;}
-          ;
+         | identifier type_classes
+           {$$ = new yy.ast.Type($1, $2, @$);                             }
+         ;
 
-parameter_list
-          : parameter
-            {$$ = [$1];                                     }
+export_from_statement
 
-          | parameter_list ',' parameter
-            {$$ = $1.concat($3);                            }
-          ;
-
-parameter
-          : unqualified_identifier ':' type
-            { $$ = new yy.ast.TypedParameter($1, $3, @$); }
-
-          | unqualified_identifier
-            { $$ = new yy.ast.UntypedParameter($1, @$);  }
-          ;
-
-children
-          : child           {$$ = [$1];          }
-          | children child  {$$ = $1.concat($2); }
-          ;
-
-child
-          : (tag | interpolation | control | characters | identifier)
-            { $$ = $1; }
+          : '{%' EXPORT IDENTIFIER FROM string_literal '%}'
+            {$$ = new yy.ast.ExportFromStatement($3, $5, @$);  }
           ;
 
 tag
-          : node    { $$ = $1; }
-          | widget  { $$ = $1; }
+          : '<' tagname attributes '>' children? '</' tagname '>'
+             {$$ = new yy.ast.Tag($2, $3, $5?$5:[], @$);}
+
+          | '<' tagname attributes '/>'
+            { $$ = new yy.ast.Tag($2, $3, [], @$); }
           ;
+tagname
+          : identifier
+            {$$ = $1;                                           }
 
-node
-          : '<' identifier attributes '>' children? '</' identifier '>'
-             {$$ = new yy.ast.Node($2, $3, $5||[], $7, @$);}
-
-          | '<' identifier '>' children? '</' identifier '>'
-             {$$ = new yy.ast.Node($2, [], $4||[], $6, @$);}
-
-          | '<' identifier attributes '/>'
-            { $$ = new yy.ast.Node($2, $3, [], $2, @$); }
-
-          | '<' identifier '/>'
-            { $$ = new yy.ast.Node($2, [], [], $2, @$); }
-          ;
-
-widget
-          : '<' cons attributes '>' children? '</' cons '>'
-             {$$ = new yy.ast.Widget($2, $3, $5||[], $7, @$);}
-
-          | '<' cons '>' children? '</' cons '>'
-             {$$ = new yy.ast.Widget($2, [], $4||[], $6, @$);}
-
-          | '<' cons attributes '/>'
-            { $$ = new yy.ast.Widget($2, $3, [], $2, @$); }
-
-          | '<' cons '/>'
-            { $$ = new yy.ast.Widget($2, [], [], $2, @$); }
+          | identifier ':' identifier
+            {$$ = new yy.ast.MemberExpression($1, $3, @$);      }
           ;
 
 attributes
-          : attribute attribute  {$$ = [$1, $2];     }
-          | attributes attribute {$$ = $1.concat($2);}
+          : attributes attribute {$$ = $1.concat($2);}
+          | {$$ = [];}
           ;
 
 attribute
           : attribute_name '=' attribute_value
-            {$$ = new yy.ast.Attribute($1, $3, @$);}
+            {$$ = new yy.ast.Attribute($1.name, $1.namespace, $3, @$);}
 
           | attribute_name
-            {$$ = new yy.ast.Attribute($1, new yy.ast.BooleanLiteral(true, @$), @$);  }
+            {$$ = new yy.ast.Attribute($1.name, $1.namespace,
+            new yy.ast.BooleanLiteral(true, @$),@$);}
           ;
 
 attribute_name
-          : IDENTIFIER                  {$$ = new yy.ast.AttributeName($1, null, @$); }
-          | IDENTIFIER ':' IDENTIFIER   {$$ = new yy.ast.AttributeName($1, $3, @$);   }
+          : IDENTIFIER                  {$$ = {namespace:null, name:$1};}
+          | IDENTIFIER ':' IDENTIFIER   {$$ = {namespace:$1, name:$3};}
           ;
 
 attribute_value
-          : (interpolation|literal)
+          : (interpolation|string_literal|number_literal|boolean_literal) 
             {$$ = $1;}
           ;
 
@@ -434,61 +439,136 @@ filters
           ;
 
 filter
-          : '|'  expression
-            {$$ = new yy.ast.Filter($2, @$);}
+          : '|'  tagname
+            {$$ = new yy.ast.Filter($2, [], @$);}
+
+          | '|'  tagname arguments 
+            {$$ = new yy.ast.Filter($2, $3, @$);}
+          ;
+
+children
+          : child           {$$ = [$1];          }
+          | children child  {$$ = $1.concat($2); }
+          ;
+
+child
+          : (tag | control | text_interpolation | characters | identifier)
+            {$$ = $1;}
+          ;
+
+text_interpolation
+          : interpolation
+            {$$ = new yy.ast.TextInterpolation($1, @$);}
           ;
 
 control
-          : (for_statement|if_statement) 
+          : (for_statement|if_statement|match_statement|call_statement) 
             {$$ = $1;}
           ;
 
 for_statement
-          : '{%' FOR parameter IN expression '%}' children '{%' ENDFOR '%}'
+          : '{%' FOR typable_identifier IN expression '%}' children '{%' ENDFOR '%}'
             {$$ = new yy.ast.ForStatement($3, null, null, $5, $7, [], @$);}
 
-          | '{%' FOR parameter ',' parameter IN expression '%}' children '{%' ENDFOR '%}'
+          | '{%' FOR typable_identifier ',' typable_identifier IN expression '%}' 
+            children '{%' ENDFOR '%}'
             {$$ = new yy.ast.ForStatement($3, $5, null, $7, $9, [], @$);}
 
-          | '{%' FOR parameter ',' parameter ',' parameter IN expression '%}'
+          | '{%' FOR typable_identifier ',' typable_identifier ',' typable_identifier IN expression '%}'
             children '{%' ENDFOR '%}'
             {$$ = new yy.ast.ForStatement($3, $5, $7, $9, $11, [], @$);}
 
-          | '{%' FOR parameter IN expression '%}' 
-             children 
-             '{%' OTHERWISE '%}' children '{%' ENDFOR '%}'
+          | '{%' FOR typable_identifier IN expression '%}' 
+             children '{%' ELSE '%}' children '{%' ENDFOR '%}'
             {$$ = new yy.ast.ForStatement($3, null, null, $5, $7, $11, @$);}
 
-          | '{%' FOR parameter ',' parameter IN expression '%}' 
-            children 
-            '{%' OTHERWISE '%}' children '{%' ENDFOR '%}'
+          | '{%' FOR typable_identifier ',' typable_identifier IN expression '%}' 
+            children '{%' ELSE '%}' children '{%' ENDFOR '%}'
             {$$ = new yy.ast.ForStatement($3, $5, null, $7, $9, $13, @$);}
 
-          | '{%' FOR parameter ',' parameter ',' parameter IN expression '%}'
-            children 
-            '{%' OTHERWISE '%}' children '{%' ENDFOR '%}'
+          | '{%' FOR typable_identifier ',' typable_identifier ',' typable_identifier IN expression '%}'
+            children '{%' ELSE '%}' children '{%' ENDFOR '%}'
             {$$ = new yy.ast.ForStatement($3, $5, null, $7, $9, $15, @$);}
           ;
 
 if_statement
-          : '{%' IF expression '%}' children else_clause
+
+         : '{%' IF expression '%}' children '{%' ENDIF '%}'
+           {$$ = new yy.ast.IfStatement($3, $5, null, @$); }
+
+         | '{%' IF expression '%}' children else_clause
            {$$ = new yy.ast.IfStatement($3, $5, $6, @$); }
-          ;
+
+         ;
 
 else_clause
 
          :  '{%' ELSE '%}' children '{%' ENDIF '%}'
-            { $$ = new yy.ast.ElseClause($4, @$); }
+            {$$ = new yy.ast.ElseClause($4, @$);                              }
 
          |  '{%' ELSE IF expression '%}' children '{%' ENDIF '%}'
-            { $$ = new yy.ast.ElseIfClause($4, $6, null,  @$); }
+            {$$ = new yy.ast.ElseIfClause($4, $6, null,  @$);                 }
 
-         |  '{%' ELSE IF expression '%}' children else_clause 
-            { $$ = new yy.ast.ElseIfClause($4, $6, $7, @$); }
+         |  '{%' ELSE IF expression '%}' children else_clause                 }
+            {$$ = new yy.ast.ElseIfClause($4, $6, $7, @$);                    }
+
+         ;
+
+match_statement
+         : '{%' MATCH identifier '%}' 
+           case_statements 
+           '{%' ELSE '%}'  
+           children
+           '{%' ENDMATCH '%}'
+            {$$ = new yy.ast.MatchStatement($3, $5, $9, @$);}
+
+         | '{%' MATCH identifier '%}' 
+            case_statements
+           '{%' ENDMATCH '%}'
+            {$$ = new yy.ast.MatchStatement($3, $5, [], @$);}
+         ;
+
+case_statements
+         : case_statement 
+           {$$ = [$1];         }
+
+         | case_statements case_statement 
+           {$$ = $1.concat($2);}
+         ;
+
+case_statement
+         : '{%' CASE TYPEOF string_literal '%}' children '{%' ENDCASE '%}'
+           {$$ = new yy.ast.TypeOfCaseStatement($4, $6, @$);}
+
+         | '{%' CASE INSTANCEOF identifier '%}' children '{%' ENDCASE '%}'
+           {$$ = new yy.ast.InstanceOfCaseStatement($4, $6, @$);}
+         ;
+
+call_statement
+         :'{%' CALL identifier arguments  '%}'
+          {$$ = new yy.ast.CallStatement($3, $4, @$);}
+
+         |'{%' CALL identifier '%}'
+          {$$ = new yy.ast.CallStatement($3, [], @$);}
+
+         |'{%' CALL member_expression '%}'
+          {$$ = new yy.ast.CallStatement($3, [], @$);}
+
+         |'{%' CALL context_property '%}'
+          {$$ = new yy.ast.CallStatement($3, [], @$);}
+
+         |'{%' CALL member_expression arguments '%}'
+          {$$ = new yy.ast.CallStatement($3, $4, @$);}
+          
+         |'{%' CALL '(' expression ')' arguments  '%}'
+          {$$ = new yy.ast.CallStatement($4, $6, @$);}
+
+         |'{%' CALL '(' expression ')' '%}'
+          {$$ = new yy.ast.CallStatement($4, [], @$);}
          ;
 
 characters
-          : CHARACTERS
+          : (CHARACTERS)
             {$$ = new yy.ast.Characters($1, @$); }
           ;
 
@@ -510,13 +590,11 @@ argument_list
           ;
 
 expression
+          : '(' expression ')'
+            { $$ = $2;                                         }
 
-          : (construct_expression | call_expression | member_expression 
-            | read_expression | function_expression | literal 
-            | context_property | cons | identifier | context_variable)
-
-          | IF expression THEN expression ELSE expression
-            { $$ = new yy.ast.IFThenExpression($2, $4, $6, @$); }
+          | expression  '?' expression ':' expression
+            {$$ = new yy.ast.TernaryExpression($1, $3, $5, @$);}
 
           | '(' expression binary_operator expression ')'
             {$$ = new yy.ast.BinaryExpression($2, $3, $4, @$); }
@@ -524,65 +602,131 @@ expression
           | '!' expression
             {$$ = new yy.ast.UnaryExpression($1, $2, @$);      }
 
-          | '(' expression ')'
-            { $$ = $2; }
-          ;
+          | (new_expression | 
+             call_expression | 
+             member_expression | 
+             read_expression |
+             function_expression | 
+             bind_expression | 
+             literal |
+             type_assertion|
+             context_property |
+             identifier |
+             context_variable)
+            {$$ = $1;                                          } 
+         ;
 
-construct_expression
-          : cons arguments
-            { $$ = new yy.ast.ConstructExpression($1, $2, @$); }
+binary_operator
+          : ('>'|'>='|'<'|'<='|'=='|'!='|'+'|'/'|'-'|'='|'&&'|'||'|'^'|INSTANCEOF)
+            { $$ = yy.help.convertOperator($1);}
           ;
 
 call_expression
-          : identifier type_arguments arguments
-            {$$ = new yy.ast.CallExpression($1, $2, $3, @$);    }
-
-          | identifier arguments
+          : identifier arguments
             {$$ = new yy.ast.CallExpression($1, [], $2, @$);    }
 
-          | member_expression type_arguments arguments
+          | identifier type_classes arguments
             {$$ = new yy.ast.CallExpression($1, $2, $3, @$);    }
 
           | member_expression arguments
             {$$ = new yy.ast.CallExpression($1, [], $2, @$);    }
 
-          | '(' expression ')' type_arguments arguments
-            {$$ = new yy.ast.CallExpression($2, $4, $5, @$);    }
+          | member_expression type_classes arguments
+            {$$ = new yy.ast.CallExpression($1, $2, $3, @$);    }
+
+          | context_property arguments
+            {$$ = new yy.ast.CallExpression($1, [], $2, @$);    }
+
+          | context_property type_classes arguments
+            {$$ = new yy.ast.CallExpression($1, $2, $3, @$);    }
 
           | '(' expression ')' arguments
             {$$ = new yy.ast.CallExpression($2, [], $4, @$);    }
           ;
 
+bind_expression
+          : identifier '::' 'identifier'
+            {$$ = new yy.ast.BindExpression($1, $3, [] , @$);}
+
+          | identifier '::' 'identifier' arguments 
+            {$$ = new yy.ast.BindExpression($1, $3, $4 , @$);}
+
+          | context_variable '::' 'identifier'
+            {$$ = new yy.ast.BindExpression($1, $3, [] , @$);}
+
+          | context_variable '::' 'identifier' arguments 
+            {$$ = new yy.ast.BindExpression($1, $3, $4 , @$);}
+
+          | member_expression '::' identifier
+            {$$ = new yy.ast.BindExpression($1, $3, [], @$);}
+
+          | member_expression '::' identifier arguments
+            {$$ = new yy.ast.BindExpression($1, $3, $4, @$);}
+          ;
+
+new_expression
+          : NEW identifier
+            {$$ = new yy.ast.NewExpression($2, [], @$);}
+
+          | NEW identifier arguments
+            {$$ = new yy.ast.NewExpression($2, $3, @$);}
+          ;
+
+function_expression
+
+          : '\\' parameter_list '=>'  expression
+            {$$ = new yy.ast.FunctionExpression($2, $4, @$);   }
+
+          | '=>' expression
+            {$$ = new yy.ast.FunctionExpression([], $2, @$);   }
+          ;
+
+parameters
+          : '(' ')'                  {$$ = [];}
+          | '(' parameter_list ')'   {$$ = $2;}
+          ;
+
+parameter_list
+
+          : typable_identifier
+            {$$ = [$1];                                     }
+
+          | parameter_list ',' typable_identifier
+            {$$ = $1.concat($3);                            }
+          ;
+
 member_expression
-
-          : qualified_identifier '.' unqualified_identifier
+          : identifier '.' identifier   
             {$$ = new yy.ast.MemberExpression($1, $3, @$); }
 
-          | qualified_constructor '.' unqualified_identifier
+          | context_variable '.' identifier
             {$$ = new yy.ast.MemberExpression($1, $3, @$); }
 
-          | context_variable '.' unqualified_identifier
+          | context_property '.' identifier 
             {$$ = new yy.ast.MemberExpression($1, $3, @$); }
 
-          | context_property '.' unqualified_identifier
+          | array_literal '.' identifier   
             {$$ = new yy.ast.MemberExpression($1, $3, @$); }
 
-          | list '.' unqualified_identifier   
+          | object_literal '.' identifier   
             {$$ = new yy.ast.MemberExpression($1, $3, @$); }
 
-          | record '.' unqualified_identifier   
+          | string_literal '.' identifier
             {$$ = new yy.ast.MemberExpression($1, $3, @$); }
 
-          | string_literal '.' unqualified_identifier
+          | call_expression '.' identifier
             {$$ = new yy.ast.MemberExpression($1, $3, @$); }
 
-          | call_expression '.' unqualified_identifier
+          | bind_expression '.' identifier
             {$$ = new yy.ast.MemberExpression($1, $3, @$); }
 
-          |'(' expression ')' '.' unqualified_identifier
+          |'(' expression ')' '.' identifier
             {$$ = new yy.ast.MemberExpression($2, $5, @$); }
 
-          | member_expression '.' unqualified_identifier
+          | type_assertion '.' identifier
+            {$$ = new yy.ast.MemberExpression($1, $3, @$); }
+
+          | member_expression '.' identifier
             {$$ = new yy.ast.MemberExpression($1, $3, @$); }
           ;
 
@@ -628,26 +772,16 @@ readable_expression
             {$$ = $2;}
           ;
 
-function_expression
-
-          : '\\' parameter_list '=>'  expression
-            {$$ = new yy.ast.FunctionExpression($2, $4, @$);   }
-
-          | '=>' expression
-            {$$ = new yy.ast.FunctionExpression([], $2, @$);   }
-          ;
-
-
 literal 
-        : (record|list|string_literal|number_literal|boolean_literal)
+        : (object_literal|array_literal|string_literal|number_literal|boolean_literal)
         ;
 
-record
+object_literal
           : '{' '}'
-            {$$ = new yy.ast.Record([], @$); }
+            {$$ = new yy.ast.ObjectLiteral([], @$); }
 
           | '{' key_value_pairs '}'
-            {$$ = new yy.ast.Record($2, @$); }
+            {$$ = new yy.ast.ObjectLiteral($2, @$); }
           ;
 
 key_value_pairs
@@ -659,16 +793,16 @@ key_value_pairs
           ;
 
 key_value_pair
-          : (unqualified_identifier|string_literal) ':' expression
-            { $$ = new yy.ast.KVP($1, $3, @$); }
+          : (IDENTIFIER|STRING_LITERAL) ':' expression
+            {$$ = {key:$1, value:$3}; }
           ;
 
-list
+array_literal
           : '[' ']'
-            {$$ = new yy.ast.List([], @$); }
+            {$$ = new yy.ast.ArrayLiteral([], @$); }
 
           | '[' argument_list ']'
-            {$$ = new yy.ast.List($2, @$); }
+            {$$ = new yy.ast.ArrayLiteral($2, @$); }
           ;
 
 string_literal
@@ -677,66 +811,46 @@ string_literal
 
 number_literal
           : NUMBER_LITERAL
-          {$$ = new yy.ast.NumberLiteral(parseFloat($1), @$); }
+          {$$ = new yy.ast.NumberLiteral(yy.help.parseNumber($1), @$); }
           ;
 
 boolean_literal
-          : TRUE
-            {$$ = new yy.ast.BooleanLiteral(true, @$);}
-
-          | FALSE
-            {$$ = new yy.ast.BooleanLiteral(false, @$);}
+          : (TRUE|FALSE)
+          {$$ = new yy.ast.BooleanLiteral(yy.help.parseBoolean($1), @$);}
           ;
 
+typable_identifier
+         : identifier
+           {$$ = $1;                                                      }
+
+         | identifier ':' identifier
+           {$$ = new yy.ast.TypableIdentifier($1, $3, [], false, @$);     }
+
+         | identifier ':' identifier '[' ']'
+           {$$ = new yy.ast.TypableIdentifier($1, $3, [], true, @$);      }
+
+         | identifier ':' identifier type_classes
+           {$$ = new yy.ast.TypableIdentifier($1, $3, $4, false, @$);     }
+
+         | identifier ':' identifier type_classes '[' ']'
+           {$$ = new yy.ast.TypableIdentifier($1, $3, $4, true, @$);      }
+         ;
+
+type_assertion
+         : '(' expression AS identifier ')'
+            {$$ = new yy.ast.TypeAssertion($2, $4, @$);          }
+         ;
+
 context_property
-          : '@' unqualified_identifier
-            { $$ = new yy.ast.ContextProperty($2, @$) }
+          : CONTEXT_PROP
+            {$$ = new yy.ast.ContextProperty($1.slice(1), @$)    }
+          ;
+
+identifier
+          : IDENTIFIER
+            {$$ = new yy.ast.Identifier($1, '', @$);             }
           ;
 
 context_variable
-          : '@' {$$ = new yy.ast.ContextVariable(@$);}
-          ;
-
-cons
-         : qualified_constructor   { $$ = $1; }
-         | unqualified_constructor { $$ = $1; }
-         ;
-
-qualified_constructor
-        : IDENTIFIER '.' CONSTRUCTOR
-          { $$ = new yy.ast.QualifiedConstructor($1, $3, @$); }
-
-        | CONSTRUCTOR '.' CONSTRUCTOR
-          { $$ = new yy.ast.QualifiedConstructor($1, $3, @$); }
-        ;
-
-unqualified_constructor
-        : CONSTRUCTOR 
-          { $$ = new yy.ast.UnqualifiedConstructor($1, @$); }
-        ;
-
-identifier
-        : qualified_identifier 
-          { $$ = new yy.ast.Identifier($1, @$); }
-
-        | unqualified_identifier
-          { $$ = new yy.ast.Identifier($1, @$); }
-        ;
-
-qualified_identifier
-         : IDENTIFIER '.' IDENTIFIER
-           {$$ = new yy.ast.QualifiedIdentifier($1, $3, @$); }
-
-         | CONSTRUCTOR '.' IDENTIFIER
-          {$$ = new yy.ast.QualifiedIdentifier($1, $3, @$); }
-         ;
-
-unqualified_identifier
-         : IDENTIFIER
-           {$$ = new yy.ast.UnqualifiedIdentifier($1, @$);   }
-         ;
-
-binary_operator
-          : ('>'|'>='|'<'|'<='|'=='|'!='|'+'|'/'|'-'|'='|'&&'|'||'|'^'|INSTANCEOF)
-            { $$ = yy.help.convertOperator($1);}
+          : ('@'|THIS) {$$ = new yy.ast.ContextVariable(@$);     }
           ;
