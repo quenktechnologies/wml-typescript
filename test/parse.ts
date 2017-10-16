@@ -1,33 +1,17 @@
-import must from 'must';
-import crypto from 'crypto';
-import fs from 'fs';
-import expects from './expectations';
-import Parser from '../src/parser/Parser';
+import * as must from 'must/register';
+import * as fs from 'fs';
+import {
+    parse
+} from '../src';
 
 var input = null;
-var result = null;
 var tests = null;
 
-function parse(text) {
-    result = '' + Parser.parse(text || input);
-    result = JSON.parse(result);
-}
-
-function json(tree) {
+function json(tree: any): string {
     return JSON.stringify(tree);
 }
 
-function print(tree) {
-
-    var hash = crypto.createHash('md5');
-    console.log('================================BEGIN');
-    console.log(json(result));
-    console.log(hash.update(json(tree)).digest('hex'));
-    console.log('================================END');
-
-}
-
-function compare(tree, that) {
+function compare(tree: any, that: any): void {
 
     must(tree).eql(that);
 
@@ -35,28 +19,24 @@ function compare(tree, that) {
 
 function makeTest(test, index) {
 
-    var hash = crypto.createHash('md5');
     var file = index.replace(/\s/g, '-');
 
-    input = test.input;
-    parse();
-
-    if (process.env.GENERATE)
-        return fs.writeFileSync(`./test/expectations/${file}.json`, json(result));
 
     if (!test.skip) {
 
-        if (test.print)
-            return print(result, index);
+        if (process.env.GENERATE) {
+            fs.writeFileSync(`./test/expectations/${file}.json`, json(parse(test.input)));
+            return;
+        }
 
-        compare(json(result), fs.readFileSync(`./test/expectations/${file}.json`, {
+
+        compare(json(parse(test.input)), fs.readFileSync(`./test/expectations/${file}.json`, {
             encoding: 'utf8'
         }));
 
     }
 
 }
-
 tests = {
 
     'should parse default import': {
@@ -93,8 +73,8 @@ tests = {
         input: '<panel><a></a></panel>'
     },
     'should parse parent tags with tag children (L2)': {
-        input: '<panel><a href="link" onclick={{this.someting.invoke()}}>' +
-            'Click Here</a><table/></panel>'
+        input: '<panel><a href="link" onclick={{@someting.invoke()}}>' +
+        'Click Here</a><table/></panel>'
     },
     'should parse parent tags with tag children (L3)': {
         input: '<panel><a href="link">Click Here</a><table/><panel c="22"></panel></panel>'
@@ -102,48 +82,42 @@ tests = {
     'should do it all together now': {
 
         input: '<modal name="mymodal" x="1" y="2">' +
-            '<modal-header>My Modal</modal-header>' +
-            '<modal-body>' +
-            'Creativxity is inhibxited by greed and corruption.' +
-            '<vote-button/>' +
-            '<vote-count source={{this}}/> Votes' +
-            '<textarea wml:id="ta" disabled size=32 onchange={{this.setText}}>' +
-            ' Various text' +
-            '</textarea>' +
-            '</modal-body>' +
-            '</modal>'
+        '<modal-header>My Modal</modal-header>' +
+        '<modal-body>' +
+        'Creativxity is inhibxited by greed and corruption.' +
+        '<vote-button/>' +
+        '<vote-count source={{@}}/> Votes' +
+        '<textarea wml:id="ta" disabled size=32 onchange={{@setText}}>' +
+        ' Various text' +
+        '</textarea>' +
+        '</modal-body>' +
+        '</modal>'
 
     },
     'should parse for expressions': {
 
         input: '<root>' +
-            '{% for item in list %}' +
-            '<stem>A Stem</stem>' +
-            '{% endfor %}' +
-            '</root>'
-
-    },
-
-    'should parse bind expressions': {
-
-        input: '<div onfocus={{this::doAction}}/>'
+        '{% for item in list %}' +
+        '<stem>A Stem</stem>' +
+        '{% endfor %}' +
+        '</root>'
 
     },
     'should parse ternary expressions': {
 
-        input: '<Html id={{this.id}}>{{this.check() ? a : b }}</div>'
+        input: '<Html id={{@id}}>{{@check() ? a : b }}</div>'
 
     },
     'should parse function expressions': {
 
-        input: '<button onclick={{\\e =>this.call(e)}}/>'
+        input: '<button onclick={{\\e =>@call(e)}}/>'
 
     },
 
     'should parse calls': {
 
         input: '<tr>{% for x,i in y %}' +
-            '{% call (this.getFrags()) (ctx1, ctx2) %}{% call val %}{% endfor %}</tr>'
+        '{% call (@getFrags()) (ctx1, ctx2) %}{% call val %}{% endfor %}</tr>'
 
     },
     'should parse negative numbers': {
@@ -154,18 +128,18 @@ tests = {
 
     'should allow filter chaining': {
 
-        input: '<p>{{ this._::value | f1 | f2(2) | f3(this.value) }}</p>'
+        input: '<p>{{ @_::value | f1 | f2(2) | f3(@value) }}</p>'
 
     },
     'should parse match statements': {
 
         input: 'import * as s from "statements"' +
-            '<Tab>' +
-            '{% match x %}' +
-            '{% case instanceof Statement %}<Statement/>{% endcase %}' +
-            '{% case typeof "string" %}<Statement/>{% endcase %}' +
-            '{% else %}<Default/>' +
-            '{% endmatch %}</Tab>'
+        '<Tab>' +
+        '{% match x %}' +
+        '{% case instanceof Statement %}<Statement/>{% endcase %}' +
+        '{% case typeof "string" %}<Statement/>{% endcase %}' +
+        '{% else %}<Default/>' +
+        '{% endmatch %}</Tab>'
 
     },
     'should parse if statements': {
@@ -240,7 +214,7 @@ tests = {
 
     'should allow calls on expressions': {
 
-        input: '<div>{{((this.content() || bar))(foo)}}</div>'
+        input: '<div>{{((@content() || bar))(foo)}}</div>'
 
     },
     'should allow for namespaced tags': {
@@ -255,23 +229,23 @@ tests = {
     },
     'should parse typed views': {
 
-        input: '{% view Main using Context %} <p>{{this.value}}</p>{% endview %}'
+        input: '{% view Main using Context %} <p>{{@value}}</p>{% endview %}'
 
     },
 
     'should parse typed views with generics': {
 
-        input: '{% view Main using Context[string] %} <p>{{this.value}}</p>{% endview %}'
+        input: '{% view Main using Context[string] %} <p>{{@value}}</p>{% endview %}'
 
     },
     'should parse typed views with type classes': {
 
-        input: '{% view Main [A,B] using Context[A,B] %} <p>{{this.values}}</p> {% endview %}'
+        input: '{% view Main [A,B] using Context[A,B] %} <p>{{@values}}</p> {% endview %}'
 
     },
     'should parse attribute reads': {
 
-        input: `<p class={{concat([x, @@['ww:class'], @@['ww:variant'?'default']])}}/>`
+        input: `<p class={{concat([x, someValue['ww:class'], some.other.value['ww:variant'?'default']])}}/>`
 
     },
     'should parse context variables': {
@@ -289,12 +263,12 @@ tests = {
 
 };
 
+
 describe('Parser', function() {
 
     beforeEach(function() {
 
         input = null;
-        result = null;
 
     });
 

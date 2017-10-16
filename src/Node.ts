@@ -118,15 +118,30 @@ export class CompositeMember {
 
 }
 
-export class Main {
+export type Main
+  = TypedMain
+  | UntypedMain
+  ;
 
-    type = 'main';
+export class TypedMain {
+
+    type = 'typed-main';
 
     constructor(
         public typeClasses: TypeClass[],
         public context: Type,
         public tag: Tag,
         public location: Location) { }
+
+}
+
+export class UntypedMain {
+
+  type = 'untyped-main';
+
+  constructor(
+    public tag : Tag,
+    public location: Location) {}
 
 }
 

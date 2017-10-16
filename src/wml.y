@@ -58,7 +58,6 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <INITIAL>'true'                                          return 'TRUE';
 <INITIAL>'false'                                         return 'FALSE';
 <INITIAL>[A-Z]{Identifier}                               return 'CONSTRUCTOR';
-<INITIAL>'@'{Identifier}                                 return 'CONTEXT_PROPERTY';
 <INITIAL>{Identifier}                                    return 'IDENTIFIER';
 
 <CONTROL>'macro'                                         return 'MACRO';
@@ -94,7 +93,6 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <CONTROL>'()'                                            return '()';
 <CONTROL>'='                 this.begin('CHILDREN');      return '=';
 <CONTROL>[A-Z]{Identifier}                               return 'CONSTRUCTOR';
-<CONTROL>'@'{Identifier}                                 return 'CONTEXT_PROPERTY';
 <CONTROL>{Identifier}                                    return 'IDENTIFIER';
 <CONTROL>'%}'                this.popState();            return '%}';
 
@@ -106,10 +104,8 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <EXPRESSION>'false'                                      return 'FALSE';
 <EXPRESSION>'this'                                       return 'THIS';
 <EXPRESSION>'if'                                         return 'IF';
-<EXPRESSION>'then'                                       return 'THEN';
 <EXPRESSION>'@'                                          return '@';
 <CONTROL>[A-Z]{Identifier}                               return 'CONSTRUCTOR';
-<EXPRESSION>'@'{Identifier}                              return 'CONTEXT_PROPERTY';
 <EXPRESSION>{Identifier}                                 return 'IDENTIFIER';
 <EXPRESSION>'}}'             this.popState();            return '}}';
 
@@ -226,7 +222,7 @@ import_member
           ;
 
 default_member
-          : unqualified_identifier
+          : (unqualified_identifier|unqualified_constructor)
             {$$ = new yy.ast.DefaultMember($1, @$);}
           ;
 
@@ -255,7 +251,10 @@ member_list
 
 main
           : '{%' USING type_classes? type '%}' tag
-            { $$ = new yy.ast.Main($3||[], $4, $6, @$); }
+            { $$ = new yy.ast.TypedMain($3||[], $4, $6, @$); }
+
+          | tag 
+            {$$ = new yy.ast.UntypedMain($1, @$); }
           ;
 
 exports
@@ -717,10 +716,10 @@ unqualified_constructor
 
 identifier
         : qualified_identifier 
-          { $$ = new yy.ast.Identifier($1, @$); }
+          { $$ = new yy.ast.QualifiedIdentifier($1, @$); }
 
         | unqualified_identifier
-          { $$ = new yy.ast.Identifier($1, @$); }
+          { $$ = new yy.ast.UnqualifiedIdentifier($1, @$); }
         ;
 
 qualified_identifier
