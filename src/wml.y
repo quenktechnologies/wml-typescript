@@ -75,6 +75,8 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <CHILDREN>'<'                this.begin('TAG');          return '<';
 <CHILDREN>[^/<>{%}]+                                     return 'CHARACTERS';
 
+<CONTROL>'main'                                          return 'MAIN';
+<CONTROL>'endmain'                                       return 'ENDMAIN';
 <CONTROL>'macro'                                         return 'MACRO';
 <CONTROL>'endmacro'                                      return 'ENDMACRO';
 <CONTROL>'for'                                           return 'FOR';
@@ -227,15 +229,9 @@ import_statement
           ;
 
 import_member
-          : default_member
-          | qualified_member
+          : aggregate_member
           | aliased_member
           | composite_member
-          ;
-
-default_member
-          : member
-            {$$ = new yy.ast.DefaultMember($1, @$);}
           ;
 
 aliased_member
@@ -243,9 +239,9 @@ aliased_member
             {$$ = new yy.ast.AliasedMember($1, $3, @$);}
           ;
 
-qualified_member
+aggregate_member
           : '*' AS member
-            {$$ = new yy.ast.QualifiedMember($3, @$);}
+            {$$ = new yy.ast.AggregateMember($3, @$);}
           ;
 
 composite_member
@@ -266,8 +262,8 @@ member
           ;
 
 main
-          : '{%' USING type_classes? type '%}' tag
-            { $$ = new yy.ast.TypedMain($3||[], $4, $6, @$); }
+          : '{%' MAIN type_classes? '(' type ')' parameters? '%}' tag
+            { $$ = new yy.ast.TypedMain($3||[], $5, $7, $9, @$); }
 
           | tag 
             {$$ = new yy.ast.UntypedMain($1, @$); }
@@ -290,15 +286,15 @@ export
           ;
 
 export_statement
-          : '{%' EXPORT unqualified_identifier FROM string_literal   '%}'
+          : '{%' EXPORT composite_member FROM string_literal   '%}'
             {$$ = new yy.ast.ExportStatement($3, $5, @$);  }
           ;
 
 view_statement
-          : '{%' VIEW unqualified_constructor type_classes? USING type '%}'
+          : '{%' VIEW unqualified_constructor type_classes? '(' type ')' parameters?'%}'
             tag
             '{%' ENDVIEW '%}'
-            {$$ = new yy.ast.ViewStatement($3, $4||[], $6, @$);     }
+            { $$ = new yy.ast.ViewStatement($3, $4||[], $6, $8, $10, @$); }
           ;
 
 fun_statement
@@ -311,15 +307,15 @@ fun_statement
           | '{%' FUN unqualified_identifier '=' child '%}' 
             {$$ = new yy.ast.FunStatement($3, [], [], $5, @$);        }
 
-          | '{%' FUN unqualified_identifier '%}' child '{%' ENDFUN '%}'
+          | '{%' FUN unqualified_identifier '%}' children '{%' ENDFUN '%}'
             {$$ = new yy.ast.FunStatement($3, [], [], $5, @$);        }
 
           | '{%' FUN unqualified_identifier type_classes parameters '%}' 
-            child '{%' ENDFUN '%}'
+            children '{%' ENDFUN '%}'
             {$$ = new yy.ast.FunStatement($3, $4, $5, $7, @$);    }
 
           | '{%' FUN unqualified_identifier parameters '%}' 
-            child '{%' ENDFUN '%}'
+            children '{%' ENDFUN '%}'
             {$$ = new yy.ast.FunStatement($3, [], $4, $6, @$);    }
           ;
 
@@ -424,16 +420,21 @@ attributes
           ;
 
 attribute
-          : attribute_name '=' attribute_value
-            {$$ = new yy.ast.Attribute($1, $3, @$);}
+          : unqualified_identifier ':' unqualified_identifier '=' attribute_value
+            {$$ = new yy.ast.Attribute($1, $3, $5, @$);}
 
-          | attribute_name
-            {$$ = new yy.ast.Attribute($1, new yy.ast.BooleanLiteral(true, @$), @$);  }
-          ;
+          | unqualified_identifier '=' attribute_value
+            {$$ =
+            new yy.ast.Attribute(new yy.ast.UnqualifiedIdentifier('html', @$),
+            $1, $3, @$);}
 
-attribute_name
-          : IDENTIFIER                  {$$ = new yy.ast.AttributeName($1, null, @$); }
-          | IDENTIFIER ':' IDENTIFIER   {$$ = new yy.ast.AttributeName($1, $3, @$);   }
+          | unqualified_identifier ':' unqualified_identifier
+            {$$ = new yy.ast.Attribute($1, $3, new yy.ast.BooleanLiteral(true, @$), @$);  }
+
+          | unqualified_identifier
+            {$$ = new yy.ast.Attribute(
+            new yy.ast.UnqualifiedIdentifier('html', @$),
+            $1, new yy.ast.BooleanLiteral(true, @$), @$);  }
           ;
 
 attribute_value
@@ -456,7 +457,7 @@ filters
 
 filter
           : '|'  expression
-            {$$ = new yy.ast.Filter($2, @$);}
+            {$$ = $2}
           ;
 
 control

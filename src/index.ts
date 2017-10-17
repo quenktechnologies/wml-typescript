@@ -1,10 +1,10 @@
 import * as Parser from './Parser';
-import * as nodes from './Node';
+import * as nodes from './AST';
 import * as afpl from 'afpl';
-import * as Template from './Templates';
+import * as TypeScript from './TypeScript';
 import { Either } from 'afpl';
 
-export type Code = Either<Error,Context>;
+export type Code = Either<Error, Context>;
 
 export interface Options {
 
@@ -16,7 +16,7 @@ export interface Options {
 
 export class Context {
 
-  constructor(public text:string) {}
+    constructor(public text: string) { }
 
 }
 
@@ -26,39 +26,20 @@ export const defaultOptions: Options = {
     module: '@quenk/wml-runtime',
 };
 
-export const parse = (str: string, ast: nodes.Nodes = nodes): nodes.Module => {
+export const parse = (str: string, ast: any = nodes): nodes.Module => {
 
     Parser.parser.yy = { ast };
     return Parser.parser.parse(str);
 
 }
 
-const _str = (a: any) => (typeof a === 'object') ? a.constructor.name : `${a}`;
-
-const reduceNodes2Ctx = (o:Options) => (p:Code, c:nodes.Node) : Code =>  p.chain(ctx=>code(c,o,ctx));
-
-export const code = (n: nodes.Node, options: Options, ctx:Context): Code => {
-
-    if (n instanceof nodes.Module) {
-
-     
-    } else {
-
-        return Either.left<Error, Context>(new Error(`Unknown node '${_str(n)}'!`));
-
-    }
-
-
-}
-
 export const compile = (src: string, options: Options = {}): Either<Error, string> => {
 
-    let opts = afpl.util.merge(defaultOptions, options);
-    let ctx = new Context();
+     let opts = afpl.util.merge(defaultOptions, options);
 
     try {
 
-        return code(parse(src), opts, ctx).chain(c => c.text);
+        return Either.right<Error, string>(TypeScript.code(parse(src), opts));
 
     } catch (e) {
 

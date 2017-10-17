@@ -39,9 +39,6 @@ function makeTest(test, index) {
 }
 tests = {
 
-    'should parse default import': {
-        input: `import lib from "path/to/libs" <tag/>`
-    },
     'should parse all import': {
         input: `import * as lib from "path/to/libs" <tag/>`
     },
@@ -186,7 +183,7 @@ tests = {
 
     'should parse export from statements': {
 
-        input: '{% export _view from "somewhere" %}'
+        input: '{% export {_view } from "somewhere" %}'
 
     },
 
@@ -230,18 +227,18 @@ tests = {
     },
     'should parse typed views': {
 
-        input: '{% view Main using Context %} <p>{{@value}}</p>{% endview %}'
+        input: '{% view Main (Context) %} <p>{{@value}}</p>{% endview %}'
 
     },
 
     'should parse typed views with generics': {
 
-        input: '{% view Main using Context[string] %} <p>{{@value}}</p>{% endview %}'
+        input: '{% view Main (Context[string]) %} <p>{{@value}}</p>{% endview %}'
 
     },
     'should parse typed views with type classes': {
 
-        input: '{% view Main [A,B] using Context[A,B] %} <p>{{@values}}</p> {% endview %}'
+        input: '{% view Main [A,B] (Context[A,B]) %} <p>{{@values}}</p> {% endview %}'
 
     },
     'should parse attribute reads': {

@@ -3,14 +3,6 @@
  */
 
 /**
- * Nodes is the interface for an object providing all the nodes.
- */
-export interface Nodes {
-
-
-}
-
-/**
  * Location is jison's location tracking information.
  */
 export interface Location {
@@ -20,9 +12,9 @@ export interface Location {
 };
 
 /**
- * Node is the interface of all the nodes
+ * AST is the interface of all the nodes
  */
-export interface Node {
+export interface AST {
 
     type: string;
     location: Location;
@@ -66,23 +58,10 @@ export class ImportStatement {
  * ImportMember 
  */
 export type ImportMember
-    = DefaultMember
-    | QualifiedMember
+    = AggregateMember
     | AliasedMember
     | CompositeMember
     ;
-
-/**
- * DefaultMember
- * @property {Identifier} member - The identifier the default export is introduced as.
- */
-export class DefaultMember {
-
-    type = 'default-member'
-
-    constructor(public member: UnqualifiedIdentifier, public location: Location) { }
-
-}
 
 /**
  * AliasedMember 
@@ -94,21 +73,20 @@ export class AliasedMember {
     type = 'aliased-member';
 
     constructor(
-        public member: UnqualifiedIdentifier,
-        public alias: UnqualifiedIdentifier,
+        public member: Member,
+        public alias: Member,
         public location: Location) { }
 
 }
 
 /**
- * QualifiedMember
- * @property {Identifier} member - The member that all imports are qualified to.
+ * AggregateMember
  */
-export class QualifiedMember {
+export class AggregateMember {
 
     type = 'qualified-member';
 
-    constructor(public member: UnqualifiedIdentifier, public location: Location) { }
+    constructor(public id: Member, public location: Location) { }
 
 }
 
@@ -121,10 +99,15 @@ export class CompositeMember {
     type = 'composite-member';
 
     constructor(
-        public members: (UnqualifiedIdentifier | AliasedMember)[],
+        public members: (Member | AliasedMember)[],
         public location: Location) { }
 
 }
+
+export type Member
+    = UnqualifiedIdentifier
+    | UnqualifiedConstructor
+    ;
 
 export type Main
     = TypedMain
@@ -138,6 +121,7 @@ export class TypedMain {
     constructor(
         public typeClasses: TypeClass[],
         public context: Type,
+        public parameters: Parameter[],
         public tag: Tag,
         public location: Location) { }
 
@@ -155,13 +139,16 @@ export class UntypedMain {
 
 export type Export
     = ExportStatement
+    | FunStatement
+    | ViewStatement
     ;
 
 export class ExportStatement {
 
     type = 'export-statement';
 
-    constructor(public id: UnqualifiedIdentifier,
+    constructor(
+        public members: CompositeMember,
         public module: StringLiteral,
         public location: Location) { }
 
@@ -178,7 +165,8 @@ export class ViewStatement {
         public id: UnqualifiedConstructor,
         public typeClasses: TypeClass[],
         public context: Type,
-        public view: Tag,
+        public parameters: Parameter[],
+        public tag: Tag,
         public location: Location) { }
 
 }
@@ -188,10 +176,10 @@ export class FunStatement {
     type = 'fun-statement';
 
     constructor(
-        public name: UnqualifiedIdentifier,
+        public id: UnqualifiedIdentifier,
         public typeClasses: TypeClass[],
         public parameters: Parameter[],
-        public body: Child,
+        public body: Child | Child[],
         public location: Location) { }
 
 }
@@ -204,7 +192,7 @@ export class TypeClass {
     type = 'type-class';
 
     constructor(
-        public value: UnqualifiedIdentifier,
+        public id: UnqualifiedConstructor,
         public constraint: Type,
         public location: Location) { }
 
@@ -215,7 +203,7 @@ export class Type {
     type = 'type';
 
     constructor(
-        public name: UnqualifiedIdentifier | Constructor,
+        public id: UnqualifiedIdentifier | Constructor,
         public typeClasses: TypeClass[],
         public location: Location) { }
 
@@ -289,19 +277,10 @@ export class Attribute {
     type = 'attribute';
 
     constructor(
-        public name: AttributeName,
+        public namespace: UnqualifiedIdentifier,
+        public name: UnqualifiedIdentifier,
         public value: AttributeValue,
         public location: Location) { }
-
-}
-
-export class AttributeName {
-
-    type = 'attribute-name';
-
-    constructor(
-        public name: string,
-        public namespace?: string) { }
 
 }
 
@@ -316,17 +295,7 @@ export class Interpolation {
 
     constructor(
         public expression: Expression,
-        public filters: Filter[],
-        public location: Location) { }
-
-}
-
-export class Filter {
-
-    type = 'filter';
-
-    constructor(
-        public expression: Expression,
+        public filters: Expression[],
         public location: Location) { }
 
 }
@@ -345,7 +314,7 @@ export class ForStatement {
         public index: Parameter,
         public all: Parameter,
         public list: Expression,
-        public fragment: Child[],
+        public body: Child[],
         public otherwise: Child[],
         public location: Location) { }
 
@@ -356,9 +325,9 @@ export class IfStatement {
     type = 'if-statement';
 
     constructor(
-        public predicate: Expression,
+        public condition: Expression,
         public then: Child[],
-        public elseClause: ElseClause,
+        public elseClause: ElseIfClause | ElseClause,
         public location: Location) { }
 
 }
@@ -378,9 +347,9 @@ export class ElseIfClause {
     type = 'else-if-clause';
 
     constructor(
-        public predicate: Expression,
-        public then: Expression,
-        public elseClause: Expression,
+        public condition: Expression,
+        public then: Child[],
+        public elseClause: ElseClause | ElseIfClause,
         public location: Location) { }
 
 }
@@ -515,22 +484,25 @@ export type Literal
 export class List {
 
     type = 'list';
-    constructor(public members: Expression[], public location: Location) { }
+    constructor(
+        public members: Expression[],
+        public location: Location) { }
 
 }
 
 export class Record {
 
     type = 'record';
+
     constructor(
-        public properties: KVP[],
+        public properties: Property[],
         public location: Location) { }
 
 }
 
-export class KVP {
+export class Property {
 
-    type = 'kvp';
+    type = 'property';
 
     constructor(
         public key: UnqualifiedIdentifier | StringLiteral,
