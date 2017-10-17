@@ -3,6 +3,14 @@
  */
 
 /**
+ * Nodes is the interface for an object providing all the nodes.
+ */
+export interface Nodes {
+
+
+}
+
+/**
  * Location is jison's location tracking information.
  */
 export interface Location {
@@ -405,35 +413,35 @@ export type Expression
 
 export class IfThenExpression {
 
-  type = 'if-then-expression';
+    type = 'if-then-expression';
 
-  constructor(
-    public condition:Expression,
-    public iftrue : Expression,
-    public iffalse : Expression,
-    public location:Location){}
+    constructor(
+        public condition: Expression,
+        public iftrue: Expression,
+        public iffalse: Expression,
+        public location: Location) { }
 
 }
 
 export class BinaryExpression {
 
-  type = 'binary-expression';
+    type = 'binary-expression';
 
-  constructor(
-    public left:Expression,
-    public operator: string,
-    public right:Expression,
-    public location:Location){}
+    constructor(
+        public left: Expression,
+        public operator: string,
+        public right: Expression,
+        public location: Location) { }
 
 }
 
 export class UnaryExpression {
 
-  type = 'unary-expression';
+    type = 'unary-expression';
 
-  constructor(
-    public operator:string,
-    public expression:Expression) {}
+    constructor(
+        public operator: string,
+        public expression: Expression) { }
 
 }
 
@@ -552,7 +560,7 @@ export class BooleanLiteral {
 
     type = 'boolean-literal';
 
-    constructor(public value: string, public location: Location) { }
+    constructor(public value: boolean, public location: Location) { }
 
 }
 
@@ -575,9 +583,19 @@ export class ContextVariable {
 }
 
 export type Constructor
-    = QualifiedConstructor
-    | UnqualifiedConstructor
+    = UnqualifiedConstructor
+    | QualifiedConstructor
     ;
+
+export class UnqualifiedConstructor {
+
+    type = 'unqualified-constructor';
+
+    constructor(
+        public id: string,
+        public location: Location) { }
+
+}
 
 export class QualifiedConstructor {
 
@@ -585,17 +603,7 @@ export class QualifiedConstructor {
 
     constructor(
         public qualifier: string,
-        public name: string,
-        public location: Location) { }
-
-}
-
-export class UnqualifiedConstructor {
-
-    type = 'unqualified-constructor';
-
-    constructor(
-        public name: string,
+        public member: string,
         public location: Location) { }
 
 }
@@ -612,7 +620,7 @@ export class UnqualifiedIdentifier {
 
     type = 'unqualified-identifier';
 
-    constructor(public value: string, public location: Location) { }
+    constructor(public id: string, public location: Location) { }
 
 }
 
@@ -624,8 +632,8 @@ export class QualifiedIdentifier {
     type = 'qualified-identifier';
 
     constructor(
-        public qualifier: Identifier,
-        public member: Identifier,
+        public qualifier: string,
+        public member: string,
         public location: Location) { }
 
 }

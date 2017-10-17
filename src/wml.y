@@ -711,21 +711,21 @@ record
           : '{' '}'
             {$$ = new yy.ast.Record([], @$); }
 
-          | '{' key_value_pairs '}'
+          | '{' properties '}'
             {$$ = new yy.ast.Record($2, @$); }
           ;
 
-key_value_pairs
-          : key_value_pair
+properties
+          : property
            {$$ = [$1]; }
 
-          | key_value_pairs ',' key_value_pair
+          | properties ',' property
            {$$ = $1.concat($3); }
           ;
 
-key_value_pair
+property
           : (unqualified_identifier|string_literal) ':' expression
-            { $$ = new yy.ast.KVP($1, $3, @$); }
+            { $$ = new yy.ast.Property($1, $3, @$); }
           ;
 
 list
@@ -737,12 +737,13 @@ list
           ;
 
 string_literal
-          : STRING_LITERAL {$$ = new yy.ast.StringLiteral($1, @$); }
+          : STRING_LITERAL 
+            {$$ = new yy.ast.StringLiteral($1.slice(1, $1.length - 1, @$)); }
           ;
 
 number_literal
           : NUMBER_LITERAL
-          {$$ = new yy.ast.NumberLiteral(parseFloat($1), @$); }
+          {$$ = new yy.ast.NumberLiteral($1, @$); }
           ;
 
 boolean_literal
