@@ -294,7 +294,7 @@ view_statement
           : '{%' VIEW unqualified_constructor type_classes? '(' type ')' parameters?'%}'
             tag
             '{%' ENDVIEW '%}'
-            { $$ = new yy.ast.ViewStatement($3, $4||[], $6, $8, $10, @$); }
+            { $$ = new yy.ast.ViewStatement($3, $4||[], $6, $8||[], $10, @$); }
           ;
 
 fun_statement
@@ -502,9 +502,6 @@ else_clause
          :  '{%' ELSE '%}' children '{%' ENDIF '%}'
             { $$ = new yy.ast.ElseClause($4, @$); }
 
-         |  '{%' ELSE IF expression '%}' children '{%' ENDIF '%}'
-            { $$ = new yy.ast.ElseIfClause($4, $6, null,  @$); }
-
          |  '{%' ELSE IF expression '%}' children else_clause 
             { $$ = new yy.ast.ElseIfClause($4, $6, $7, @$); }
          ;
@@ -551,7 +548,7 @@ expression
             { $$ = $1; }
 
           | '(' expression ')'
-            { $$ = $1; }
+            { $$ = $2; }
           ;
 
 if_expression
@@ -571,7 +568,7 @@ binary_expression
             {$$ = new yy.ast.BinaryExpression($2, $4, $5, @$); }
  
           | '(' expression ')' binary_operator '(' expression ')'
-            {$$ = new yy.ast.BinaryExpression($1, $2, $3, @$); }
+            {$$ = new yy.ast.BinaryExpression($2, $4, $6, @$); }
           ;
 
 unary_expression
@@ -784,10 +781,10 @@ unqualified_constructor
 
 identifier
         : qualified_identifier 
-          { $$ = new yy.ast.QualifiedIdentifier($1, @$); }
+          { $$ = $1; }
 
         | unqualified_identifier
-          { $$ = new yy.ast.UnqualifiedIdentifier($1, @$); }
+          { $$ = $1; }
         ;
 
 qualified_identifier

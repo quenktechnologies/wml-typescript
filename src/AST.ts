@@ -36,7 +36,7 @@ export class Module {
         public imports: ImportStatement[],
         public exports: Export[],
         public main: Main,
-        public location) { }
+        public location:Location) { }
 
 }
 

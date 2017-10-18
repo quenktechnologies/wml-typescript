@@ -1,8 +1,6 @@
-import * as must from 'must/register';
+import * as must from 'must';
 import * as fs from 'fs';
-import {
-    parse
-} from '../src';
+import { parse, compile } from '../src';
 
 var input = null;
 var tests = null;
@@ -21,22 +19,30 @@ function makeTest(test, index) {
 
     var file = index.replace(/\s/g, '-');
 
+    if (process.env.GENERATE) {
+
+        return parse(test.input)
+            .map(json)
+            .map(txt => { fs.writeFileSync(`./test/expectations/${file}.json`, txt); })
+            .chain(() => compile(test.input))
+            .map(txt => { fs.writeFileSync(`./test/expectations/${file}.ts`, txt); })
+            .cata(e => { throw e; }, () => { });
+    }
 
     if (!test.skip) {
 
-        if (process.env.GENERATE) {
-            fs.writeFileSync(`./test/expectations/${file}.json`, json(parse(test.input)));
-            return;
-        }
-
-
         compare(json(parse(test.input)), fs.readFileSync(`./test/expectations/${file}.json`, {
+            encoding: 'utf8'
+        }));
+
+        compare(compile(test.input), fs.readFileSync(`./test/expectations/${file}.ts`, {
             encoding: 'utf8'
         }));
 
     }
 
 }
+
 tests = {
 
     'should parse all import': {
@@ -52,7 +58,7 @@ tests = {
         input: '<user name="xyaa aaz" position={{4|x(20)}} wml:val="test"/>',
     },
     'should parse a self closing tag with attributes 1': {
-        input: '<user enabled id=24 />',
+        input: '<user app:enabled id=24 />',
     },
     'should parse a self closing tag with attributes 2': {
         input: '<user name="xyaa aaz" id="24" align="left"/>',
@@ -127,12 +133,6 @@ tests = {
         input: '<p>{{ @value | f1 | f2(2) | f3(@value) }}</p>'
 
     },
-    'should parse if statements': {
-
-        input: '<Tag>{% if value %} <text>Text</text> {% else %} no text {% endif %}</Tag>'
-
-    },
-
     'should parse if else statements': {
 
         input: '<Tag>{% if value %}<text>Text</text>{% else %}<text>else</text>{% endif %}</Tag>'
@@ -141,7 +141,16 @@ tests = {
 
     'should parse if else if statements': {
 
-        input: '<Tag>{% if value %}<text>Text</text>{% else if value %} <text>else</text>{% endif %}</Tag>'
+        input: `
+        <Tag>
+          {% if value %}
+            <text>Text</text>
+          {% else if value %} 
+            <text>else</text> 
+          {% else %} 
+            no 
+          {% endif %}
+        </Tag>`
 
     },
 
@@ -191,7 +200,6 @@ tests = {
 
         input: '<p>{{(Styles.A  + Styles.B)}}</p>'
 
-
     },
 
     'should parse complicated expressions': {
@@ -199,12 +207,12 @@ tests = {
         input: '<div class={{((Styles.A + " ") + Style.B)}}/>'
     },
 
-    'should allow for expression after fun': {
+    'should allow for statement as child of fun': {
 
         input: '{% fun sven %} {% for a in b %} {{b}} {% endfor %} {% endfun %}'
 
     },
-    'should allow if expression after fun': {
+    'should allow if statement as child of  fun': {
 
         input: '{% fun ate (o:object) %} {% if a %} {{a}} {% else %} {{a}} {% endif %} {% endfun %}'
 
@@ -226,12 +234,6 @@ tests = {
 
     },
     'should parse typed views': {
-
-        input: '{% view Main (Context) %} <p>{{@value}}</p>{% endview %}'
-
-    },
-
-    'should parse typed views with generics': {
 
         input: '{% view Main (Context[string]) %} <p>{{@value}}</p>{% endview %}'
 

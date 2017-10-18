@@ -13,6 +13,7 @@
   "author": "Lasana Murray <lmurray@quenk.com> (http://quenk.com)",
   "license": "Apache-2.0",
   "devDependencies": {
+    "@quenk/wml-runtime": "^0.4.5",
     "@types/mocha": "^2.2.43",
     "@types/node": "^8.0.34",
     "jison": "^0.4.16",

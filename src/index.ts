@@ -26,10 +26,19 @@ export const defaultOptions: Options = {
     module: '@quenk/wml-runtime',
 };
 
-export const parse = (str: string, ast: any = nodes): nodes.Module => {
+export const parse = (str: string, ast: any = nodes): Either<Error, nodes.Module> => {
 
     Parser.parser.yy = { ast };
-    return Parser.parser.parse(str);
+
+  try {
+
+    return Either.right<Error, nodes.Module>(Parser.parser.parse(str));
+
+  }catch(e) {
+
+    return Either.left<Error, nodes.Module>(e);
+
+  }
 
 }
 
@@ -39,7 +48,7 @@ export const compile = (src: string, options: Options = {}): Either<Error, strin
 
     try {
 
-        return Either.right<Error, string>(TypeScript.code(parse(src), opts));
+      return parse(src).map(m=> TypeScript.code(m, opts));
 
     } catch (e) {
 

@@ -1,6 +1,6 @@
 import * as nodes from './AST';
 import * as afpl from 'afpl';
-import {Options} from './';
+import { Options } from './';
 
 /**
  * Types and functions for generating typescript program text.
@@ -36,7 +36,7 @@ export class ${id}${typeClasses} extends AppView<${ctx}> {
 /**
  * code turns an AST into typescript code.
  */
-export const code = (n: nodes.Module, _:Options) :string => module2TS(n);
+export const code = (n: nodes.Module, _: Options): string => module2TS(n);
 
 /**
  * module2TS converts a module to a typescript module.
@@ -49,7 +49,7 @@ ${n.imports.map(importStatement2TS).join(';\n')}
 
 ${n.exports.map(exports2TS).join(';\n')}
 
-${main2TS(n.main)}
+${n.main ? main2TS(n.main) : ''}
 `;
 
 /**
@@ -145,7 +145,7 @@ export const exportStatement2TS = (n: nodes.ExportStatement) =>
  */
 export const viewStatement2TS = (n: nodes.ViewStatement) =>
     view(
-        identifier2TS(n.id),
+        constructor2TS(n.id),
         typeClasses2TS(n.typeClasses),
         n.parameters.map(parameter2TS).join(','),
         type2TS(n.context), tag2TS(n.tag));
@@ -154,7 +154,7 @@ export const viewStatement2TS = (n: nodes.ViewStatement) =>
  * funStatement2TS converts a function statement to typescript.
  */
 export const funStatement2TS = (n: nodes.FunStatement) =>
-    `export function ${n.id}${typeClasses2TS(n.typeClasses)}` +
+    `export function ${unqualifiedIdentifier2TS(n.id)}${typeClasses2TS(n.typeClasses)}` +
     `(${n.parameters.map(parameter2TS).join(',')})` +
     `{ return ${Array.isArray(n.body) ? children2TS(n.body) : child2TS(n.body)}; } `;
 
@@ -168,7 +168,7 @@ export const typeClasses2TS = (ns: nodes.TypeClass[]) =>
  * typeClass2TS converts a typeclass into a typescript typeclass.
  */
 export const typeClass2TS = (n: nodes.TypeClass) =>
-    `${constructor2TS(n.id)}${n.constraint ? 'extends ' + type2TS(n.constraint) : ''}`;
+    `${identifierOrConstructor2TS(n.id)}${n.constraint ? 'extends ' + type2TS(n.constraint) : ''}`;
 
 /**
  * type2TS converts a type hint to a typescript type hint.
@@ -239,8 +239,8 @@ export const child2TS = (n: nodes.Child) => {
 export const tag2TS = (n: nodes.Tag) => {
 
     let children = children2TS(n.children);
-    let attrs = groupAttrs(n.attributes);
-    let name = identifier2TS(n.open);
+    let attrs = attrs2String(groupAttrs(n.attributes));
+    let name = identifierOrConstructor2TS(n.open);
 
     return (n.type === 'widget') ? `$$widget(${name}, ${attrs}, ${children})` :
         `$$node('${name}', ${attrs}, ${children})`;
@@ -248,12 +248,31 @@ export const tag2TS = (n: nodes.Tag) => {
 }
 
 /**
+ * attrs2String 
+ */
+export const attrs2String = (attrs: { [key: string]: string[] }) => '{' +
+    (Object.keys(attrs).map(ns => `${ns} : { ${attrs[ns].join(',')} }`)) + '}';
+
+/**
  * groupAttrs groups attributes according to their namespace.
  */
 export const groupAttrs = (ns: nodes.Attribute[]) => ns.reduce((p, c) =>
-    afpl.util.fuse<any, any>(p, {
-        [c.namespace.id || 'html']: { [c.name.id]: expression2TS(c.value) }
-    }), { html: {}, wml: {} });
+    afpl.util.merge<any, any>(p, {
+        [c.namespace.id || 'html']: (p[c.namespace.id || 'html'] || []).concat(
+            attribute2TS(c))
+    }), { html: [], wml: [] });
+
+/**
+ * attribute2Value 
+ */
+export const attribute2TS = (n: nodes.Attribute) =>
+    `${unqualifiedIdentifier2TS(n.name)} : ${attributeValue2TS(n.value)}`;
+
+/**
+ * attributeValue2TS converts an attribute value to typescript.
+ */
+export const attributeValue2TS = (n: nodes.Interpolation | nodes.Literal) =>
+    (n instanceof nodes.Interpolation) ? interpolation2TS(n) : literal2TS(n);
 
 /**
  * interpolation2TS converts interpolation expressions to typescript.
@@ -265,7 +284,7 @@ export const interpolation2TS = (n: nodes.Interpolation) =>
  * forStatement2TS converts a for statement to typescript.
  */
 export const forStatement2TS = (n: nodes.ForStatement) =>
-    `$$for(${expression2TS(n.list)}, function for` +
+    `$$for(${expression2TS(n.list)}, function _for` +
     `(${[n.variable, n.index, n.all].filter(x => x).map(parameter2TS).join(',')})` +
     `{ return ${children2TS(n.body)} },` +
     `function otherwise() { return ${children2TS(n.otherwise)} })`;
@@ -276,7 +295,7 @@ export const forStatement2TS = (n: nodes.ForStatement) =>
 export const ifStatement2TS = (n: nodes.IfStatement) =>
     `$$if(${expression2TS(n.condition)}, ` +
     `function then()` +
-    `{ return ${children2TS(n.then)} }, ${else2TS(n)}) `;
+    `{ return ${children2TS(n.then)} }, ${n.elseClause ? else2TS(n.elseClause) : '$$empty'}) `;
 
 const else2TS = (n: nodes.ElseClause | nodes.ElseIfClause) =>
     (n instanceof nodes.ElseClause) ? elseClause2TS(n) :
@@ -325,6 +344,10 @@ export const expression2TS = (n: nodes.Expression): string => {
         return readExpression2TS(n);
     else if (n instanceof nodes.FunctionExpression)
         return functionExpression2TS(n);
+    else if (n instanceof nodes.Record)
+        return record2TS(n)
+    else if (n instanceof nodes.List)
+        return list2TS(n)
     else if (n instanceof nodes.BooleanLiteral)
         return boolean2TS(n);
     else if (n instanceof nodes.NumberLiteral)
@@ -341,6 +364,8 @@ export const expression2TS = (n: nodes.Expression): string => {
         return unqualifiedIdentifier2TS(n);
     else if (n instanceof nodes.QualifiedIdentifier)
         return qualifiedIdentifier2TS(n);
+    else if (n instanceof nodes.ContextVariable)
+        return contextVariable2TS(n);
     else
         _throwNotKnown(n);
 
@@ -356,7 +381,7 @@ export const ifThenExpression2TS = (n: nodes.IfThenExpression): string =>
  * binaryExpression2TS converts a binary expression to typescript.
  */
 export const binaryExpression2TS = (n: nodes.BinaryExpression) =>
-    `(${expression2TS(n.left)}) ${convertOperator(n.operator)} '('${expression2TS(n.right)} ')'`;
+    `(${expression2TS(n.left)} ${convertOperator(n.operator)} ${expression2TS(n.right)} )`;
 
 /**
  * convertOperator for strictness.
@@ -484,12 +509,18 @@ export const contextVariable2TS = (_: nodes.ContextVariable) => `$$ctx`;
 /**
  * identifierOrConstructor2TS
  */
-export const identifierOrConstructor2TS = (n: nodes.Identifier | nodes.Constructor) =>
-    ((n instanceof nodes.UnqualifiedIdentifier) || (n instanceof nodes.QualifiedIdentifier)) ?
-        identifier2TS(n) :
-        ((n instanceof nodes.UnqualifiedConstructor) || (n instanceof nodes.QualifiedConstructor)) ?
-            constructor2TS(n) :
-            _throwNotKnown(n);
+export const identifierOrConstructor2TS = (n: nodes.Identifier | nodes.Constructor) => {
+
+    if ((n instanceof nodes.UnqualifiedIdentifier) ||
+        (n instanceof nodes.QualifiedIdentifier))
+        return identifier2TS(n);
+    else if ((n instanceof nodes.UnqualifiedConstructor) ||
+        (n instanceof nodes.QualifiedConstructor))
+        return constructor2TS(n);
+    else
+        return _throwNotKnown(n);
+
+}
 
 /**
  * constructor2TS turns a constructor to a typescript identifier.
@@ -521,14 +552,12 @@ export const identifier2TS = (n: nodes.Identifier) =>
             _throwNotKnown(n);
 
 /**
+ * qualifiedIdentifier2TS converts a qualified identifier to typescript
+ */
+export const qualifiedIdentifier2TS = (n: nodes.QualifiedIdentifier) =>
+    `${n.qualifier}.${n.member}`;
+
+/**
  * unqualifiedIdentifier2TS converts an unqualified identifier to typescript
  */
 export const unqualifiedIdentifier2TS = (n: nodes.UnqualifiedIdentifier) => `${n.id}`;
-
-/**
- * qualifiedIdentifier2TS converts a qualified identifier to typescript
- */
-export const qualifiedIdentifier2TS = (n: nodes.QualifiedIdentifier) => `${n.qualifier}.${n.member}`;
-
-
-
