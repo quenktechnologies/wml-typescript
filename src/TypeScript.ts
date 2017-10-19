@@ -25,9 +25,7 @@ export const view = (id: string, typeClasses: string, params: string, ctx: strin
 
         super(context);
 
-        let ___view = this;
-
-        this.template = (___ctx:${ctx}) =>
+        this.template = (___ctx:${ctx}, ___view:AppView<${ctx}>) =>
           ${tag ? tag : '<Node>document.createDocumentFragment()'};
 
        }
