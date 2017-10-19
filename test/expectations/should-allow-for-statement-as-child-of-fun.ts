@@ -1,9 +1,7 @@
 
-import { empty as $$empty, box as $$box, text as $$text, node as $$node,
-    read as $$read, widget as $$widget, ifE as $$if, forE as $$for,
-    domify as $$domify, AppView} from "@quenk/wml-runtime";
+import * as $wml from '../../src';
 
 
-export function sven(){ return $$for(b, function _for(a){ return b },function otherwise() { return $$empty() }); } 
+export function sven  () { return $wml.map(b, function _map(a ) { return $wml.domify(b)  }, function otherwise() { return function () {} }) ; } 
 
 

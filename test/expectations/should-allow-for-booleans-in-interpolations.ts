@@ -1,23 +1,18 @@
 
-import { empty as $$empty, box as $$box, text as $$text, node as $$node,
-    read as $$read, widget as $$widget, ifE as $$if, forE as $$for,
-    domify as $$domify, AppView} from "@quenk/wml-runtime";
+import * as $wml from '../../src';
 
 
 
 
  
-export class Main extends AppView<void> {
+export class Main extends $wml.AppView<void> {
 
     constructor(context: void) {
 
         super(context);
 
-        let view = this;
-
-        this.template = function($$view:AppView<void>, $$ctx:void) {
-            return $$node('bool', {html : { active : true  },wml : {  }}, (fun  ()) ? false  : true  )
-        }
+        this.template = (___ctx:void) =>
+          $wml.unpart($wml.node('bool', {html : { active : true   } ,wml : {  } }, [$wml.domify((fun  ()) ? false  : true  ) ]) )
 
        }
 

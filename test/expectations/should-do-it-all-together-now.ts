@@ -1,23 +1,18 @@
 
-import { empty as $$empty, box as $$box, text as $$text, node as $$node,
-    read as $$read, widget as $$widget, ifE as $$if, forE as $$for,
-    domify as $$domify, AppView} from "@quenk/wml-runtime";
+import * as $wml from '../../src';
 
 
 
 
  
-export class Main extends AppView<void> {
+export class Main extends $wml.AppView<void> {
 
     constructor(context: void) {
 
         super(context);
 
-        let view = this;
-
-        this.template = function($$view:AppView<void>, $$ctx:void) {
-            return $$node('modal', {html : { name : `mymodal`,x : `1`,y : `2` },wml : {  }}, $$box($$node('modal-header', {html : {  },wml : {  }}, 'My Modal'),$$node('modal-body', {html : {  },wml : {  }}, $$box('Creativxity is inhibxited by greed and corruption.',$$node('vote-button', {html : {  },wml : {  }}, $$empty()),$$node('vote-count', {html : { source : $$ctx },wml : {  }}, $$empty()),' Votes',$$node('textarea', {html : { disabled : true ,size : 32,onchange : $$ctx.setText },wml : { id : `ta` }}, ' Various text')))))
-        }
+        this.template = (___ctx:void) =>
+          $wml.unpart($wml.node('modal', {html : { name : `mymodal` ,x : `1` ,y : `2`  } ,wml : {  } }, [$wml.node('modal-header', {html : {  } ,wml : {  } }, [$wml.text('My Modal')]) ,$wml.node('modal-body', {html : {  } ,wml : {  } }, [$wml.text('Creativxity is inhibxited by greed and corruption.'),$wml.node('vote-button', {html : {  } ,wml : {  } }, []) ,$wml.node('vote-count', {html : { source : ___ctx  } ,wml : {  } }, []) ,$wml.text(' Votes'),$wml.node('textarea', {html : { disabled : true  ,size : 32 ,onchange : ___ctx.setText  } ,wml : { id : `ta`  } }, [$wml.text(' Various text')]) ]) ]) )
 
        }
 

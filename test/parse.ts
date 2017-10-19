@@ -24,7 +24,7 @@ function makeTest(test, index) {
         return parse(test.input)
             .map(json)
             .map(txt => { fs.writeFileSync(`./test/expectations/${file}.json`, txt); })
-            .chain(() => compile(test.input))
+            .chain(() => compile(test.input, {module:'../../src'}))
             .map(txt => { fs.writeFileSync(`./test/expectations/${file}.ts`, txt); })
             .cata(e => { throw e; }, () => { });
     }
@@ -256,6 +256,11 @@ tests = {
     'should allow read expressions in if expressions': {
 
         input: `<p>{% if @taggin['attr' as string] %}x{% else %} yz fefd {% endif %}</p>`
+
+    },
+    'should allow construct expression': {
+
+        input: '<TextView android:thing={value:1}>{{Person(@value)}}</TextView>'
 
     }
 

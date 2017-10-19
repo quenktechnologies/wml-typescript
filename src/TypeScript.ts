@@ -12,21 +12,19 @@ const _throwNotKnown = (n: nodes.AST): string => {
 
 }
 
+const noop = () => `function () {}`;
 /**
  * view template.
  */
 export const view = (id: string, typeClasses: string, params: string, ctx: string, tag: string) => ` 
-export class ${id}${typeClasses} extends AppView<${ctx}> {
+export class ${id}${typeClasses} extends $wml.AppView<${ctx}> {
 
     constructor(context: ${ctx}${params ? ',' + params : ''}) {
 
         super(context);
 
-        let view = this;
-
-        this.template = function($$view:AppView<${ctx}>, $$ctx:${ctx}) {
-            return ${tag ? tag : '<Node>document.createDocumentFragment()'}
-        }
+        this.template = (___ctx:${ctx}) =>
+          ${tag ? '$wml.unpart(' + tag + ')' : '<Node>document.createDocumentFragment()'}
 
        }
 
@@ -36,15 +34,13 @@ export class ${id}${typeClasses} extends AppView<${ctx}> {
 /**
  * code turns an AST into typescript code.
  */
-export const code = (n: nodes.Module, _: Options): string => module2TS(n);
+export const code = (n: nodes.Module, o: Options): string => module2TS(n, o);
 
 /**
  * module2TS converts a module to a typescript module.
  */
-export const module2TS = (n: nodes.Module) => `
-import { empty as $$empty, box as $$box, text as $$text, node as $$node,
-    read as $$read, widget as $$widget, ifE as $$if, forE as $$for,
-    domify as $$domify, AppView} from "@quenk/wml-runtime";
+export const module2TS = (n: nodes.Module, { module }: Options) => `
+import * as $wml from '${module}';
 ${n.imports.map(importStatement2TS).join(';\n')}
 
 ${n.exports.map(exports2TS).join(';\n')}
@@ -72,7 +68,7 @@ export const exports2TS = (n: nodes.Export) => {
  * importStatement2TS converts an import statement.
  */
 export const importStatement2TS = (n: nodes.ImportStatement) =>
-    `import ${importMember2TS(n.member)} from ${string2TS(n.module)}`;
+    `import ${importMember2TS(n.member)} from ${string2TS(n.module)} `;
 
 /**
  * importMember2TS converts the members of an import to typescript.
@@ -94,13 +90,13 @@ export const importMember2TS = (n: nodes.ImportMember) => {
  * aliasedMember2TS converts a member alias to typescript.
  */
 export const aliasedMember2TS = (n: nodes.AliasedMember) =>
-    `${identifierOrConstructor2TS(n.member)} as ${identifierOrConstructor2TS(n.alias)}`;
+    `${identifierOrConstructor2TS(n.member)} as ${identifierOrConstructor2TS(n.alias)} `;
 
 /**
  * aggregateMember2TS converts a qualified member to typescript.
  */
 export const aggregateMember2TS = (n: nodes.AggregateMember) =>
-    `* as ${identifierOrConstructor2TS(n.id)}`;
+    `* as ${identifierOrConstructor2TS(n.id)} `;
 
 /**
  * compositeMember2TS coverts to typescript.
@@ -138,7 +134,7 @@ export const untypedMain2TS = (n: nodes.UntypedMain) =>
  * exportStatement2TS converts an export statement to typescript.
  */
 export const exportStatement2TS = (n: nodes.ExportStatement) =>
-    `export ${compositeMember2TS(n.members)};`
+    `export ${compositeMember2TS(n.members)}; `
 
 /**
  * viewStatement2TS converts a view statement into a typescript class.
@@ -154,27 +150,27 @@ export const viewStatement2TS = (n: nodes.ViewStatement) =>
  * funStatement2TS converts a function statement to typescript.
  */
 export const funStatement2TS = (n: nodes.FunStatement) =>
-    `export function ${unqualifiedIdentifier2TS(n.id)}${typeClasses2TS(n.typeClasses)}` +
-    `(${n.parameters.map(parameter2TS).join(',')})` +
+    `export function ${unqualifiedIdentifier2TS(n.id)} ${typeClasses2TS(n.typeClasses)} ` +
+    `(${n.parameters.map(parameter2TS).join(',')}) ` +
     `{ return ${Array.isArray(n.body) ? children2TS(n.body) : child2TS(n.body)}; } `;
 
 /**
  * typeClasses2TS converts a list of typeclasses into the a list of typescript typeclasses.
  */
-export const typeClasses2TS = (ns: nodes.TypeClass[]) =>
-    (ns.length === 0) ? '' : `<${ns.map(typeClass2TS).join(',')}>`;
+export const typeClasses2TS = (ns: nodes.TypeClass[]): string =>
+    (ns.length === 0) ? '' : `< ${ns.map(typeClass2TS).join(',')}>`;
 
 /**
  * typeClass2TS converts a typeclass into a typescript typeclass.
  */
 export const typeClass2TS = (n: nodes.TypeClass) =>
-    `${identifierOrConstructor2TS(n.id)}${n.constraint ? 'extends ' + type2TS(n.constraint) : ''}`;
+    `${identifierOrConstructor2TS(n.id)} ${n.constraint ? 'extends ' + type2TS(n.constraint) : ''} `;
 
 /**
  * type2TS converts a type hint to a typescript type hint.
  */
 export const type2TS = (n: nodes.Type) =>
-    `${identifierOrConstructor2TS(n.id)}${typeClasses2TS(n.typeClasses)}`;
+    `${identifierOrConstructor2TS(n.id)} ${typeClasses2TS(n.typeClasses)} `;
 
 /**
  * parameter2TS converts a parameter to a typescript parameter.
@@ -188,30 +184,30 @@ export const parameter2TS = (n: nodes.Parameter) =>
  * typedParameter2TS converts a typed parameter into a non-any typescript parameter.
  */
 export const typedParameter2TS = (n: nodes.TypedParameter) =>
-    `${identifier2TS(n.id)}:${type2TS(n.hint)}`;
+    `${identifier2TS(n.id)}:${type2TS(n.hint)} `;
 
 /**
  * untypedParameter2TS converts an type inferred parameter to a typescript parameter.
  */
 export const untypedParameter2TS = (n: nodes.UntypedParameter) =>
-    `${identifier2TS(n.id)}`;
+    `${identifier2TS(n.id)} `;
 
 /**
  * children2TS converts a list of children to typescript.
  */
-export const children2TS = (list: nodes.Child[]) =>
-    (list.length === 0) ? '$$empty()' :
+export const children2TS = (list: nodes.Child[]): string =>
+    (list.length === 0) ? noop() :
         (list.length === 1) ? child2TS(list[0]) :
-            `$$box(${list.map(l => child2TS(l)).join(',')})`;
+            `$$box(${list.map(l => child2TS(l)).join(',')}) `;
 
 /**
  * child2TS converts children to typescript.
  */
-export const child2TS = (n: nodes.Child) => {
+export const child2TS = (n: nodes.Child): string => {
     if ((n instanceof nodes.Node) || (n instanceof nodes.Widget))
         return tag2TS(n);
     else if (n instanceof nodes.Interpolation)
-        return interpolation2TS(n);
+        return `$wml.domify(${interpolation2TS(n)}) `;
     else if (n instanceof nodes.IfStatement)
         return ifStatement2TS(n);
     else if (n instanceof nodes.ForStatement)
@@ -238,12 +234,12 @@ export const child2TS = (n: nodes.Child) => {
  */
 export const tag2TS = (n: nodes.Tag) => {
 
-    let children = children2TS(n.children);
+    let children = n.children.map(child2TS);
     let attrs = attrs2String(groupAttrs(n.attributes));
     let name = identifierOrConstructor2TS(n.open);
 
-    return (n.type === 'widget') ? `$$widget(${name}, ${attrs}, ${children})` :
-        `$$node('${name}', ${attrs}, ${children})`;
+    return (n.type === 'widget') ? `$wml.widget(${name}, ${attrs}, ${children}) ` :
+        `$wml.node('${name}', ${attrs}, [${children}]) `;
 
 }
 
@@ -251,7 +247,7 @@ export const tag2TS = (n: nodes.Tag) => {
  * attrs2String 
  */
 export const attrs2String = (attrs: { [key: string]: string[] }) => '{' +
-    (Object.keys(attrs).map(ns => `${ns} : { ${attrs[ns].join(',')} }`)) + '}';
+    (Object.keys(attrs).map(ns => `${ns} : { ${attrs[ns].join(',')} } `)) + '}';
 
 /**
  * groupAttrs groups attributes according to their namespace.
@@ -260,13 +256,13 @@ export const groupAttrs = (ns: nodes.Attribute[]) => ns.reduce((p, c) =>
     afpl.util.merge<any, any>(p, {
         [c.namespace.id || 'html']: (p[c.namespace.id || 'html'] || []).concat(
             attribute2TS(c))
-    }), { html: [], wml: [] });
+    }), ({ html: [], wml: [] } as { [key: string]: string[] }));
 
 /**
  * attribute2Value 
  */
 export const attribute2TS = (n: nodes.Attribute) =>
-    `${unqualifiedIdentifier2TS(n.name)} : ${attributeValue2TS(n.value)}`;
+    `${unqualifiedIdentifier2TS(n.name)} : ${attributeValue2TS(n.value)} `;
 
 /**
  * attributeValue2TS converts an attribute value to typescript.
@@ -278,26 +274,26 @@ export const attributeValue2TS = (n: nodes.Interpolation | nodes.Literal) =>
  * interpolation2TS converts interpolation expressions to typescript.
  */
 export const interpolation2TS = (n: nodes.Interpolation) =>
-    n.filters.reduce((p, c) => `${expression2TS(c)}(${p})`, expression2TS(n.expression));
+    n.filters.reduce((p, c) => `${expression2TS(c)} (${p})`, expression2TS(n.expression));
 
 /**
  * forStatement2TS converts a for statement to typescript.
  */
 export const forStatement2TS = (n: nodes.ForStatement) =>
-    `$$for(${expression2TS(n.list)}, function _for` +
-    `(${[n.variable, n.index, n.all].filter(x => x).map(parameter2TS).join(',')})` +
-    `{ return ${children2TS(n.body)} },` +
-    `function otherwise() { return ${children2TS(n.otherwise)} })`;
+    `$wml.map(${expression2TS(n.list)}, function _map` +
+    `(${[n.variable, n.index, n.all].filter(x => x).map(parameter2TS).join(',')}) ` +
+    `{ return ${children2TS(n.body)} }, ` +
+    `function otherwise() { return ${children2TS(n.otherwise)} }) `;
 
 /**
  * ifStatement2TS converts an if statement to typescript.
  */
 export const ifStatement2TS = (n: nodes.IfStatement) =>
-    `$$if(${expression2TS(n.condition)}, ` +
+    `$wml.ifthen(${expression2TS(n.condition)}, ` +
     `function then()` +
-    `{ return ${children2TS(n.then)} }, ${n.elseClause ? else2TS(n.elseClause) : '$$empty'}) `;
+    `{ return ${children2TS(n.then)} }, ${n.elseClause ? else2TS(n.elseClause) : noop()}) `;
 
-const else2TS = (n: nodes.ElseClause | nodes.ElseIfClause) =>
+const else2TS = (n: nodes.ElseClause | nodes.ElseIfClause): string =>
     (n instanceof nodes.ElseClause) ? elseClause2TS(n) :
         (n instanceof nodes.ElseIfClause) ? elseIfClause2TS(n) :
             _throwNotKnown(n);
@@ -313,7 +309,7 @@ export const elseClause2TS = (n: nodes.ElseClause) =>
  */
 export const elseIfClause2TS = (n: nodes.ElseIfClause) =>
     `function elseif()` +
-    `{ return $$if(${expression2TS(n.condition)}, ` +
+    `{ return $wml.ifthen(${expression2TS(n.condition)}, ` +
     `function then() ` +
     `{ return ${children2TS(n.then)}; }, ` +
     `${else2TS(n.elseClause)});}`;
@@ -321,7 +317,7 @@ export const elseIfClause2TS = (n: nodes.ElseIfClause) =>
 /**
  * characters2TS converts character text to a typescript string.
  */
-export const characters2TS = (n: nodes.Characters) => `'${n.value}'`;
+export const characters2TS = (n: nodes.Characters) => `$wml.text('${n.value}')`;
 
 /**
  * expression2TS converts a wml expression to a typescript expression.
@@ -381,7 +377,7 @@ export const ifThenExpression2TS = (n: nodes.IfThenExpression): string =>
  * binaryExpression2TS converts a binary expression to typescript.
  */
 export const binaryExpression2TS = (n: nodes.BinaryExpression) =>
-    `(${expression2TS(n.left)} ${convertOperator(n.operator)} ${expression2TS(n.right)} )`;
+    `(${expression2TS(n.left)} ${convertOperator(n.operator)} ${expression2TS(n.right)}) `;
 
 /**
  * convertOperator for strictness.
@@ -433,7 +429,7 @@ export const memberExpression2TS = (n: nodes.MemberExpression) =>
  * NOTE: this part of the language is most likely to change.
  */
 export const readExpression2TS = (n: nodes.ReadExpression) =>
-    `$$resolve< ${type2TS(n.hint)}>(${expression2TS(n.path)}, ${expression2TS(n.target)} ` +
+    `$wml.read < ${type2TS(n.hint)}>(${expression2TS(n.path)}, ${expression2TS(n.target)} ` +
     `${n.defaults ? ',' + expression2TS(n.defaults) : ''})`;
 
 /**
@@ -499,12 +495,12 @@ export const key2TS = (n: nodes.StringLiteral | nodes.UnqualifiedIdentifier) =>
  * property access.
  */
 export const contextProperty2TS = (n: nodes.ContextProperty) =>
-    `$$ctx.${identifier2TS(n.member)}`;
+    `___ctx.${identifier2TS(n.member)}`;
 
 /**
  * contextVariable2TS turns the context variable into the context identifier.
  */
-export const contextVariable2TS = (_: nodes.ContextVariable) => `$$ctx`;
+export const contextVariable2TS = (_: nodes.ContextVariable) => `___ctx`;
 
 /**
  * identifierOrConstructor2TS

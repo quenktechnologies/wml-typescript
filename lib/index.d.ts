@@ -1,8 +1,11 @@
+/// <reference path="../src/Parser.d.ts" />
 import * as nodes from './AST';
 import { Either } from 'afpl';
 export declare type Code = Either<Error, Context>;
 export interface Options {
     debug?: boolean;
+    es5?: boolean;
+    pretty?: boolean;
     main?: string;
     module?: string;
 }

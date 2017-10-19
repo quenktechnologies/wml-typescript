@@ -63,15 +63,15 @@ export declare const funStatement2TS: (n: nodes.FunStatement) => string;
 /**
  * typeClasses2TS converts a list of typeclasses into the a list of typescript typeclasses.
  */
-export declare const typeClasses2TS: (ns: nodes.TypeClass[]) => any;
+export declare const typeClasses2TS: (ns: nodes.TypeClass[]) => string;
 /**
  * typeClass2TS converts a typeclass into a typescript typeclass.
  */
-export declare const typeClass2TS: (n: nodes.TypeClass) => any;
+export declare const typeClass2TS: (n: nodes.TypeClass) => string;
 /**
  * type2TS converts a type hint to a typescript type hint.
  */
-export declare const type2TS: (n: nodes.Type) => any;
+export declare const type2TS: (n: nodes.Type) => string;
 /**
  * parameter2TS converts a parameter to a typescript parameter.
  */
@@ -87,15 +87,15 @@ export declare const untypedParameter2TS: (n: nodes.UntypedParameter) => string;
 /**
  * children2TS converts a list of children to typescript.
  */
-export declare const children2TS: (list: nodes.Child[]) => any;
+export declare const children2TS: (list: nodes.Child[]) => string;
 /**
  * child2TS converts children to typescript.
  */
-export declare const child2TS: (n: nodes.Child) => any;
+export declare const child2TS: (n: nodes.Child) => string;
 /**
  * tag2TS converts a tag (node/widget) to typescript.
  */
-export declare const tag2TS: (n: nodes.Tag) => any;
+export declare const tag2TS: (n: nodes.Tag) => string;
 /**
  * attrs2String
  */
@@ -121,19 +121,19 @@ export declare const interpolation2TS: (n: nodes.Interpolation) => string;
 /**
  * forStatement2TS converts a for statement to typescript.
  */
-export declare const forStatement2TS: (n: nodes.ForStatement) => any;
+export declare const forStatement2TS: (n: nodes.ForStatement) => string;
 /**
  * ifStatement2TS converts an if statement to typescript.
  */
-export declare const ifStatement2TS: (n: nodes.IfStatement) => any;
+export declare const ifStatement2TS: (n: nodes.IfStatement) => string;
 /**
  * elseClause2TS converts the else clause of an if statement to typescript.
  */
-export declare const elseClause2TS: (n: nodes.ElseClause) => any;
+export declare const elseClause2TS: (n: nodes.ElseClause) => string;
 /**
  * elseIfClause2TS converts an else if clause to typescript.
  */
-export declare const elseIfClause2TS: (n: nodes.ElseIfClause) => any;
+export declare const elseIfClause2TS: (n: nodes.ElseIfClause) => string;
 /**
  * characters2TS converts character text to a typescript string.
  */

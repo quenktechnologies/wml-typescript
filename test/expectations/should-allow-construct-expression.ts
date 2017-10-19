@@ -12,7 +12,7 @@ export class Main extends $wml.AppView<void> {
         super(context);
 
         this.template = (___ctx:void) =>
-          $wml.unpart($wml.widget(Input, {html : { name : ___ctx.level.name   } ,wml : {  } }, ) )
+          $wml.unpart($wml.widget(TextView, {html : {  } ,wml : {  } ,android : { thing : {'value' : 1}  } }, $wml.domify(new Person (___ctx.value)) ) )
 
        }
 
