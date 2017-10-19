@@ -152,7 +152,7 @@ export const viewStatement2TS = (n: nodes.ViewStatement) =>
  * funStatement2TS converts a function statement to typescript.
  */
 export const funStatement2TS = (n: nodes.FunStatement) =>
-    `export function ${unqualifiedIdentifier2TS(n.id)} ${typeClasses2TS(n.typeClasses)} ` +
+    `export function ${unqualifiedIdentifier2TS(n.id)}${typeClasses2TS(n.typeClasses)}` +
     `(${_appendView(n.parameters.map(parameter2TS).join(','))}) ` +
     `{ return ${Array.isArray(n.body) ? children2TS(n.body) : child2TS(n.body)}; } `;
 

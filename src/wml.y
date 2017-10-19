@@ -263,7 +263,7 @@ member
 
 main
           : '{%' MAIN type_classes? '(' type ')' parameters? '%}' tag
-            { $$ = new yy.ast.TypedMain($3||[], $5, $7, $9, @$); }
+            { $$ = new yy.ast.TypedMain($3||[], $5, $7||[], $9, @$); }
 
           | tag 
             {$$ = new yy.ast.UntypedMain($1, @$); }
