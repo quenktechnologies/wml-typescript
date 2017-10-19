@@ -25,7 +25,7 @@ export const view = (id: string, typeClasses: string, params: string, ctx: strin
 
         super(context);
 
-        this.template = (___ctx:${ctx}, ___view:AppView<${ctx}>) =>
+        this.template = (___ctx:${ctx}, ___view:$wml.AppView<${ctx}>) =>
           ${tag ? tag : '<Node>document.createDocumentFragment()'};
 
        }
@@ -44,7 +44,9 @@ export const code = (n: nodes.Module, o: Options): string => module2TS(n, o);
 export const module2TS = (n: nodes.Module, { module }: Options) => `
 import * as $wml from '${module}';
 ${n.imports.map(importStatement2TS).join(';\n')}
+
 ${n.exports.map(exports2TS).join(';\n')}
+
 ${n.main ? main2TS(n.main) : ''}
 `;
 

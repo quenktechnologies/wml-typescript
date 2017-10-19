@@ -18,7 +18,7 @@ export interface Options {
 const defaultOptions: Options = {
     debug: false,
     main: 'Main',
-    module: '@quenk/wml-runtime',
+    module: '@quenk/wml',
 };
 
 /**
