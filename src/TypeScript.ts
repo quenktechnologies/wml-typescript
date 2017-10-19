@@ -12,19 +12,23 @@ const _throwNotKnown = (n: nodes.AST): string => {
 
 }
 
+const _appendView = (s: string) => s === '' ? '___view' : `${s},___view`;
+
 const noop = () => `function () {}`;
 /**
  * view template.
  */
-export const view = (id: string, typeClasses: string, params: string, ctx: string, tag: string) => ` 
-export class ${id}${typeClasses} extends $wml.AppView<${ctx}> {
+export const view = (id: string, typeClasses: string, params: string, ctx: string, tag: string) =>
+    `export class ${id}${typeClasses} extends $wml.AppView<${ctx}> {
 
     constructor(context: ${ctx}${params ? ',' + params : ''}) {
 
         super(context);
 
+        let ___view = this;
+
         this.template = (___ctx:${ctx}) =>
-          ${tag ? '$wml.unpart(' + tag + ')' : '<Node>document.createDocumentFragment()'}
+          ${tag ? tag : '<Node>document.createDocumentFragment()'};
 
        }
 
@@ -42,9 +46,7 @@ export const code = (n: nodes.Module, o: Options): string => module2TS(n, o);
 export const module2TS = (n: nodes.Module, { module }: Options) => `
 import * as $wml from '${module}';
 ${n.imports.map(importStatement2TS).join(';\n')}
-
 ${n.exports.map(exports2TS).join(';\n')}
-
 ${n.main ? main2TS(n.main) : ''}
 `;
 
@@ -68,7 +70,7 @@ export const exports2TS = (n: nodes.Export) => {
  * importStatement2TS converts an import statement.
  */
 export const importStatement2TS = (n: nodes.ImportStatement) =>
-    `import ${importMember2TS(n.member)} from ${string2TS(n.module)} `;
+    `import ${importMember2TS(n.member)} from '${n.module.value}'; `;
 
 /**
  * importMember2TS converts the members of an import to typescript.
@@ -134,7 +136,7 @@ export const untypedMain2TS = (n: nodes.UntypedMain) =>
  * exportStatement2TS converts an export statement to typescript.
  */
 export const exportStatement2TS = (n: nodes.ExportStatement) =>
-    `export ${compositeMember2TS(n.members)}; `
+    `export ${compositeMember2TS(n.members)} from '${n.module.value}';\n`
 
 /**
  * viewStatement2TS converts a view statement into a typescript class.
@@ -151,7 +153,7 @@ export const viewStatement2TS = (n: nodes.ViewStatement) =>
  */
 export const funStatement2TS = (n: nodes.FunStatement) =>
     `export function ${unqualifiedIdentifier2TS(n.id)} ${typeClasses2TS(n.typeClasses)} ` +
-    `(${n.parameters.map(parameter2TS).join(',')}) ` +
+    `(${_appendView(n.parameters.map(parameter2TS).join(','))}) ` +
     `{ return ${Array.isArray(n.body) ? children2TS(n.body) : child2TS(n.body)}; } `;
 
 /**
@@ -196,7 +198,7 @@ export const untypedParameter2TS = (n: nodes.UntypedParameter) =>
  * children2TS converts a list of children to typescript.
  */
 export const children2TS = (list: nodes.Child[]): string =>
-    (list.length === 0) ? noop() :
+    (list.length === 0) ? 'document.createDocumentFragment();' :
         (list.length === 1) ? child2TS(list[0]) :
             `$$box(${list.map(l => child2TS(l)).join(',')}) `;
 
@@ -238,8 +240,8 @@ export const tag2TS = (n: nodes.Tag) => {
     let attrs = attrs2String(groupAttrs(n.attributes));
     let name = identifierOrConstructor2TS(n.open);
 
-    return (n.type === 'widget') ? `$wml.widget(${name}, ${attrs}, ${children}) ` :
-        `$wml.node('${name}', ${attrs}, [${children}]) `;
+    return (n.type === 'widget') ? `$wml.widget(${name}, ${attrs}, [${children}], ___view)` :
+        `$wml.node('${name}', ${attrs}, [${children}], ___view) `;
 
 }
 
@@ -317,7 +319,7 @@ export const elseIfClause2TS = (n: nodes.ElseIfClause) =>
 /**
  * characters2TS converts character text to a typescript string.
  */
-export const characters2TS = (n: nodes.Characters) => `$wml.text('${n.value}')`;
+export const characters2TS = (n: nodes.Characters) => `$wml.text(\`${n.value}\`)`;
 
 /**
  * expression2TS converts a wml expression to a typescript expression.
@@ -436,8 +438,7 @@ export const readExpression2TS = (n: nodes.ReadExpression) =>
  * functionExpression2TS converts a function expression to a typescript function expression.
  */
 export const functionExpression2TS = (n: nodes.FunctionExpression) =>
-    `function function_expression(${n.parameters.map(parameter2TS).join(',')}) {
-    ` +
+    `function function_expression(${n.parameters.map(parameter2TS).join(',')})` +
     `{ return ${expression2TS(n.body)} } `;
 
 /**

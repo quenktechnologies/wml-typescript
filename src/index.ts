@@ -12,14 +12,6 @@ export { Options, parse, compile } from './Compiler';
 export type Maybe<A> = Maybe<A>;
 
 /**
- * Child can be Content or a Part.
- */
-export type Child
-    = Content
-    | Part
-    ;
-
-/**
  * WMLElement can be DOM content or a user defined widget. 
  */
 export type WMLElement
@@ -117,11 +109,11 @@ export interface Widget extends Renderable {
 
 /**
  * Template is a function that given a View and a Context 
- * will provide DOM content wrapped in a Part.
+ * will provide DOM content.
  */
 export interface Template<C> {
 
-    (context: C): Part
+    (context: C, view: AppView<C>): Content
 
 }
 
@@ -205,59 +197,6 @@ export interface Groups {
 }
 
 /**
- * Part of the rendered view.
- */
-export class Part {
-
-    constructor(
-        public ids: Ids,
-        public groups: Groups,
-        public widgets: Widget[],
-        public node: Node) { }
-
-    /**
-     * adopt content
-     */
-    adopt(c: Content): Part {
-
-        this.node.appendChild(c);
-        return this;
-
-    }
-
-    /**
-     * merge a part into this one, the DOM of the passed Part because
-     * a child Node of this Part.
-     */
-    merge({ ids, groups, widgets, node }: Part): Part {
-
-        this.node.appendChild(node);
-
-        Object.keys(groups).forEach(g => {
-
-            this.groups[g] = this.groups[g] || [];
-            this.groups[g] = this.groups[g].concat(groups[g]);
-
-        });
-
-        Object.keys(ids).forEach(id => {
-
-            if (this.ids.hasOwnProperty(id))
-                throw new Error(`Duplicate id '${id}' detected!`);
-
-            this.ids[id] = ids[id];
-
-        });
-
-        this.widgets = this.widgets.concat(widgets);
-
-        return this;
-
-    }
-
-}
-
-/**
  * @private
  */
 export interface WidgetConstructor<A> {
@@ -276,13 +215,33 @@ export interface WidgetConstructor<A> {
  * @param {A} [defaultValue] - This value is returned if the value is not set.
  * @private
  */
-export const read = <A>(path: string, o: object, defaultValue: A): A => {
+export const read = <A>(path: string, o: object, defaultValue?: A): A => {
 
     let ret = property.get<A, object>(path.split(':').join('.'), o);
 
     return (ret != null) ? ret : defaultValue;
 
 }
+
+/**
+ * @private
+ */
+const adopt = (child: Content, e: Node): void => {
+
+    switch (typeof child) {
+        case 'string':
+        case 'number':
+        case 'boolean':
+            e.appendChild(document.createTextNode('' + child));
+        case 'object':
+            e.appendChild(<Node>child);
+            break;
+        default:
+            throw new TypeError(`Can not adopt child ${child} of type ${typeof child}`);
+
+    }
+
+};
 
 /**
  * @private
@@ -337,10 +296,11 @@ export const text = (value: boolean | number | string): Text =>
  * node is called to create a regular DOM node
  * @private
  */
-export const node = <A>(
+export const node = <A, C>(
     tag: string,
     attributes: AttributeMap<A>,
-    children: Child[]): Part => {
+    children: Content[],
+    view: AppView<C>): Node => {
 
     var e = document.createElement(tag);
 
@@ -364,13 +324,18 @@ export const node = <A>(
 
         });
 
-    let _id = (<any>attributes['wml']).id;
-    let _group = (<Attrs><any>attributes).wml.group;
-    let id = _id ? { [_id]: e } : {};
-    let group = _group ? { [_group]: [e] } : {};
+    children.forEach(c => adopt(c, e));
 
-    return children.reduce<Part>((p: Part, c: Child): Part => (c instanceof Part) ? p.merge(c) :
-        p.adopt(c), new Part(id, group, [], e));
+    let id = (<any>attributes['wml']).id;
+    let group = (<Attrs><any>attributes).wml.group;
+
+    if (id)
+        view.register(id, e);
+
+    if (group)
+        view.registerGroup(group, e);
+
+    return e;
 
 }
 
@@ -384,30 +349,34 @@ export const node = <A>(
  * @return {Widget}
  */
 export const widget =
-    <A extends Attrs>(
+    <C, A>(
         Constructor: WidgetConstructor<A>,
         attributes: A,
-        children: Child[]): Part => {
+        children: Content[],
+        view: AppView<C>): Content => {
 
-        let childs = children.map(c => c instanceof Part ? c.node : c);
+        var childs: Content[] = [];
+        var w;
 
-        let w = new Constructor(attributes, childs);
-        let _id = (<any>attributes['wml']).id;
-        let _group = (<Attrs><any>attributes).wml.group;
-        let id = _id ? { [_id]: w } : {};
-        let group = _group ? { [_group]: [w] } : {};
-        let node = w.render();
+        children.forEach(child => (child instanceof Array) ?
+            childs.push.apply(childs, child) : childs.push(child));
 
-        return children.reduce<Part>((p, c) => c instanceof Part ?
-            p.merge(c) : p, new Part(id, group, [w], node));
+        w = new Constructor(attributes, childs);
+
+        let id = (<Attrs><any>attributes).wml.id;
+        let group = (<Attrs><any>attributes).wml.group;
+
+        if (id)
+            view.register(id, w);
+
+        if (group)
+            view.registerGroup(group, w);
+
+        view.widgets.push(w);
+
+        return w.render();
 
     }
-
-/**
- * @private
- * unpart
- */
-export const unpart = (p: Child): Content => (p instanceof Part) ? p.node : p;
 
 /**
  * ifthen provides an if then expression
@@ -474,6 +443,26 @@ export class AppView<C> implements View {
 
     constructor(public context: C) { }
 
+    register(id: string, w: WMLElement): AppView<C> {
+
+        if (this.ids.hasOwnProperty(id))
+            throw new Error(`Duplicate id '${id}' detected!`);
+
+        this.ids[id] = w;
+
+        return this;
+
+    }
+
+    registerGroup(group: string, e: WMLElement): AppView<C> {
+
+        this.groups[group] = this.groups[group] || [];
+        this.groups[group].push(e);
+
+        return this;
+
+    }
+
     findById<A extends WMLElement>(id: string): Maybe<A> {
 
         return Maybe.fromAny<A>(<A>this.ids[id]);
@@ -520,7 +509,7 @@ export class AppView<C> implements View {
         this.widgets.forEach(w => w.removed());
         this.widgets = [];
         this._fragRoot = null;
-        this.tree = this.template(this.context);
+        this.tree = this.template(this.context, this);
         this.ids['root'] = (this.ids['root']) ? this.ids['root'] : this.tree;
 
         if (this.tree.nodeName === (document.createDocumentFragment()).nodeName)
@@ -533,4 +522,3 @@ export class AppView<C> implements View {
     }
 
 }
-

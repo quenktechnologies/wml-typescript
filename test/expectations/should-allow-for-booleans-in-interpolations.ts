@@ -2,17 +2,16 @@
 import * as $wml from '../../src';
 
 
-
-
- 
 export class Main extends $wml.AppView<void> {
 
     constructor(context: void) {
 
         super(context);
 
+        let ___view = this;
+
         this.template = (___ctx:void) =>
-          $wml.unpart($wml.node('bool', {html : { active : true   } ,wml : {  } }, [$wml.domify((fun  ()) ? false  : true  ) ]) )
+          $wml.node('bool', {html : { active : true   } ,wml : {  } }, [$wml.domify((fun  ()) ? false  : true  ) ], ___view) ;
 
        }
 

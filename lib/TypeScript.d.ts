@@ -7,11 +7,11 @@ export declare const view: (id: string, typeClasses: string, params: string, ctx
 /**
  * code turns an AST into typescript code.
  */
-export declare const code: (n: nodes.Module, _: Options) => string;
+export declare const code: (n: nodes.Module, o: Options) => string;
 /**
  * module2TS converts a module to a typescript module.
  */
-export declare const module2TS: (n: nodes.Module) => string;
+export declare const module2TS: (n: nodes.Module, {module}: Options) => string;
 /**
  * exports2TS converts various exports to typescript.
  */

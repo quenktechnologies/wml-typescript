@@ -1,7 +1,6 @@
 
 import * as $wml from '../../src';
 
-
-export {_view}; 
+export {_view} from 'somewhere';
 
 
