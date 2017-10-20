@@ -580,9 +580,22 @@ unary_expression
           ;
 
 simple_expression
-          : (construct_expression | call_expression | member_expression 
+          : (view_construction|fun_application|construct_expression | call_expression | member_expression 
              | literal | context_property | cons | identifier | context_variable)
             { $$ = $1; }
+          ;
+
+view_construction
+          :  '<' cons arguments '>'
+            { $$ = new yy.ast.ViewConstruction($2, $3, @$); }
+          ;
+
+fun_application
+          :  '<' identifier type_arguments arguments '>'
+            { $$ = new yy.ast.FunApplication($2, $3, $4, @$); }
+
+          |  '<' identifier arguments '>'
+            { $$ = new yy.ast.FunApplication($2, [], $3, @$); }
           ;
 
 construct_expression

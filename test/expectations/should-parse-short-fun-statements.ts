@@ -2,6 +2,6 @@
 import * as $wml from '../../src';
 
 
-export function vue($view) { return $wml.widget(View, {html : {  } ,wml : {  } }, [], $view); } 
+export const vue = ()=><C>($view:$wml.AppView<C>)=>$wml.widget(View, {html : {  } ,wml : {  } }, [], $view);
 
 

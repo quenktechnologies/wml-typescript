@@ -15,8 +15,6 @@ const _throwNotKnown = (n: nodes.AST): string => {
 
 }
 
-const _appendView = (s: string) => s === '' ? VIEW : `${s},${VIEW}`;
-
 const noop = () => `function () {}`;
 /**
  * view template.
@@ -155,9 +153,10 @@ export const viewStatement2TS = (n: nodes.ViewStatement) =>
  * funStatement2TS converts a function statement to typescript.
  */
 export const funStatement2TS = (n: nodes.FunStatement) =>
-    `export function ${unqualifiedIdentifier2TS(n.id)}${typeClasses2TS(n.typeClasses)}` +
-    `(${_appendView(n.parameters.map(parameter2TS).join(','))}) ` +
-    `{ return ${Array.isArray(n.body) ? children2TS(n.body) : child2TS(n.body)}; } `;
+    `export const ${unqualifiedIdentifier2TS(n.id)} = ` +
+    `${typeClasses2TS(n.typeClasses)}(${n.parameters.map(parameter2TS).join(',')})=>` +
+    `<C>(${VIEW}:$wml.AppView<C>)=>` +
+    `${Array.isArray(n.body) ? children2TS(n.body) : child2TS(n.body)};`;
 
 /**
  * typeClasses2TS converts a list of typeclasses into the a list of typescript typeclasses.
@@ -335,6 +334,10 @@ export const expression2TS = (n: nodes.Expression): string => {
         return binaryExpression2TS(n)
     else if (n instanceof nodes.UnaryExpression)
         return unaryExpression2TS(n);
+    else if (n instanceof nodes.ViewConstruction)
+        return viewConstruction2TS(n);
+    else if (n instanceof nodes.FunApplication)
+        return funApplication2TS(n);
     else if (n instanceof nodes.ConstructExpression)
         return constructExpression2TS(n);
     else if (n instanceof nodes.CallExpression)
@@ -393,10 +396,23 @@ export const convertOperator = (op: string) =>
             op;
 
 /**
- * unaryExpression2TS converts a unary expression to typescript
+ * unaryExpression2TS converts a unary expression to typescript.
  */
 export const unaryExpression2TS = (n: nodes.UnaryExpression) =>
     `${n.operator} (${expression2TS(n.expression)})`;
+
+/**
+ * viewConstruction2TS convers a view construction to typescript.
+ */
+export const viewConstruction2TS = (n: nodes.ViewConstruction) =>
+    `(new ${constructor2TS(n.cons)}(${args2TS(n.args)})).render()`;
+
+/**
+ * funApplication2TS converts a fun application to typescript.
+ */
+export const funApplication2TS = (n: nodes.FunApplication) =>
+    `${expression2TS(n.target)} ${typeArgs2TS(n.typeArgs)} ` +
+    `(${args2TS(n.args)})(${VIEW})`;
 
 /**
  * constructExpression2TS converts a construct expression to a typescript new expression.

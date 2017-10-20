@@ -267,6 +267,16 @@ tests = {
 
         input: '{% main (Date) %} <p>{{@toString()}}</p>'
 
+    },
+    'should allow view construction': {
+
+        input: '<p>{{ <Panel(1,2,3)> }}</p>'
+
+    },
+    'should allow fun application': {
+
+        input: '<p>{{ <panel(1,2,3)> }}</p>'
+
     }
 
 };

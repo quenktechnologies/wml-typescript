@@ -368,6 +368,8 @@ export type Expression
     = IfThenExpression
     | BinaryExpression
     | UnaryExpression
+    | ViewConstruction
+    | FunApplication
     | ConstructExpression
     | CallExpression
     | MemberExpression
@@ -411,6 +413,29 @@ export class UnaryExpression {
     constructor(
         public operator: string,
         public expression: Expression) { }
+
+}
+
+export class ViewConstruction {
+
+  type = 'view-construction';
+
+  constructor(
+    public cons: Constructor,
+    public args: Expression[],
+    public location: Location){}
+
+}
+
+export class FunApplication {
+
+  type = 'fun-application';
+
+  constructor(
+   public target: Expression,
+        public typeArgs: Type[],
+        public args: Expression[],
+        public location: Location) { }
 
 }
 

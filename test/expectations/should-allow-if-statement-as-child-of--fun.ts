@@ -2,6 +2,6 @@
 import * as $wml from '../../src';
 
 
-export function ate(o:object   ,$view) { return $wml.ifthen(a, function then(){ return $wml.domify(a)  }, function else_clause() { return $wml.domify(a)  } ) ; } 
+export const ate = (o:object   )=><C>($view:$wml.AppView<C>)=>$wml.ifthen(a, function then(){ return $wml.domify(a)  }, function else_clause() { return $wml.domify(a)  } ) ;
 
 

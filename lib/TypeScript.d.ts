@@ -155,9 +155,17 @@ export declare const binaryExpression2TS: (n: nodes.BinaryExpression) => string;
  */
 export declare const convertOperator: (op: string) => string;
 /**
- * unaryExpression2TS converts a unary expression to typescript
+ * unaryExpression2TS converts a unary expression to typescript.
  */
 export declare const unaryExpression2TS: (n: nodes.UnaryExpression) => string;
+/**
+ * viewConstruction2TS convers a view construction to typescript.
+ */
+export declare const viewConstruction2TS: (n: nodes.ViewConstruction) => string;
+/**
+ * funApplication2TS converts a fun application to typescript.
+ */
+export declare const funApplication2TS: (n: nodes.FunApplication) => string;
 /**
  * constructExpression2TS converts a construct expression to a typescript new expression.
  */

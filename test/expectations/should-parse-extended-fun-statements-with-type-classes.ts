@@ -2,6 +2,6 @@
 import * as $wml from '../../src';
 
 
-export function vue< A  ,B extends C   ,C  >(a:A   ,b:B   ,$view) { return $wml.domify(((a + b)  + c) ) ; } 
+export const vue = < A  ,B extends C   ,C  >(a:A   ,b:B   )=><C>($view:$wml.AppView<C>)=>$wml.domify(((a + b)  + c) ) ;
 
 
