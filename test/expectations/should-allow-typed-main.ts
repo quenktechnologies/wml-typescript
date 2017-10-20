@@ -2,16 +2,16 @@
 import * as $wml from '../../src';
 
 
+
+
 export class Main extends $wml.AppView<Date  > {
 
     constructor(context: Date  ) {
 
         super(context);
 
-        let ___view = this;
-
-        this.template = (___ctx:Date  ) =>
-          $wml.node('p', {html : {  } ,wml : {  } }, [$wml.domify(___ctx.toString  ()) ], ___view) ;
+        this.template = ($context:Date  , $view:$wml.AppView<Date  >) =>
+          $wml.node('p', {html : {  } ,wml : {  } }, [$wml.domify($context.toString  ()) ], $view) ;
 
        }
 

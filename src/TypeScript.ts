@@ -2,6 +2,9 @@ import * as nodes from './AST';
 import * as afpl from 'afpl';
 import { Options } from './';
 
+const CONTEXT = '$context';
+const VIEW = '$view';
+
 /**
  * Types and functions for generating typescript program text.
  */
@@ -12,7 +15,7 @@ const _throwNotKnown = (n: nodes.AST): string => {
 
 }
 
-const _appendView = (s: string) => s === '' ? '___view' : `${s},___view`;
+const _appendView = (s: string) => s === '' ? VIEW : `${s},${VIEW}`;
 
 const noop = () => `function () {}`;
 /**
@@ -25,7 +28,7 @@ export const view = (id: string, typeClasses: string, params: string, ctx: strin
 
         super(context);
 
-        this.template = (___ctx:${ctx}, ___view:$wml.AppView<${ctx}>) =>
+        this.template = (${CONTEXT}:${ctx}, ${VIEW}:$wml.AppView<${ctx}>) =>
           ${tag ? tag : '<Node>document.createDocumentFragment()'};
 
        }
@@ -240,8 +243,8 @@ export const tag2TS = (n: nodes.Tag) => {
     let attrs = attrs2String(groupAttrs(n.attributes));
     let name = identifierOrConstructor2TS(n.open);
 
-    return (n.type === 'widget') ? `$wml.widget(${name}, ${attrs}, [${children}], ___view)` :
-        `$wml.node('${name}', ${attrs}, [${children}], ___view) `;
+    return (n.type === 'widget') ? `$wml.widget(${name}, ${attrs}, [${children}], ${VIEW})` :
+        `$wml.node('${name}', ${attrs}, [${children}], ${VIEW}) `;
 
 }
 
@@ -496,12 +499,12 @@ export const key2TS = (n: nodes.StringLiteral | nodes.UnqualifiedIdentifier) =>
  * property access.
  */
 export const contextProperty2TS = (n: nodes.ContextProperty) =>
-    `___ctx.${identifier2TS(n.member)}`;
+    `${CONTEXT}.${identifier2TS(n.member)}`;
 
 /**
  * contextVariable2TS turns the context variable into the context identifier.
  */
-export const contextVariable2TS = (_: nodes.ContextVariable) => `___ctx`;
+export const contextVariable2TS = (_: nodes.ContextVariable) => `${CONTEXT}`;
 
 /**
  * identifierOrConstructor2TS
