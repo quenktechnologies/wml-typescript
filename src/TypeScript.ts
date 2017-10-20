@@ -2,8 +2,8 @@ import * as nodes from './AST';
 import * as afpl from 'afpl';
 import { Options } from './';
 
-const CONTEXT = '$context';
-const VIEW = '$view';
+const CONTEXT = '___context';
+const VIEW = '___view';
 
 /**
  * Types and functions for generating typescript program text.
