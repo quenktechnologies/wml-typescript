@@ -118,6 +118,17 @@ export interface Template<C> {
 }
 
 /**
+ * ContentProvider is the type of the function fun statements return.
+ * The <C> typeclass is the context the ContentProvider is 
+ * expected to be used in.
+ */
+export interface ContentProvider<C> {
+
+    (view: AppView<C>): Content
+
+}
+
+/**
  * Component is an abstract Widget implementation
  * that can be used instead of manually implementing the whole interface.
  *
