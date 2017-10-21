@@ -10,8 +10,8 @@ export class Main extends $wml.AppView<void> {
 
         super(context);
 
-        this.template = ($context:void, $view:$wml.AppView<void>) =>
-          $wml.node('button', {html : { onclick : function function_expression(e ){ return $context.call  (e) }   } ,wml : {  } }, [], $view) ;
+        this.template = (___context:void, ___view:$wml.AppView<void>) =>
+          $wml.node('button', {html : { onclick : function function_expression(e ){ return ___context.call  (e) }   } ,wml : {  } }, [], ___view) ;
 
        }
 

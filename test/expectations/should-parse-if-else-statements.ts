@@ -10,8 +10,8 @@ export class Main extends $wml.AppView<void> {
 
         super(context);
 
-        this.template = ($context:void, $view:$wml.AppView<void>) =>
-          $wml.widget(Tag, {html : {  } ,wml : {  } }, [$wml.ifthen(value, function then(){ return $wml.node('text', {html : {  } ,wml : {  } }, [$wml.text(`Text`)], $view)  }, function else_clause() { return $wml.node('text', {html : {  } ,wml : {  } }, [$wml.text(`else`)], $view)  } ) ], $view);
+        this.template = (___context:void, ___view:$wml.AppView<void>) =>
+          $wml.widget(Tag, {html : {  } ,wml : {  } }, [$wml.ifthen(value, function then(){ return $wml.node('text', {html : {  } ,wml : {  } }, [$wml.text(`Text`)], ___view)  }, function else_clause() { return $wml.node('text', {html : {  } ,wml : {  } }, [$wml.text(`else`)], ___view)  } ) ], ___view);
 
        }
 

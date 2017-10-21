@@ -10,8 +10,8 @@ export class Main extends $wml.AppView<Date  > {
 
         super(context);
 
-        this.template = ($context:Date  , $view:$wml.AppView<Date  >) =>
-          $wml.node('p', {html : {  } ,wml : {  } }, [$wml.domify($context.toString  ()) ], $view) ;
+        this.template = (___context:Date  , ___view:$wml.AppView<Date  >) =>
+          $wml.node('p', {html : {  } ,wml : {  } }, [$wml.domify(___context.toString  ()) ], ___view) ;
 
        }
 

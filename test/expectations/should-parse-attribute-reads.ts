@@ -10,8 +10,8 @@ export class Main extends $wml.AppView<void> {
 
         super(context);
 
-        this.template = ($context:void, $view:$wml.AppView<void>) =>
-          $wml.node('p', {html : { class : concat  ([x,$wml.read < string  >(`ww:class`, someValue ),$wml.read < string  >(`ww:variant`, some.other.value  ,`default`)])  } ,wml : {  } }, [], $view) ;
+        this.template = (___context:void, ___view:$wml.AppView<void>) =>
+          $wml.node('p', {html : { class : concat  ([x,$wml.read < string  >(`ww:class`, someValue ),$wml.read < string  >(`ww:variant`, some.other.value  ,`default`)])  } ,wml : {  } }, [], ___view) ;
 
        }
 

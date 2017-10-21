@@ -31,13 +31,16 @@ function makeTest(test, index) {
 
     if (!test.skip) {
 
-        compare(json(parse(test.input)), fs.readFileSync(`./test/expectations/${file}.json`, {
-            encoding: 'utf8'
-        }));
-
-        compare(compile(test.input), fs.readFileSync(`./test/expectations/${file}.ts`, {
-            encoding: 'utf8'
-        }));
+        parse(test.input)
+            .map(json)
+            .map(txt => compare(txt, fs.readFileSync(`./test/expectations/${file}.json`, {
+                encoding: 'utf8'
+            })))
+            .chain(() => compile(test.input, { module: '../../src' }))
+            .map(txt => compare(txt, fs.readFileSync(`./test/expectations/${file}.ts`, {
+                encoding: 'utf8'
+            })))
+            .cata(e => { throw e; }, () => { });
 
     }
 
