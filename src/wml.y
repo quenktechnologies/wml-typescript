@@ -298,25 +298,66 @@ view_statement
           ;
 
 fun_statement
-          : '{%' FUN unqualified_identifier type_classes parameters '=' child '%}'
-            {$$ = new yy.ast.FunStatement($3, $4, $5, $7, @$);    }
 
-          | '{%' FUN unqualified_identifier parameters '=' child '%}'
-            {$$ = new yy.ast.FunStatement($3, [], $4, $6, @$);    }
+          : '{%' FUN unqualified_identifier type_classes context_type parameters '%}' 
+            children '{%' ENDFUN '%}'
+            { $$ = new yy.ast.FunStatement($3, $4, $5, $6, $8, @$); }
 
-          | '{%' FUN unqualified_identifier '=' child '%}' 
-            {$$ = new yy.ast.FunStatement($3, [], [], $5, @$);        }
-
-          | '{%' FUN unqualified_identifier '%}' children '{%' ENDFUN '%}'
-            {$$ = new yy.ast.FunStatement($3, [], [], $5, @$);        }
+          | '{%' FUN unqualified_identifier type_classes context_type '%}' 
+            children '{%' ENDFUN '%}'
+            { $$ = new yy.ast.FunStatement($3, $4, $5, [], $7, @$); }
 
           | '{%' FUN unqualified_identifier type_classes parameters '%}' 
             children '{%' ENDFUN '%}'
-            {$$ = new yy.ast.FunStatement($3, $4, $5, $7, @$);    }
+            { $$ = new yy.ast.FunStatement($3, $4, null, $5, $7, @$); }
+
+          | '{%' FUN unqualified_identifier type_classes '%}' 
+            children '{%' ENDFUN '%}'
+            { $$ = new yy.ast.FunStatement($3, $4, null, [], $6, @$); }
+
+          | '{%' FUN unqualified_identifier context_type parameters '%}' 
+            children '{%' ENDFUN '%}'
+            { $$ = new yy.ast.FunStatement($3, [], $4, $5, $7, @$); }
+
+          | '{%' FUN unqualified_identifier context_type '%}' 
+            children '{%' ENDFUN '%}'
+            { $$ = new yy.ast.FunStatement($3, [], $4, [], $6, @$); }
 
           | '{%' FUN unqualified_identifier parameters '%}' 
             children '{%' ENDFUN '%}'
-            {$$ = new yy.ast.FunStatement($3, [], $4, $6, @$);    }
+            { $$ = new yy.ast.FunStatement($3,[],null,$4,$6,@$); }
+
+          | '{%' FUN unqualified_identifier '%}' children '{%' ENDFUN '%}'
+            { $$ = new yy.ast.FunStatement($3,[],null,[],$5,@$); }
+
+          | '{%' FUN unqualified_identifier type_classes context_type parameters '=' child '%}' 
+            { $$ = new yy.ast.FunStatement($3, $4, $5, $6, $8, @$); }
+
+          | '{%' FUN unqualified_identifier type_classes context_type '=' child '%}' 
+            { $$ = new yy.ast.FunStatement($3, $4, $5, [], $7, @$); }
+
+          | '{%' FUN unqualified_identifier type_classes parameters '=' child '%}' 
+            { $$ = new yy.ast.FunStatement($3, $4, null, $5, $7, @$); }
+
+          | '{%' FUN unqualified_identifier type_classes '=' child '%}' 
+            { $$ = new yy.ast.FunStatement($3, $4, null, [], $6, @$); }
+
+          | '{%' FUN unqualified_identifier context_type parameters '=' child '%}' 
+            { $$ = new yy.ast.FunStatement($3, [], $4, $5, $7, @$); }
+
+          | '{%' FUN unqualified_identifier context_type '=' child '%}' 
+            { $$ = new yy.ast.FunStatement($3, [], $4, [], $6, @$); }
+
+          | '{%' FUN unqualified_identifier parameters '=' child '%}' 
+            { $$ = new yy.ast.FunStatement($3,[],null,$4,$6,@$); }
+
+          | '{%' FUN unqualified_identifier '=' child '%}'
+            { $$ = new yy.ast.FunStatement($3,[],null,[],$5,@$); }
+          ;
+
+context_type
+          : '(' type ')'
+            { $$ = $2; }
           ;
 
 type_classes
@@ -346,8 +387,8 @@ type_class
           ;
 
 type 
-          : (unqualified_identifier|cons) type_classes?
-            {$$ = new yy.ast.Type($1, $2||[], @$);                             }
+          : cons type_classes?
+            { $$ = new yy.ast.Type($1, $2||[], @$); }               
           ;
 
 parameters
@@ -591,11 +632,30 @@ view_construction
           ;
 
 fun_application
-          :  '<' identifier type_arguments arguments '>'
-            { $$ = new yy.ast.FunApplication($2, $3, $4, @$); }
+          : '<' identifier type_arguments arguments arguments '>'
+            { $$ = new yy.ast.FunApplication($2, $3, $4, $5, @$); }
+
+          |  '<' identifier type_arguments arguments '>'
+            { $$ = new yy.ast.FunApplication($2, $3, [], $4, @$); } 
+
+          |  '<' identifier arguments arguments '>'
+           { $$ = new yy.ast.FunApplication($2, [], $3, $4, @$); }
 
           |  '<' identifier arguments '>'
-            { $$ = new yy.ast.FunApplication($2, [], $3, @$); }
+           { $$ = new yy.ast.FunApplication($2, [], [], $3, @$); }
+          ;
+
+type_arguments
+          : '[' type_arg_list ']'
+            { $$ = $2; }
+          ;
+
+type_arg_list
+          :  type 
+            { $$ = [$1]; }
+          
+          |  type_arg_list ',' type
+            { $$ = $1.concat($3); }
           ;
 
 construct_expression
@@ -817,3 +877,4 @@ binary_operator
           : ('>'|'>='|'<'|'<='|'=='|'!='|'+'|'/'|'-'|'='|'&&'|'||'|'^'|INSTANCEOF)
             { $$ = $1; }
           ;
+

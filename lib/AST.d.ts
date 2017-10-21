@@ -115,11 +115,12 @@ export declare class ViewStatement {
 export declare class FunStatement {
     id: UnqualifiedIdentifier;
     typeClasses: TypeClass[];
+    context: Type;
     parameters: Parameter[];
     body: Child | Child[];
     location: Location;
     type: string;
-    constructor(id: UnqualifiedIdentifier, typeClasses: TypeClass[], parameters: Parameter[], body: Child | Child[], location: Location);
+    constructor(id: UnqualifiedIdentifier, typeClasses: TypeClass[], context: Type, parameters: Parameter[], body: Child | Child[], location: Location);
 }
 /**
  * TypeClass
@@ -251,18 +252,19 @@ export declare class UnaryExpression {
 }
 export declare class ViewConstruction {
     cons: Constructor;
-    args: Expression[];
+    context: Expression[];
     location: Location;
     type: string;
-    constructor(cons: Constructor, args: Expression[], location: Location);
+    constructor(cons: Constructor, context: Expression[], location: Location);
 }
 export declare class FunApplication {
     target: Expression;
     typeArgs: Type[];
+    context: Expression[];
     args: Expression[];
     location: Location;
     type: string;
-    constructor(target: Expression, typeArgs: Type[], args: Expression[], location: Location);
+    constructor(target: Expression, typeArgs: Type[], context: Expression[], args: Expression[], location: Location);
 }
 export declare class ConstructExpression {
     cons: Constructor;

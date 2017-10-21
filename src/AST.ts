@@ -36,7 +36,7 @@ export class Module {
         public imports: ImportStatement[],
         public exports: Export[],
         public main: Main,
-        public location:Location) { }
+        public location: Location) { }
 
 }
 
@@ -178,6 +178,7 @@ export class FunStatement {
     constructor(
         public id: UnqualifiedIdentifier,
         public typeClasses: TypeClass[],
+        public context: Type,
         public parameters: Parameter[],
         public body: Child | Child[],
         public location: Location) { }
@@ -418,22 +419,23 @@ export class UnaryExpression {
 
 export class ViewConstruction {
 
-  type = 'view-construction';
+    type = 'view-construction';
 
-  constructor(
-    public cons: Constructor,
-    public args: Expression[],
-    public location: Location){}
+    constructor(
+        public cons: Constructor,
+        public context: Expression[],
+        public location: Location) { }
 
 }
 
 export class FunApplication {
 
-  type = 'fun-application';
+    type = 'fun-application';
 
-  constructor(
-   public target: Expression,
+    constructor(
+        public target: Expression,
         public typeArgs: Type[],
+        public context: Expression[],
         public args: Expression[],
         public location: Location) { }
 

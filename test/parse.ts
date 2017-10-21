@@ -165,7 +165,7 @@ tests = {
 
     'should parse short fun statements with arguments': {
 
-        input: '{% fun vue(a,b,c:string) = <View a={{a}} b={{b}} c={{c}}/> %}'
+        input: '{% fun vue(a,b,c:String) = <View a={{a}} b={{b}} c={{c}}/> %}'
 
     },
 
@@ -183,7 +183,7 @@ tests = {
 
     'should parse extended fun statements with arguments': {
 
-        input: '{% fun vue(a,b,c:string) %}<View a={{a}} b={{b}} c={{c}}/> {% endfun %}'
+        input: '{% fun vue(a,b,c:String) %}<View a={{a}} b={{b}} c={{c}}/> {% endfun %}'
 
     },
 
@@ -217,7 +217,7 @@ tests = {
     },
     'should allow if statement as child of  fun': {
 
-        input: '{% fun ate (o:object) %} {% if a %} {{a}} {% else %} {{a}} {% endif %} {% endfun %}'
+        input: '{% fun ate (o:Object) %} {% if a %} {{a}} {% else %} {{a}} {% endif %} {% endfun %}'
 
     },
     'should allow for booleans in interpolations': {
@@ -238,7 +238,7 @@ tests = {
     },
     'should parse typed views': {
 
-        input: '{% view Main (Context[string]) %} <p>{{@value}}</p>{% endview %}'
+        input: '{% view Main (Context[String]) %} <p>{{@value}}</p>{% endview %}'
 
     },
     'should parse typed views with type classes': {
@@ -248,7 +248,7 @@ tests = {
     },
     'should parse attribute reads': {
 
-        input: `<p class={{concat([x, someValue['ww:class' as string ], some.other.value['ww:variant' as string ?'default']])}}/>`
+        input: `<p class={{concat([x, someValue['ww:class' as String ], some.other.value['ww:variant' as String ?'default']])}}/>`
 
     },
     'should parse context variables': {
@@ -258,7 +258,7 @@ tests = {
     },
     'should allow read expressions in if expressions': {
 
-        input: `<p>{% if @taggin['attr' as string] %}x{% else %} yz fefd {% endif %}</p>`
+        input: `<p>{% if @taggin['attr' as String] %}x{% else %} yz fefd {% endif %}</p>`
 
     },
     'should allow construct expression': {
@@ -273,12 +273,22 @@ tests = {
     },
     'should allow view construction': {
 
-        input: '<p>{{ <Panel(1,2,3)> }}</p>'
+        input: '<p>{{ <Panel(@)> }}</p>'
 
     },
     'should allow fun application': {
 
         input: '<p>{{ <panel(1,2,3)> }}</p>'
+
+    },
+    'should allow fun application with context': {
+
+        input: '<div>{{ <panel(@)(12)> }}</div>'
+
+    },
+    'should allow fun statements to specify a context (part 2)': {
+
+        input: `{% fun action (Date)(n:String) %} <p>{{n}}</p> {% endfun %}`
 
     }
 

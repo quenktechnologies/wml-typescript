@@ -149,13 +149,18 @@ export const viewStatement2TS = (n: nodes.ViewStatement) =>
         n.parameters.map(parameter2TS).join(','),
         type2TS(n.context), tag2TS(n.tag));
 
+const _funContext = (n: nodes.Type) => `(${CONTEXT}:${type2TS(n)})=>`;
+
+const _funView = () => `(${VIEW}:$wml.View)=>`;
+
 /**
  * funStatement2TS converts a function statement to typescript.
  */
 export const funStatement2TS = (n: nodes.FunStatement) =>
     `export const ${unqualifiedIdentifier2TS(n.id)} = ` +
     `${typeClasses2TS(n.typeClasses)}(${n.parameters.map(parameter2TS).join(',')})=>` +
-    `<C>(${VIEW}:$wml.AppView<C>)=>` +
+    ((n.context != null) ? _funContext(n.context) : '') +
+    _funView() +
     `${Array.isArray(n.body) ? children2TS(n.body) : child2TS(n.body)};`;
 
 /**
@@ -405,14 +410,17 @@ export const unaryExpression2TS = (n: nodes.UnaryExpression) =>
  * viewConstruction2TS convers a view construction to typescript.
  */
 export const viewConstruction2TS = (n: nodes.ViewConstruction) =>
-    `(new ${constructor2TS(n.cons)}(${args2TS(n.args)})).render()`;
+    `(new ${constructor2TS(n.cons)}(${args2TS(n.context)})).render()`;
+
+const _applyFun = (context: nodes.Expression[]) =>
+    (context.length > 0 ? `(${args2TS(context)})` : '') + `(${VIEW})`;
 
 /**
  * funApplication2TS converts a fun application to typescript.
  */
 export const funApplication2TS = (n: nodes.FunApplication) =>
     `${expression2TS(n.target)} ${typeArgs2TS(n.typeArgs)} ` +
-    `(${args2TS(n.args)})(${VIEW})`;
+    `(${args2TS(n.args)})${_applyFun(n.context)}`
 
 /**
  * constructExpression2TS converts a construct expression to a typescript new expression.

@@ -82,6 +82,23 @@ export interface View extends Renderable {
      */
     findGroupByName(name: string): Maybe<WMLElement[]>;
 
+    /**
+     * registerWidget registers a widget with the view.
+     * 
+     * This widget will be notified during lifecycle event.
+     */
+    registerWidget(w: Widget): View;
+
+    /**
+     * registerById a WMLElement with this View.
+     */
+    registerById(id: string, w: WMLElement): View;
+
+    /**
+     * registerByGroup a WMLELement with this View.
+     */
+    registerByGroup(group: string, e: WMLElement): View;
+
 }
 
 /**
@@ -113,7 +130,7 @@ export interface Widget extends Renderable {
  */
 export interface Template<C> {
 
-    (context: C, view: AppView<C>): Content
+    (context: C, view: View): Content
 
 }
 
@@ -122,9 +139,9 @@ export interface Template<C> {
  * The <C> typeclass is the context the ContentProvider is 
  * expected to be used in.
  */
-export interface ContentProvider<C> {
+export interface ContentProvider {
 
-    (view: AppView<C>): Content
+    (view: View): Content
 
 }
 
@@ -307,11 +324,11 @@ export const text = (value: boolean | number | string): Text =>
  * node is called to create a regular DOM node
  * @private
  */
-export const node = <A, C>(
+export const node = <A>(
     tag: string,
     attributes: AttributeMap<A>,
     children: Content[],
-    view: AppView<C>): Node => {
+    view: View): Node => {
 
     var e = document.createElement(tag);
 
@@ -341,10 +358,10 @@ export const node = <A, C>(
     let group = (<Attrs><any>attributes).wml.group;
 
     if (id)
-        view.register(id, e);
+        view.registerById(id, e);
 
     if (group)
-        view.registerGroup(group, e);
+        view.registerByGroup(group, e);
 
     return e;
 
@@ -360,11 +377,11 @@ export const node = <A, C>(
  * @return {Widget}
  */
 export const widget =
-    <C, A>(
+    <A>(
         Constructor: WidgetConstructor<A>,
         attributes: A,
         children: Content[],
-        view: AppView<C>): Content => {
+        view: View): Content => {
 
         var childs: Content[] = [];
         var w;
@@ -378,12 +395,12 @@ export const widget =
         let group = (<Attrs><any>attributes).wml.group;
 
         if (id)
-            view.register(id, w);
+            view.registerById(id, w);
 
         if (group)
-            view.registerGroup(group, w);
+            view.registerByGroup(group, w);
 
-        view.widgets.push(w);
+        view.registerWidget(w);
 
         return w.render();
 
@@ -454,7 +471,15 @@ export class AppView<C> implements View {
 
     constructor(public context: C) { }
 
-    register(id: string, w: WMLElement): AppView<C> {
+    registerWidget(w: Widget): AppView<C> {
+
+        this.widgets.push(w);
+
+        return this;
+
+    }
+
+    registerById(id: string, w: WMLElement): AppView<C> {
 
         if (this.ids.hasOwnProperty(id))
             throw new Error(`Duplicate id '${id}' detected!`);
@@ -465,7 +490,7 @@ export class AppView<C> implements View {
 
     }
 
-    registerGroup(group: string, e: WMLElement): AppView<C> {
+    registerByGroup(group: string, e: WMLElement): AppView<C> {
 
         this.groups[group] = this.groups[group] || [];
         this.groups[group].push(e);

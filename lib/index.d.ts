@@ -57,6 +57,20 @@ export interface View extends Renderable {
      * Returns a Maybe type from the afpl library.
      */
     findGroupByName(name: string): Maybe<WMLElement[]>;
+    /**
+     * registerWidget registers a widget with the view.
+     *
+     * This widget will be notified during lifecycle event.
+     */
+    registerWidget(w: Widget): View;
+    /**
+     * registerById a WMLElement with this View.
+     */
+    registerById(id: string, w: WMLElement): View;
+    /**
+     * registerByGroup a WMLELement with this View.
+     */
+    registerByGroup(group: string, e: WMLElement): View;
 }
 /**
  *
@@ -82,15 +96,15 @@ export interface Widget extends Renderable {
  * will provide DOM content.
  */
 export interface Template<C> {
-    (context: C, view: AppView<C>): Content;
+    (context: C, view: View): Content;
 }
 /**
  * ContentProvider is the type of the function fun statements return.
  * The <C> typeclass is the context the ContentProvider is
  * expected to be used in.
  */
-export interface ContentProvider<C> {
-    (view: AppView<C>): Content;
+export interface ContentProvider {
+    (view: View): Content;
 }
 /**
  * Component is an abstract Widget implementation
@@ -184,7 +198,7 @@ export declare const text: (value: string | number | boolean) => Text;
  * node is called to create a regular DOM node
  * @private
  */
-export declare const node: <A, C>(tag: string, attributes: AttributeMap<A>, children: Content[], view: AppView<C>) => Node;
+export declare const node: <A>(tag: string, attributes: AttributeMap<A>, children: Content[], view: View) => Node;
 /**
  * widget creates and renders a new wml widget instance.
  * @param {function} Construtor
@@ -194,7 +208,7 @@ export declare const node: <A, C>(tag: string, attributes: AttributeMap<A>, chil
  * @private
  * @return {Widget}
  */
-export declare const widget: <C, A>(Constructor: WidgetConstructor<A>, attributes: A, children: Content[], view: AppView<C>) => Content;
+export declare const widget: <A>(Constructor: WidgetConstructor<A>, attributes: A, children: Content[], view: View) => Content;
 /**
  * ifthen provides an if then expression
  * @private
@@ -229,8 +243,9 @@ export declare class AppView<C> implements View {
     template: Template<C>;
     _fragRoot: Node;
     constructor(context: C);
-    register(id: string, w: WMLElement): AppView<C>;
-    registerGroup(group: string, e: WMLElement): AppView<C>;
+    registerWidget(w: Widget): AppView<C>;
+    registerById(id: string, w: WMLElement): AppView<C>;
+    registerByGroup(group: string, e: WMLElement): AppView<C>;
     findById<A extends WMLElement>(id: string): Maybe<A>;
     findGroupByName(name: string): Maybe<WMLElement[]>;
     invalidate(): void;
