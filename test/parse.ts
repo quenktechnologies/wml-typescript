@@ -294,6 +294,11 @@ tests = {
     'should parse list types': {
 
         input: '{% fun action [A](s: String[], a:A[]) = {{  \'${s}${a}\' }} %}'
+    },
+    'should allow context properties as fun application': {
+
+        input: '<div>{{ <@action()> }}</div>'
+
     }
 
 };
