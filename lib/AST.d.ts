@@ -135,9 +135,10 @@ export declare class TypeClass {
 export declare class Type {
     id: UnqualifiedIdentifier | Constructor;
     typeClasses: TypeClass[];
+    list: boolean;
     location: Location;
     type: string;
-    constructor(id: UnqualifiedIdentifier | Constructor, typeClasses: TypeClass[], location: Location);
+    constructor(id: UnqualifiedIdentifier | Constructor, typeClasses: TypeClass[], list: boolean, location: Location);
 }
 export declare type Parameter = TypedParameter | UntypedParameter;
 export declare class TypedParameter {
