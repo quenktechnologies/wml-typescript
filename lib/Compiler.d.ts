@@ -13,6 +13,10 @@ export interface Options {
  */
 export declare const parse: (str: string, ast?: any) => Either<Error, nodes.Module>;
 /**
+ * pretty up the output.
+ */
+export declare const pretty: (doit: boolean) => (s: string) => string;
+/**
  * compile a string of WML turning it into typescript code.
  */
 export declare const compile: (src: string, options?: Options) => Either<Error, string>;
