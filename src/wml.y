@@ -639,17 +639,23 @@ view_construction
           ;
 
 fun_application
-          : '<' identifier type_arguments arguments arguments '>'
+          : '<' fun_target type_arguments arguments arguments '>'
             { $$ = new yy.ast.FunApplication($2, $3, $4, $5, @$); }
 
-          |  '<' identifier type_arguments arguments '>'
+          |  '<' fun_target type_arguments arguments '>'
             { $$ = new yy.ast.FunApplication($2, $3, [], $4, @$); } 
 
-          |  '<' identifier arguments arguments '>'
+          |  '<' fun_target arguments arguments '>'
            { $$ = new yy.ast.FunApplication($2, [], $3, $4, @$); }
 
-          |  '<' identifier arguments '>'
+          |  '<' fun_target arguments '>'
            { $$ = new yy.ast.FunApplication($2, [], [], $3, @$); }
+          ;
+
+fun_target
+          : identifier
+          | context_property
+          | '(' expression ')'
           ;
 
 type_arguments
