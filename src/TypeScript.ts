@@ -213,7 +213,7 @@ export const untypedParameter2TS = (n: nodes.UntypedParameter) =>
 export const children2TS = (list: nodes.Child[]): string =>
     (list.length === 0) ? 'document.createDocumentFragment();' :
         (list.length === 1) ? child2TS(list[0]) :
-            `$$box(${list.map(l => child2TS(l)).join(',')}) `;
+            `$wml.box(${list.map(l => child2TS(l)).join(',')}) `;
 
 /**
  * child2TS converts children to typescript.
