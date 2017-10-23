@@ -388,7 +388,14 @@ type_class
 
 type 
           : cons type_classes?
-            { $$ = new yy.ast.Type($1, $2||[], @$); }               
+            { $$ = new yy.ast.Type($1, $2||[], false, @$); }               
+
+          | cons type_classes '[' ']'
+            { $$ = new yy.ast.Type($1, $2, true, @$); }
+
+          | cons '[' ']'
+            { $$ = new yy.ast.Type($1, [], true, @$); }
+          
           ;
 
 parameters

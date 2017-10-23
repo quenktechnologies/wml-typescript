@@ -206,6 +206,7 @@ export class Type {
     constructor(
         public id: UnqualifiedIdentifier | Constructor,
         public typeClasses: TypeClass[],
+        public list: boolean,
         public location: Location) { }
 
 }

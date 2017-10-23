@@ -290,6 +290,10 @@ tests = {
 
         input: `{% fun action (Date)(n:String) %} <p>{{n}}</p> {% endfun %}`
 
+    },
+    'should parse list types': {
+
+        input: '{% fun action [A](s: String[], a:A[]) = {{  \'${s}${a}\' }} %}'
     }
 
 };

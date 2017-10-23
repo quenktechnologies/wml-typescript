@@ -4,7 +4,7 @@ import { Options } from './';
 
 const CONTEXT = '___context';
 const VIEW = '___view';
-const prims = ['String','Boolean', 'Number', 'Object', 'Undefined','Null','Void','Never','Any'];
+const prims = ['String', 'Boolean', 'Number', 'Object', 'Undefined', 'Null', 'Void', 'Never', 'Any'];
 
 /**
  * Types and functions for generating typescript program text.
@@ -174,16 +174,18 @@ export const typeClasses2TS = (ns: nodes.TypeClass[]): string =>
  * typeClass2TS converts a typeclass into a typescript typeclass.
  */
 export const typeClass2TS = (n: nodes.TypeClass) =>
-    `${identifierOrConstructor2TS(n.id)} ${n.constraint ? 'extends ' + type2TS(n.constraint) : ''} `;
+    `${identifierOrConstructor2TS(n.id)} `+
+    `${n.constraint ? 'extends ' + type2TS(n.constraint) : ''} `;
 
-const _toPrim = (typ:string)=>
-  prims.indexOf(typ) > -1 ? typ.toLowerCase() : typ;
+const _toPrim = (typ: string) =>
+    prims.indexOf(typ) > -1 ? typ.toLowerCase() : typ;
 
 /**
  * type2TS converts a type hint to a typescript type hint.
  */
 export const type2TS = (n: nodes.Type) =>
-    `${_toPrim(identifierOrConstructor2TS(n.id))} ${typeClasses2TS(n.typeClasses)} `;
+    `${_toPrim(identifierOrConstructor2TS(n.id))} ` +
+    `${typeClasses2TS(n.typeClasses)} ${n.list ? '[]' : ''}`;
 
 /**
  * parameter2TS converts a parameter to a typescript parameter.
