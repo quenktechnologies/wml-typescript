@@ -653,9 +653,14 @@ fun_application
           ;
 
 fun_target
-          : identifier
-          | context_property
+          : identifier 
+            { $$ = $1; }
+
+          | context_property 
+            { $$ = $1; }
+
           | '(' expression ')'
+            { $$ = $2; }
           ;
 
 type_arguments

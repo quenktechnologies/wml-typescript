@@ -174,7 +174,7 @@ export const typeClasses2TS = (ns: nodes.TypeClass[]): string =>
  * typeClass2TS converts a typeclass into a typescript typeclass.
  */
 export const typeClass2TS = (n: nodes.TypeClass) =>
-    `${identifierOrConstructor2TS(n.id)} `+
+    `${identifierOrConstructor2TS(n.id)} ` +
     `${n.constraint ? 'extends ' + type2TS(n.constraint) : ''} `;
 
 const _toPrim = (typ: string) =>
@@ -471,8 +471,8 @@ export const readExpression2TS = (n: nodes.ReadExpression) =>
  * functionExpression2TS converts a function expression to a typescript function expression.
  */
 export const functionExpression2TS = (n: nodes.FunctionExpression) =>
-    `function function_expression(${n.parameters.map(parameter2TS).join(',')})` +
-    `{ return ${expression2TS(n.body)} } `;
+    `(${n.parameters.map(parameter2TS).join(',')})=>` +
+    `${expression2TS(n.body)};`;
 
 /**
  * literal2TS converts literals.
