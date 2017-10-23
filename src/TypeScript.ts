@@ -472,7 +472,7 @@ export const readExpression2TS = (n: nodes.ReadExpression) =>
  */
 export const functionExpression2TS = (n: nodes.FunctionExpression) =>
     `(${n.parameters.map(parameter2TS).join(',')})=>` +
-    `${expression2TS(n.body)};`;
+    `${expression2TS(n.body)}`;
 
 /**
  * literal2TS converts literals.
