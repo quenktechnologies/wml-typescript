@@ -24,7 +24,7 @@ function makeTest(test, index) {
         return parse(test.input)
             .map(json)
             .map(txt => { fs.writeFileSync(`./test/expectations/${file}.json`, txt); })
-            .chain(() => compile(test.input, { module: '../../src' }))
+            .chain(() => compile(test.input, { module: '../../src', pretty: true }))
             .map(txt => { fs.writeFileSync(`./test/expectations/${file}.ts`, txt); })
             .cata(e => { throw e; }, () => { });
     }

@@ -71,7 +71,7 @@ Options:
   -h --help          Show this screen.
   --extension ext    The file extension to use when writing files. [default: js]
   --es5              Output ES5 javascript.
-  --pretty           Pretty prints the output. (not implemented yet)
+  --pretty           Pretty prints the output.
   --version          Show version.
 `, {
         version: require('../package.json').version
