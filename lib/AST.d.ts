@@ -77,13 +77,14 @@ export declare class CompositeMember {
 export declare type Member = UnqualifiedIdentifier | UnqualifiedConstructor;
 export declare type Main = TypedMain | UntypedMain;
 export declare class TypedMain {
+    id: UnqualifiedConstructor;
     typeClasses: TypeClass[];
     context: Type;
     parameters: Parameter[];
     tag: Tag;
     location: Location;
     type: string;
-    constructor(typeClasses: TypeClass[], context: Type, parameters: Parameter[], tag: Tag, location: Location);
+    constructor(id: UnqualifiedConstructor, typeClasses: TypeClass[], context: Type, parameters: Parameter[], tag: Tag, location: Location);
 }
 export declare class UntypedMain {
     tag: Tag;

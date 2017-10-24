@@ -122,7 +122,7 @@ export const main2TS = (n: nodes.Main) =>
  * typedMain2TS converts a typed main file to typescript.
  */
 export const typedMain2TS = (n: nodes.TypedMain) =>
-    view('Main',
+    view(n.id?unqualifiedIdentifier2TS(n.id):'Main',
         typeClasses2TS(n.typeClasses),
         n.parameters.map(parameter2TS).join(','),
         type2TS(n.context),

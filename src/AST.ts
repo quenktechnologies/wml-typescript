@@ -119,6 +119,7 @@ export class TypedMain {
     type = 'typed-main';
 
     constructor(
+        public id: UnqualifiedConstructor,
         public typeClasses: TypeClass[],
         public context: Type,
         public parameters: Parameter[],

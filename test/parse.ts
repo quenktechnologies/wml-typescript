@@ -268,7 +268,7 @@ tests = {
     },
     'should allow typed main': {
 
-        input: '{% main (Date) %} <p>{{@toString()}}</p>'
+        input: '{% main Something (Date) %} <p>{{@toString()}}</p>'
 
     },
     'should allow view construction': {
