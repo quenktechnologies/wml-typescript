@@ -262,11 +262,15 @@ member
           ;
 
 main
-          : '{%' MAIN unqualified_constructor? type_classes? '(' type ')' parameters? '%}' tag
+          : '{%' MAIN unqualified_constructor? type_classes? '(' type ')' parameters? '%}' tag end_main?
             { $$ = new yy.ast.TypedMain($3, $4||[], $6, $8||[], $10, @$); }
 
           | tag 
             {$$ = new yy.ast.UntypedMain($1, @$); }
+          ;
+
+end_main
+          : '{%' ENDMAIN '%}'
           ;
 
 exports
