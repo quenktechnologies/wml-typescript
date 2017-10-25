@@ -15,8 +15,8 @@ export class Main extends $wml.AppView < void > {
                 wml: {}
             }, [$wml.node('a', {
                 html: {
-                    href: `link`,
-                    onclick: ___context.someting.invoke()
+                    'href': `link`,
+                    'onclick': ___context.someting.invoke()
                 },
                 wml: {}
             }, [$wml.text(`Click Here`)], ___view), $wml.node('table', {

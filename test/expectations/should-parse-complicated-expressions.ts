@@ -12,7 +12,7 @@ export class Main extends $wml.AppView < void > {
         this.template = (___context: void, ___view: $wml.AppView < void > ) =>
             $wml.node('div', {
                 html: {
-                    class: ((Styles.A + ` `) + Style.B)
+                    'class': ((Styles.A + ` `) + Style.B)
                 },
                 wml: {}
             }, [], ___view);

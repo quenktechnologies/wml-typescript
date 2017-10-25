@@ -14,7 +14,7 @@ export class Main extends $wml.AppView < void > {
                 html: {},
                 wml: {},
                 android: {
-                    thing: {
+                    'thing': {
                         'value': 1
                     }
                 }

@@ -12,9 +12,9 @@ export class Main extends $wml.AppView < void > {
         this.template = (___context: void, ___view: $wml.AppView < void > ) =>
             $wml.node('tag', {
                 html: {
-                    n: (-0.5 + 3),
-                    m: (4 + -2),
-                    g: (10 - -5)
+                    'n': (-0.5 + 3),
+                    'm': (4 + -2),
+                    'g': (10 - -5)
                 },
                 wml: {}
             }, [], ___view);

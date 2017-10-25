@@ -15,7 +15,7 @@ export class Main extends $wml.AppView < void > {
                 wml: {}
             }, [$wml.node('a', {
                 html: {
-                    href: `link`
+                    'href': `link`
                 },
                 wml: {}
             }, [$wml.text(`Click Here`)], ___view), $wml.node('table', {
@@ -23,7 +23,7 @@ export class Main extends $wml.AppView < void > {
                 wml: {}
             }, [], ___view), $wml.node('panel', {
                 html: {
-                    c: `22`
+                    'c': `22`
                 },
                 wml: {}
             }, [], ___view)], ___view);

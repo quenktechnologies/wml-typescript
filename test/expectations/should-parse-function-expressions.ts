@@ -12,7 +12,7 @@ export class Main extends $wml.AppView < void > {
         this.template = (___context: void, ___view: $wml.AppView < void > ) =>
             $wml.node('button', {
                 html: {
-                    onclick: (e) => ___context.call(e)
+                    'onclick': (e) => ___context.call(e)
                 },
                 wml: {}
             }, [], ___view);

@@ -12,7 +12,7 @@ export class Main extends $wml.AppView < void > {
         this.template = (___context: void, ___view: $wml.AppView < void > ) =>
             $wml.widget(Html, {
                 html: {
-                    id: ___context.id
+                    'id': ___context.id
                 },
                 wml: {}
             }, [$wml.domify((___context.check()) ? a : b)], ___view);

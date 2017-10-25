@@ -12,8 +12,8 @@ export class Main extends $wml.AppView < void > {
         this.template = (___context: void, ___view: $wml.AppView < void > ) =>
             $wml.node('tag', {
                 html: {
-                    on: true,
-                    off: false
+                    'on': true,
+                    'off': false
                 },
                 wml: {}
             }, [], ___view);

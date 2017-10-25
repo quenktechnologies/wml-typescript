@@ -277,7 +277,7 @@ export const groupAttrs = (ns: nodes.Attribute[]) => ns.reduce((p, c) =>
  * attribute2Value 
  */
 export const attribute2TS = (n: nodes.Attribute) =>
-    `${unqualifiedIdentifier2TS(n.name)} : ${attributeValue2TS(n.value)} `;
+    `'${unqualifiedIdentifier2TS(n.name)}' : ${attributeValue2TS(n.value)} `;
 
 /**
  * attributeValue2TS converts an attribute value to typescript.

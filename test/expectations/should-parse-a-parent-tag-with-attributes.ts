@@ -12,9 +12,9 @@ export class Main extends $wml.AppView < void > {
         this.template = (___context: void, ___view: $wml.AppView < void > ) =>
             $wml.node('panel', {
                 html: {
-                    type: `default`,
-                    size: `40`,
-                    align: `left`
+                    'type': `default`,
+                    'size': `40`,
+                    'align': `left`
                 },
                 wml: {}
             }, [], ___view);
