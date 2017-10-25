@@ -507,7 +507,7 @@ export class AppView<C> implements View {
 
     findGroupByName(name: string): Maybe<WMLElement[]> {
 
-        return Maybe.fromArray(this.groups[name]);
+        return Maybe.fromArray(this.groups.hasOwnProperty(name) ?        this.groups[name]: []);
 
     }
 
