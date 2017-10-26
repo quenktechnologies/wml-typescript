@@ -93,10 +93,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <CONTROL>'view'                                          return 'VIEW';
 <CONTROL>'using'                                         return 'USING';
 <CONTROL>'endview'                                       return 'ENDVIEW';
-<CONTROL>'match'                                         return 'MATCH';
-<CONTROL>'endmatch'                                      return 'ENDMATCH';
 <CONTROL>'instanceof'                                    return 'INSTANCEOF';
-<CONTROL>'typeof'                                        return 'TYPEOF';
 <CONTROL>'this'                                          return 'THIS';
 <CONTROL>'fun'                                           return 'FUN';
 <CONTROL>'endfun'                                        return 'ENDFUN';
