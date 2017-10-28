@@ -10,7 +10,8 @@
   "scripts": {
     "test": "./node_modules/.bin/mocha --opts mocha.opts test/parse.ts",
     "build": "rm -R lib; mkdir -p lib; npm run -s parser; ./node_modules/.bin/tsc -p src && cp src/Parser.js lib/Parser.js",
-    "parser": "./node_modules/.bin/jison -o src/Parser.js src/wml.y"
+    "parser": "./node_modules/.bin/jison -o src/Parser.js src/wml.y",
+"docs": "./node_modules/.bin/typedoc --mode modules --ignoreCompilerErrors --out docs  src && echo 'DO NOT DELETE!' > docs/.nojekyll"
   },
   "author": "Lasana Murray <lmurray@quenk.com> (http://quenk.com)",
   "license": "Apache-2.0",
@@ -37,6 +38,7 @@
     "jsbeautify": "^0.3.6",
     "jsdom-global": "^3.0.2",
     "property-seek": "^3.1.1",
+    "typedoc": "^0.9.0",
     "typescript-formatter": "^6.0.0"
   }
 }
