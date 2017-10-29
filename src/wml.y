@@ -58,6 +58,8 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <INITIAL>'{{'                this.begin('EXPRESSION');   return '{{';
 <INITIAL>{Constructor}                                   return 'CONSTRUCTOR';
 <INITIAL>{Identifier}                                    return 'IDENTIFIER';
+<INITIAL>'{'                                             return '{';
+<INITIAL>'}'                                             return '}';
 
 <TAG>'true'                                              return 'TRUE';
 <TAG>'false'                                             return 'FALSE';
@@ -67,12 +69,16 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <TAG>'/'                                                 return 'NOSE';
 <TAG>'>'                     this.begin('CHILDREN');     return '>';
 <TAG>'{{'                    this.begin('EXPRESSION');   return '{{';
+<TAG>'{'                                                 return '{';
+<TAG>'}'                                                 return '}';
 
 <CHILDREN>'{{'               this.begin('EXPRESSION');   return '{{';
 <CHILDREN>'{%'               this.begin('CONTROL');      return '{%';
 <CHILDREN>'<!--'             this.begin('COMMENT');      return;
 <CHILDREN>'</'               this.begin('TAG');          return '</';
 <CHILDREN>'<'                this.begin('TAG');          return '<';
+<CHILDREN>'{'                                            return '{';
+<CHILDREN>'}'                                            return '}';
 <CHILDREN>[^/<>{%}]+                                     return 'CHARACTERS';
 
 <CONTROL>'main'                                          return 'MAIN';
@@ -101,16 +107,20 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <CONTROL>'::'                                            return '::';
 <CONTROL>'@'                                             return '@';
 <CONTROL>'()'                                            return '()';
-<CONTROL>'='                 this.begin('CONTROL_CHILD');return '=';
+<CONTROL>'='              this.popState();this.begin('CONTROL_CHILD');return '=';
 <CONTROL>{Constructor}                                   return 'CONSTRUCTOR';
 <CONTROL>{Identifier}                                    return 'IDENTIFIER';
 <CONTROL>'%}'                this.popState();            return '%}';
+<CONTROL>'{'                                             return '{';
+<CONTROL>'}'                                             return '}';
 
 <CONTROL_CHILD>'<'           this.begin('TAG');          return '<';
 <CONTROL_CHILD>'{{'          this.begin('EXPRESSION');   return '{{';
 <CONTROL_CHILD>'%}'          this.popState();            return '%}';
 <CONTROL_CHILD>{Constructor}                             return 'CONSTRUCTOR';
 <CONTROL_CHILD>{Identifier}                              return 'IDENTIFIER';
+<CONTROL_CHILD>'{'                                       return '{';
+<CONTROL_CHILD>'}'                                       return '}';
 
 <EXPRESSION>'|'                                          return '|';
 <EXPRESSION>'=>'                                         return '=>';
@@ -126,6 +136,8 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <EXPRESSION>{Constructor}                                return 'CONSTRUCTOR';
 <EXPRESSION>{Identifier}                                 return 'IDENTIFIER';
 <EXPRESSION>'}}'             this.popState();            return '}}';
+<EXPRESSION>'{'                                          return '{';
+<EXPRESSION>'}'                                          return '}';
 
 <COMMENT>(.|\r|\n)*?'-->'    this.popState();            return;
 
@@ -156,8 +168,6 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <*>','                                                   return ',';
 <*>'?'                                                   return '?';
 <*>'.'                                                   return '.';
-<*>'{'                                                   return '{';
-<*>'}'                                                   return '}';
 
 <*><<EOF>>                                               return 'EOF';
 

@@ -100,8 +100,6 @@ export interface Template<C> {
 }
 /**
  * ContentProvider is the type of the function fun statements return.
- * The <C> typeclass is the context the ContentProvider is
- * expected to be used in.
  */
 export interface ContentProvider {
     (view: View): Content;
