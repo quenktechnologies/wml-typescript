@@ -300,9 +300,9 @@ tests = {
         input: '<div>{{ <@action()> }}</div>'
 
     },
-   'should allow view statements after short fun': {
+    'should allow view statements after short fun': {
 
-     input: `
+        input: `
 
 {% fun template [A](Date[A])(o:A, _:String, __:A[]) = {{String(o)}}  %}
 
@@ -314,13 +314,17 @@ tests = {
 
       <li>{{option}}and{{index}}</li>
 
+    {% else %}
+
+      <p>De nada!</p>
+
     {% endfor %}
 
   </ul>
 
 {% endview %}`
 
-   }
+    }
 
 };
 

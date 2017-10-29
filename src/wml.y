@@ -537,17 +537,17 @@ for_statement
 
           | '{%' FOR parameter IN expression '%}' 
              children 
-             '{%' OTHERWISE '%}' children '{%' ENDFOR '%}'
+             '{%' ELSE '%}' children '{%' ENDFOR '%}'
             {$$ = new yy.ast.ForStatement($3, null, null, $5, $7, $11, @$);}
 
           | '{%' FOR parameter ',' parameter IN expression '%}' 
             children 
-            '{%' OTHERWISE '%}' children '{%' ENDFOR '%}'
+            '{%' ELSE '%}' children '{%' ENDFOR '%}'
             {$$ = new yy.ast.ForStatement($3, $5, null, $7, $9, $13, @$);}
 
           | '{%' FOR parameter ',' parameter ',' parameter IN expression '%}'
             children 
-            '{%' OTHERWISE '%}' children '{%' ENDFOR '%}'
+            '{%' ELSE '%}' children '{%' ENDFOR '%}'
             {$$ = new yy.ast.ForStatement($3, $5, null, $7, $9, $15, @$);}
           ;
 

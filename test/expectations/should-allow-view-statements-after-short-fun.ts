@@ -18,7 +18,10 @@ export class Results < A > extends $wml.AppView < Date < A > > {
                     wml: {}
                 }, [$wml.domify(option), $wml.text(`and`), $wml.domify(index)], ___view)
             }, function otherwise() {
-                return document.createDocumentFragment();
+                return $wml.node('p', {
+                    html: {},
+                    wml: {}
+                }, [$wml.text(`De nada!`)], ___view)
             })], ___view);
 
     }
