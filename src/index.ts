@@ -499,13 +499,18 @@ export class AppView<C> implements View {
 
     findById<A extends WMLElement>(id: string): Maybe<A> {
 
-        return Maybe.fromAny<A>(<A>this.ids[id]);
+        return Maybe
+            .fromAny<A>(<A>this.ids[id])
+            .orElse(() => {
+                console.warn(`The id '${id}' is missing!`);
+                return Maybe.nothing<A>();
+            });
 
     }
 
     findGroupByName(name: string): Maybe<WMLElement[]> {
 
-        return Maybe.fromArray(this.groups.hasOwnProperty(name) ?        this.groups[name]: []);
+        return Maybe.fromArray(this.groups.hasOwnProperty(name) ? this.groups[name] : []);
 
     }
 
