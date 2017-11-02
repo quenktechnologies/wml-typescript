@@ -117,7 +117,7 @@ export declare abstract class Component<A extends Attrs> implements Widget {
      *
      * The render method by default returns the render result of this View.
      */
-    view: View;
+    abstract view: View;
     /**
      * attrs is the attributes this Component excepts.
      */
