@@ -4,6 +4,7 @@ import { Options } from './';
 
 const CONTEXT = '___context';
 const VIEW = '___view';
+const WML = '___wml';
 const prims = ['String', 'Boolean', 'Number', 'Object', 'Undefined', 'Null', 'Void', 'Never', 'Any'];
 
 /**
@@ -21,13 +22,13 @@ const noop = () => `function () {}`;
  * view template.
  */
 export const view = (id: string, typeClasses: string, params: string, ctx: string, tag: string) =>
-    `export class ${id}${typeClasses} extends $wml.AppView<${ctx}> {
+    `export class ${id}${typeClasses} extends ${WML}.AppView<${ctx}> {
 
     constructor(context: ${ctx}${params ? ',' + params : ''}) {
 
         super(context);
 
-        this.template = (${CONTEXT}:${ctx}, ${VIEW}:$wml.AppView<${ctx}>) =>
+        this.template = (${CONTEXT}:${ctx}, ${VIEW}:${WML}.AppView<${ctx}>) =>
           ${tag ? tag : '<Node>document.createDocumentFragment()'};
 
        }
@@ -44,7 +45,7 @@ export const code = (n: nodes.Module, o: Options): string => module2TS(n, o);
  * module2TS converts a module to a typescript module.
  */
 export const module2TS = (n: nodes.Module, { module }: Options) => `
-import * as $wml from '${module}';
+import * as ${WML} from '${module}';
 ${n.imports.map(importStatement2TS).join(';\n')}
 
 ${n.exports.map(exports2TS).join(';\n')}
@@ -152,7 +153,7 @@ export const viewStatement2TS = (n: nodes.ViewStatement) =>
 
 const _funContext = (n: nodes.Type) => `(${CONTEXT}:${type2TS(n)})=>`;
 
-const _funView = () => `(${VIEW}:$wml.View)=>`;
+const _funView = () => `(${VIEW}:${WML}.View)=>`;
 
 /**
  * funStatement2TS converts a function statement to typescript.
@@ -213,7 +214,7 @@ export const untypedParameter2TS = (n: nodes.UntypedParameter) =>
 export const children2TS = (list: nodes.Child[]): string =>
     (list.length === 0) ? 'document.createDocumentFragment();' :
         (list.length === 1) ? child2TS(list[0]) :
-            `$wml.box(${list.map(l => child2TS(l)).join(',')}) `;
+            `${WML}.box(${list.map(l => child2TS(l)).join(',')}) `;
 
 /**
  * child2TS converts children to typescript.
@@ -222,7 +223,7 @@ export const child2TS = (n: nodes.Child): string => {
     if ((n instanceof nodes.Node) || (n instanceof nodes.Widget))
         return tag2TS(n);
     else if (n instanceof nodes.Interpolation)
-        return `$wml.domify(${interpolation2TS(n)}) `;
+        return `${WML}.domify(${interpolation2TS(n)}) `;
     else if (n instanceof nodes.IfStatement)
         return ifStatement2TS(n);
     else if (n instanceof nodes.ForStatement)
@@ -253,8 +254,8 @@ export const tag2TS = (n: nodes.Tag) => {
     let attrs = attrs2String(groupAttrs(n.attributes));
     let name = identifierOrConstructor2TS(n.open);
 
-    return (n.type === 'widget') ? `$wml.widget(${name}, ${attrs}, [${children}], ${VIEW})` :
-        `$wml.node('${name}', ${attrs}, [${children}], ${VIEW}) `;
+    return (n.type === 'widget') ? `${WML}.widget(${name}, ${attrs}, [${children}], ${VIEW})` :
+        `${WML}.node('${name}', ${attrs}, [${children}], ${VIEW}) `;
 
 }
 
@@ -295,7 +296,7 @@ export const interpolation2TS = (n: nodes.Interpolation) =>
  * forStatement2TS converts a for statement to typescript.
  */
 export const forStatement2TS = (n: nodes.ForStatement) =>
-    `$wml.map(${expression2TS(n.list)}, function _map` +
+    `${WML}.map(${expression2TS(n.list)}, function _map` +
     `(${[n.variable, n.index, n.all].filter(x => x).map(parameter2TS).join(',')}) ` +
     `{ return ${children2TS(n.body)} }, ` +
     `function otherwise() { return ${children2TS(n.otherwise)} }) `;
@@ -304,7 +305,7 @@ export const forStatement2TS = (n: nodes.ForStatement) =>
  * ifStatement2TS converts an if statement to typescript.
  */
 export const ifStatement2TS = (n: nodes.IfStatement) =>
-    `$wml.ifthen(${expression2TS(n.condition)}, ` +
+    `${WML}.ifthen(${expression2TS(n.condition)}, ` +
     `function then()` +
     `{ return ${children2TS(n.then)} }, ${n.elseClause ? else2TS(n.elseClause) : noop()}) `;
 
@@ -324,7 +325,7 @@ export const elseClause2TS = (n: nodes.ElseClause) =>
  */
 export const elseIfClause2TS = (n: nodes.ElseIfClause) =>
     `function elseif()` +
-    `{ return $wml.ifthen(${expression2TS(n.condition)}, ` +
+    `{ return ${WML}.ifthen(${expression2TS(n.condition)}, ` +
     `function then() ` +
     `{ return ${children2TS(n.then)}; }, ` +
     `${else2TS(n.elseClause)});}`;
@@ -332,7 +333,7 @@ export const elseIfClause2TS = (n: nodes.ElseIfClause) =>
 /**
  * characters2TS converts character text to a typescript string.
  */
-export const characters2TS = (n: nodes.Characters) => `$wml.text(\`${n.value}\`)`;
+export const characters2TS = (n: nodes.Characters) => `${WML}.text(\`${n.value}\`)`;
 
 /**
  * expression2TS converts a wml expression to a typescript expression.
@@ -464,7 +465,7 @@ export const memberExpression2TS = (n: nodes.MemberExpression) =>
  * NOTE: this part of the language is most likely to change.
  */
 export const readExpression2TS = (n: nodes.ReadExpression) =>
-    `$wml.read < ${type2TS(n.hint)}>(${expression2TS(n.path)}, ${expression2TS(n.target)} ` +
+    `${WML}.read < ${type2TS(n.hint)}>(${expression2TS(n.path)}, ${expression2TS(n.target)} ` +
     `${n.defaults ? ',' + expression2TS(n.defaults) : ''})`;
 
 /**
