@@ -1,4 +1,4 @@
-import * as $wml from '../../src';
+import * as ___wml from '../../src';
 import {
     A,
     B

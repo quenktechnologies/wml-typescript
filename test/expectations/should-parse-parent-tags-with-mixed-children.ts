@@ -1,22 +1,22 @@
-import * as $wml from '../../src';
+import * as ___wml from '../../src';
 
 
 
 
-export class Main extends $wml.AppView < void > {
+export class Main extends ___wml.AppView < void > {
 
     constructor(context: void) {
 
         super(context);
 
-        this.template = (___context: void, ___view: $wml.AppView < void > ) =>
-            $wml.node('panel', {
+        this.template = (___context: void, ___view: ___wml.AppView < void > ) =>
+            ___wml.node('panel', {
                 html: {},
                 wml: {}
-            }, [$wml.text(` This is my offsprings.`), $wml.node('a', {
+            }, [___wml.text(` This is my offsprings.`), ___wml.node('a', {
                 html: {},
                 wml: {}
-            }, [$wml.text(`Link`)], ___view), $wml.text(`Hey now! `), $wml.widget(Input, {
+            }, [___wml.text(`Link`)], ___view), ___wml.text(`Hey now! `), ___wml.widget(Input, {
                 html: {},
                 wml: {}
             }, [], ___view)], ___view);

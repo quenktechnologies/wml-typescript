@@ -1,37 +1,37 @@
-import * as $wml from '../../src';
+import * as ___wml from '../../src';
 
 
 
 
-export class Main extends $wml.AppView < void > {
+export class Main extends ___wml.AppView < void > {
 
     constructor(context: void) {
 
         super(context);
 
-        this.template = (___context: void, ___view: $wml.AppView < void > ) =>
-            $wml.node('modal', {
+        this.template = (___context: void, ___view: ___wml.AppView < void > ) =>
+            ___wml.node('modal', {
                 html: {
                     'name': `mymodal`,
                     'x': `1`,
                     'y': `2`
                 },
                 wml: {}
-            }, [$wml.node('modal-header', {
+            }, [___wml.node('modal-header', {
                 html: {},
                 wml: {}
-            }, [$wml.text(`My Modal`)], ___view), $wml.node('modal-body', {
+            }, [___wml.text(`My Modal`)], ___view), ___wml.node('modal-body', {
                 html: {},
                 wml: {}
-            }, [$wml.text(`Creativxity is inhibxited by greed and corruption.`), $wml.node('vote-button', {
+            }, [___wml.text(`Creativxity is inhibxited by greed and corruption.`), ___wml.node('vote-button', {
                 html: {},
                 wml: {}
-            }, [], ___view), $wml.node('vote-count', {
+            }, [], ___view), ___wml.node('vote-count', {
                 html: {
                     'source': ___context
                 },
                 wml: {}
-            }, [], ___view), $wml.text(` Votes`), $wml.node('textarea', {
+            }, [], ___view), ___wml.text(` Votes`), ___wml.node('textarea', {
                 html: {
                     'disabled': true,
                     'size': 32,
@@ -40,7 +40,7 @@ export class Main extends $wml.AppView < void > {
                 wml: {
                     'id': `ta`
                 }
-            }, [$wml.text(` Various text`)], ___view)], ___view)], ___view);
+            }, [___wml.text(` Various text`)], ___view)], ___view)], ___view);
 
     }
 

@@ -1,7 +1,7 @@
-import * as $wml from '../../src';
+import * as ___wml from '../../src';
 
 
-export const vue = () => (___view: $wml.View) => $wml.widget(View, {
+export const vue = () => (___view: ___wml.View) => ___wml.widget(View, {
     html: {},
     wml: {}
 }, [], ___view);

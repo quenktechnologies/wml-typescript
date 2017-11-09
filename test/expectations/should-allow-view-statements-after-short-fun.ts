@@ -1,27 +1,27 @@
-import * as $wml from '../../src';
+import * as ___wml from '../../src';
 
 
-export const template = < A > (o: A, _: string, __: A[]) => (___context: Date < A > ) => (___view: $wml.View) => $wml.domify(new String(o));;
-export class Results < A > extends $wml.AppView < Date < A > > {
+export const template = < A > (o: A, _: string, __: A[]) => (___context: Date < A > ) => (___view: ___wml.View) => ___wml.domify(new String(o));;
+export class Results < A > extends ___wml.AppView < Date < A > > {
 
     constructor(context: Date < A > ) {
 
         super(context);
 
-        this.template = (___context: Date < A > , ___view: $wml.AppView < Date < A > > ) =>
-            $wml.node('ul', {
+        this.template = (___context: Date < A > , ___view: ___wml.AppView < Date < A > > ) =>
+            ___wml.node('ul', {
                 html: {},
                 wml: {}
-            }, [$wml.map([1, 3, 4], function _map(option, index) {
-                return $wml.node('li', {
+            }, [___wml.map([1, 3, 4], function _map(option, index) {
+                return ___wml.node('li', {
                     html: {},
                     wml: {}
-                }, [$wml.domify(option), $wml.text(`and`), $wml.domify(index)], ___view)
+                }, [___wml.domify(option), ___wml.text(`and`), ___wml.domify(index)], ___view)
             }, function otherwise() {
-                return $wml.node('p', {
+                return ___wml.node('p', {
                     html: {},
                     wml: {}
-                }, [$wml.text(`De nada!`)], ___view)
+                }, [___wml.text(`De nada!`)], ___view)
             })], ___view);
 
     }

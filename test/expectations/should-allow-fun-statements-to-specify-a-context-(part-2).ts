@@ -1,7 +1,7 @@
-import * as $wml from '../../src';
+import * as ___wml from '../../src';
 
 
-export const action = (n: string) => (___context: Date) => (___view: $wml.View) => $wml.node('p', {
+export const action = (n: string) => (___context: Date) => (___view: ___wml.View) => ___wml.node('p', {
     html: {},
     wml: {}
-}, [$wml.domify(n)], ___view);
+}, [___wml.domify(n)], ___view);

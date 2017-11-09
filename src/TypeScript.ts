@@ -123,7 +123,7 @@ export const main2TS = (n: nodes.Main) =>
  * typedMain2TS converts a typed main file to typescript.
  */
 export const typedMain2TS = (n: nodes.TypedMain) =>
-    view(n.id?unqualifiedIdentifier2TS(n.id):'Main',
+    view(n.id ? unqualifiedIdentifier2TS(n.id) : 'Main',
         typeClasses2TS(n.typeClasses),
         n.parameters.map(parameter2TS).join(','),
         type2TS(n.context),
@@ -304,31 +304,15 @@ export const forStatement2TS = (n: nodes.ForStatement) =>
 /**
  * ifStatement2TS converts an if statement to typescript.
  */
-export const ifStatement2TS = (n: nodes.IfStatement) =>
-    `${WML}.ifthen(${expression2TS(n.condition)}, ` +
-    `function then()` +
-    `{ return ${children2TS(n.then)} }, ${n.elseClause ? else2TS(n.elseClause) : noop()}) `;
+export const ifStatement2TS = (n: nodes.IfStatement | nodes.ElseIfClause) =>
+    `(${expression2TS(n.condition)})? ` +
+    `${children2TS(n.then)}:` +
+    `${n.elseClause ? else2TS(n.elseClause) : noop()}`;
 
 const else2TS = (n: nodes.ElseClause | nodes.ElseIfClause): string =>
-    (n instanceof nodes.ElseClause) ? elseClause2TS(n) :
-        (n instanceof nodes.ElseIfClause) ? elseIfClause2TS(n) :
+    (n instanceof nodes.ElseClause) ? children2TS(n.children) :
+        (n instanceof nodes.ElseIfClause) ? ifStatement2TS(n) :
             _throwNotKnown(n);
-
-/**
- * elseClause2TS converts the else clause of an if statement to typescript.
- */
-export const elseClause2TS = (n: nodes.ElseClause) =>
-    `function else_clause() { return ${children2TS(n.children)} } `;
-
-/**
- * elseIfClause2TS converts an else if clause to typescript.
- */
-export const elseIfClause2TS = (n: nodes.ElseIfClause) =>
-    `function elseif()` +
-    `{ return ${WML}.ifthen(${expression2TS(n.condition)}, ` +
-    `function then() ` +
-    `{ return ${children2TS(n.then)}; }, ` +
-    `${else2TS(n.elseClause)});}`;
 
 /**
  * characters2TS converts character text to a typescript string.

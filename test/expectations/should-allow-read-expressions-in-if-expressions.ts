@@ -1,23 +1,19 @@
-import * as $wml from '../../src';
+import * as ___wml from '../../src';
 
 
 
 
-export class Main extends $wml.AppView < void > {
+export class Main extends ___wml.AppView < void > {
 
     constructor(context: void) {
 
         super(context);
 
-        this.template = (___context: void, ___view: $wml.AppView < void > ) =>
-            $wml.node('p', {
+        this.template = (___context: void, ___view: ___wml.AppView < void > ) =>
+            ___wml.node('p', {
                 html: {},
                 wml: {}
-            }, [$wml.ifthen($wml.read < string > (`attr`, ___context.taggin), function then() {
-                return $wml.text(`x`)
-            }, function else_clause() {
-                return $wml.text(` yz fefd `)
-            })], ___view);
+            }, [(___wml.read < string > (`attr`, ___context.taggin)) ? ___wml.text(`x`) : ___wml.text(` yz fefd `)], ___view);
 
     }
 

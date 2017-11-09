@@ -1,19 +1,19 @@
-import * as $wml from '../../src';
+import * as ___wml from '../../src';
 
 
 
 
-export class Main extends $wml.AppView < void > {
+export class Main extends ___wml.AppView < void > {
 
     constructor(context: void) {
 
         super(context);
 
-        this.template = (___context: void, ___view: $wml.AppView < void > ) =>
-            $wml.node('p', {
+        this.template = (___context: void, ___view: ___wml.AppView < void > ) =>
+            ___wml.node('p', {
                 html: {},
                 wml: {}
-            }, [$wml.domify((Styles.A + Styles.B))], ___view);
+            }, [___wml.domify((Styles.A + Styles.B))], ___view);
 
     }
 

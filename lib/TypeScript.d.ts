@@ -125,15 +125,7 @@ export declare const forStatement2TS: (n: nodes.ForStatement) => string;
 /**
  * ifStatement2TS converts an if statement to typescript.
  */
-export declare const ifStatement2TS: (n: nodes.IfStatement) => string;
-/**
- * elseClause2TS converts the else clause of an if statement to typescript.
- */
-export declare const elseClause2TS: (n: nodes.ElseClause) => string;
-/**
- * elseIfClause2TS converts an else if clause to typescript.
- */
-export declare const elseIfClause2TS: (n: nodes.ElseIfClause) => string;
+export declare const ifStatement2TS: (n: nodes.IfStatement | nodes.ElseIfClause) => string;
 /**
  * characters2TS converts character text to a typescript string.
  */

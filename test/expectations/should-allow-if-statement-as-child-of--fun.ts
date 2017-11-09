@@ -1,8 +1,4 @@
-import * as $wml from '../../src';
+import * as ___wml from '../../src';
 
 
-export const ate = (o: object) => (___view: $wml.View) => $wml.ifthen(a, function then() {
-    return $wml.domify(a)
-}, function else_clause() {
-    return $wml.domify(a)
-});
+export const ate = (o: object) => (___view: ___wml.View) => (a) ? ___wml.domify(a) : ___wml.domify(a);

@@ -1,17 +1,17 @@
-import * as $wml from '../../src';
+import * as ___wml from '../../src';
 
 
-export class Main extends $wml.AppView < Context < String > > {
+export class Main extends ___wml.AppView < Context < String > > {
 
     constructor(context: Context < String > ) {
 
         super(context);
 
-        this.template = (___context: Context < String > , ___view: $wml.AppView < Context < String > > ) =>
-            $wml.node('p', {
+        this.template = (___context: Context < String > , ___view: ___wml.AppView < Context < String > > ) =>
+            ___wml.node('p', {
                 html: {},
                 wml: {}
-            }, [$wml.domify(___context.value)], ___view);
+            }, [___wml.domify(___context.value)], ___view);
 
     }
 
