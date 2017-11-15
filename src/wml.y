@@ -413,7 +413,7 @@ curried_parameters
           : parameter 
             {$$ = [$1]; }
 
-          | curried_parameters '->' parameter
+          | curried_parameters ('->'|',') parameter
             {$$ = $1.concat($3); }
 
           | '(' curried_parameters ')'
