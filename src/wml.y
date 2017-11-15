@@ -418,6 +418,9 @@ curried_parameters
 
           | '(' curried_parameters ')'
             {$$ = $2; }
+
+          | '(' ')'
+            {$$ = [];}
           ; 
 
 parameters

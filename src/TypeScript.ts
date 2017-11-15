@@ -155,7 +155,7 @@ const _funContext = (n: nodes.Type) => `(${CONTEXT}:${type2TS(n)})=>`;
 
 const _funView = () => `(${VIEW}:${WML}.View)=>`;
 
-const _curry = (n: nodes.Parameter[]) => (n.length === 0) ? '()=>' :
+const _curry = (n: nodes.Parameter[]) =>
     n.map(parameter2TS).map(s => `(${s})=>`).join('');
 
 /**
@@ -163,10 +163,11 @@ const _curry = (n: nodes.Parameter[]) => (n.length === 0) ? '()=>' :
  */
 export const funStatement2TS = (n: nodes.FunStatement) =>
     `export const ${unqualifiedIdentifier2TS(n.id)} = ` +
-    `${typeClasses2TS(n.typeClasses)}` +
-    ((n.context != null) ? _funContext(n.context) : '') +
-    `${_curry(n.parameters)}${_funView()}` +
-    `${Array.isArray(n.body) ? children2TS(n.body) : child2TS(n.body)};`;
+        `${typeClasses2TS(n.typeClasses)}` +
+        ((n.context == null) && n.parameters.length === 0) ? '()=>' :
+        ((n.context != null) ? _funContext(n.context) : '') +
+        `${_curry(n.parameters)}${_funView()}` +
+        `${Array.isArray(n.body) ? children2TS(n.body) : child2TS(n.body)};`;
 
 /**
  * typeClasses2TS converts a list of typeclasses into the a list of typescript typeclasses.
