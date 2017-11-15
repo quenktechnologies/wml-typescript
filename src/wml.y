@@ -107,6 +107,7 @@ Text ({DoubleStringCharacter}*)|({SingleStringCharacter}*)
 <CONTROL>'::'                                            return '::';
 <CONTROL>'@'                                             return '@';
 <CONTROL>'()'                                            return '()';
+<CONTROL>'->'                                            return '->';
 <CONTROL>'='              this.popState();this.begin('CONTROL_CHILD');return '=';
 <CONTROL>{Constructor}                                   return 'CONSTRUCTOR';
 <CONTROL>{Identifier}                                    return 'IDENTIFIER';
@@ -286,7 +287,6 @@ exports
 
           | exports export
             {$$ = $1.concat($2);}
-
           ;
 
 export
@@ -310,7 +310,7 @@ view_statement
 
 fun_statement
 
-          : '{%' FUN unqualified_identifier type_classes context_type parameters '%}' 
+          : '{%' FUN unqualified_identifier type_classes context_type curried_parameters '%}' 
             children '{%' ENDFUN '%}'
             { $$ = new yy.ast.FunStatement($3, $4, $5, $6, $8, @$); }
 
@@ -318,7 +318,7 @@ fun_statement
             children '{%' ENDFUN '%}'
             { $$ = new yy.ast.FunStatement($3, $4, $5, [], $7, @$); }
 
-          | '{%' FUN unqualified_identifier type_classes parameters '%}' 
+          | '{%' FUN unqualified_identifier type_classes curried_parameters '%}' 
             children '{%' ENDFUN '%}'
             { $$ = new yy.ast.FunStatement($3, $4, null, $5, $7, @$); }
 
@@ -326,7 +326,7 @@ fun_statement
             children '{%' ENDFUN '%}'
             { $$ = new yy.ast.FunStatement($3, $4, null, [], $6, @$); }
 
-          | '{%' FUN unqualified_identifier context_type parameters '%}' 
+          | '{%' FUN unqualified_identifier context_type curried_parameters '%}' 
             children '{%' ENDFUN '%}'
             { $$ = new yy.ast.FunStatement($3, [], $4, $5, $7, @$); }
 
@@ -334,32 +334,32 @@ fun_statement
             children '{%' ENDFUN '%}'
             { $$ = new yy.ast.FunStatement($3, [], $4, [], $6, @$); }
 
-          | '{%' FUN unqualified_identifier parameters '%}' 
+          | '{%' FUN unqualified_identifier curried_parameters '%}' 
             children '{%' ENDFUN '%}'
             { $$ = new yy.ast.FunStatement($3,[],null,$4,$6,@$); }
 
           | '{%' FUN unqualified_identifier '%}' children '{%' ENDFUN '%}'
             { $$ = new yy.ast.FunStatement($3,[],null,[],$5,@$); }
 
-          | '{%' FUN unqualified_identifier type_classes context_type parameters '=' child '%}' 
+          | '{%' FUN unqualified_identifier type_classes context_type curried_parameters '=' child '%}' 
             { $$ = new yy.ast.FunStatement($3, $4, $5, $6, $8, @$); }
 
           | '{%' FUN unqualified_identifier type_classes context_type '=' child '%}' 
             { $$ = new yy.ast.FunStatement($3, $4, $5, [], $7, @$); }
 
-          | '{%' FUN unqualified_identifier type_classes parameters '=' child '%}' 
+          | '{%' FUN unqualified_identifier type_classes curried_parameters '=' child '%}' 
             { $$ = new yy.ast.FunStatement($3, $4, null, $5, $7, @$); }
 
           | '{%' FUN unqualified_identifier type_classes '=' child '%}' 
             { $$ = new yy.ast.FunStatement($3, $4, null, [], $6, @$); }
 
-          | '{%' FUN unqualified_identifier context_type parameters '=' child '%}' 
+          | '{%' FUN unqualified_identifier context_type curried_parameters '=' child '%}' 
             { $$ = new yy.ast.FunStatement($3, [], $4, $5, $7, @$); }
 
           | '{%' FUN unqualified_identifier context_type '=' child '%}' 
             { $$ = new yy.ast.FunStatement($3, [], $4, [], $6, @$); }
 
-          | '{%' FUN unqualified_identifier parameters '=' child '%}' 
+          | '{%' FUN unqualified_identifier curried_parameters '=' child '%}' 
             { $$ = new yy.ast.FunStatement($3,[],null,$4,$6,@$); }
 
           | '{%' FUN unqualified_identifier '=' child '%}'
@@ -408,6 +408,17 @@ type
             { $$ = new yy.ast.Type($1, [], true, @$); }
           
           ;
+
+curried_parameters
+          : parameter 
+            {$$ = [$1]; }
+
+          | curried_parameters '->' parameter
+            {$$ = $1.concat($3); }
+
+          | '(' curried_parameters ')'
+            {$$ = $2; }
+          ; 
 
 parameters
           : '(' ')'                  {$$ = [];}
@@ -650,17 +661,11 @@ view_construction
           ;
 
 fun_application
-          : '<' fun_target type_arguments arguments arguments '>'
-            { $$ = new yy.ast.FunApplication($2, $3, $4, $5, @$); }
+          : '<' fun_target type_arguments partial_application '>'
+            { $$ = new yy.ast.FunApplication($2, $3, $4||[], @$); }
 
-          |  '<' fun_target type_arguments arguments '>'
-            { $$ = new yy.ast.FunApplication($2, $3, [], $4, @$); } 
-
-          |  '<' fun_target arguments arguments '>'
-           { $$ = new yy.ast.FunApplication($2, [], $3, $4, @$); }
-
-          |  '<' fun_target arguments '>'
-           { $$ = new yy.ast.FunApplication($2, [], [], $3, @$); }
+          |  '<' fun_target partial_application '>'
+           { $$ = new yy.ast.FunApplication($2, [], $3 ||[], @$); }
           ;
 
 fun_target
@@ -686,6 +691,18 @@ type_arg_list
           |  type_arg_list ',' type
             { $$ = $1.concat($3); }
           ;
+
+partial_application
+
+         : '(' ')'
+           { $$ = []; }
+
+         | '(' expression ')'
+           { $$ = [$2]; }
+
+         | partial_application '(' expression ')'
+          { $$ = $1.concat($3); }
+         ;
 
 construct_expression
           : cons arguments

@@ -437,7 +437,6 @@ export class FunApplication {
     constructor(
         public target: Expression,
         public typeArgs: Type[],
-        public context: Expression[],
         public args: Expression[],
         public location: Location) { }
 

@@ -154,6 +154,7 @@ export declare const unaryExpression2TS: (n: nodes.UnaryExpression) => string;
  * viewConstruction2TS convers a view construction to typescript.
  */
 export declare const viewConstruction2TS: (n: nodes.ViewConstruction) => string;
+export declare const _curriedApplication: (ns: nodes.Expression[]) => string;
 /**
  * funApplication2TS converts a fun application to typescript.
  */

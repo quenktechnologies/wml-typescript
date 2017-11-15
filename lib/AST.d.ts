@@ -262,11 +262,10 @@ export declare class ViewConstruction {
 export declare class FunApplication {
     target: Expression;
     typeArgs: Type[];
-    context: Expression[];
     args: Expression[];
     location: Location;
     type: string;
-    constructor(target: Expression, typeArgs: Type[], context: Expression[], args: Expression[], location: Location);
+    constructor(target: Expression, typeArgs: Type[], args: Expression[], location: Location);
 }
 export declare class ConstructExpression {
     cons: Constructor;

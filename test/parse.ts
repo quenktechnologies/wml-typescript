@@ -165,13 +165,13 @@ tests = {
 
     'should parse short fun statements with arguments': {
 
-        input: '{% fun vue(a,b,c:String) = <View a={{a}} b={{b}} c={{c}}/> %}'
+        input: '{% fun vue a -> b -> c:String = <View a={{a}} b={{b}} c={{c}}/> %}'
 
     },
 
     'should parse short fun statements with type classes': {
 
-        input: '{% fun vue [A,B:C,C] (a:A, b:B) = {{ (a + b) + c }} %}'
+        input: '{% fun vue [A,B:C,C] a:A -> b:B = {{ (a + b) + c }} %}'
 
     },
 
@@ -183,13 +183,13 @@ tests = {
 
     'should parse extended fun statements with arguments': {
 
-        input: '{% fun vue(a,b,c:String) %}<View a={{a}} b={{b}} c={{c}}/> {% endfun %}'
+        input: '{% fun vue a -> b -> c:String %}<View a={{a}} b={{b}} c={{c}}/> {% endfun %}'
 
     },
 
     'should parse extended fun statements with type classes': {
 
-        input: '{% fun vue [A,B:C,C] (a:A, b:B) %} {{ (a + b) + c }} {% endfun %}'
+        input: '{% fun vue [A,B:C,C] (a:A -> b:B) %} {{ (a + b) + c }} {% endfun %}'
 
     },
 
@@ -278,7 +278,7 @@ tests = {
     },
     'should allow fun application': {
 
-        input: '<p>{{ <panel(1,2,3)> }}</p>'
+        input: '<p>{{ <panel(1)(2)(3)> }}</p>'
 
     },
     'should allow fun application with context': {
@@ -293,7 +293,7 @@ tests = {
     },
     'should parse list types': {
 
-        input: '{% fun action [A](s: String[], a:A[]) = {{  \'${s}${a}\' }} %}'
+        input: '{% fun action [A](s: String[] -> a:A[]) = {{  \'${s}${a}\' }} %}'
     },
     'should allow context properties as fun application': {
 
@@ -304,7 +304,7 @@ tests = {
 
         input: `
 
-{% fun template [A](Date[A])(o:A, _:String, __:A[]) = {{String(o)}}  %}
+{% fun template [A](Date[A])(o:A -> _:String -> __:A[]) = {{String(o)}}  %}
 
 {% view Results [A](Date[A]) %}
 
