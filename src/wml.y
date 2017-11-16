@@ -669,6 +669,10 @@ fun_application
 
           |  '<' fun_target partial_application '>'
            { $$ = new yy.ast.FunApplication($2, [], $3 ||[], @$); }
+
+          |  '<' fun_target '>'
+           { $$ = new yy.ast.FunApplication($2, [], [], @$); }
+
           ;
 
 fun_target
