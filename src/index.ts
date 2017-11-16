@@ -523,10 +523,10 @@ export class AppView<C> implements View {
         var parent = tree.parentNode;
 
         if (tree == null)
-            throw new ReferenceError('invalidate(): Cannot invalidate a view that has not been rendered!');
+            return console.warn('invalidate(): Cannot invalidate a view that has not been rendered!');
 
         if (tree.parentNode == null)
-            throw new ReferenceError('invalidate(): Attempt to invalidate a view that has not been inserted to DOM!');
+            return console.warn('invalidate(): Attempt to invalidate a view that has not been inserted to DOM!');
 
         childs = (<Element>tree.parentNode).children;
 
@@ -534,12 +534,12 @@ export class AppView<C> implements View {
         // when we attempt to call replaceChild. Noticeably after doing work on an array.
         // We do this to use the index instead of passing the reference directly.
         for (let i = 0; i < childs.length; i++)
-            if (childs[i] === tree) 
+            if (childs[i] === tree)
                 realFirstChildIndex = i;
 
-      // just in case we never got the index.
-      if(realFirstChildIndex === -1)
-      throw new Error('invaldiate(): Cannot invalidate view, DOM tree appears to have no parent!');
+        // just in case we never got the index.
+        if (realFirstChildIndex === -1)
+            throw new Error('invaldiate(): Cannot invalidate view, DOM tree appears to have no parent!');
 
         parent.replaceChild(this.render(), (<Element>parent).children[realFirstChildIndex]);
 
