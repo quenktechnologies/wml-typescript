@@ -24,11 +24,11 @@ const noop = () => `function () {}`;
 export const view = (id: string, typeClasses: string, params: string, ctx: string, tag: string) =>
     `export class ${id}${typeClasses} extends ${WML}.AppView<${ctx}> {
 
-    constructor(context: ${ctx}${params ? ',' + params : ''}) {
+    constructor(${CONTEXT}: ${ctx}${params ? ',' + params : ''}) {
 
-        super(context);
+        super(${CONTEXT});
 
-        this.template = (${CONTEXT}:${ctx}, ${VIEW}:${WML}.AppView<${ctx}>) =>
+        this.template = (${VIEW}:${WML}.AppView<${ctx}>) =>
           ${tag ? tag : '<Node>document.createDocumentFragment()'};
 
        }

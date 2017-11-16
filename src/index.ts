@@ -125,12 +125,13 @@ export interface Widget extends Renderable {
 };
 
 /**
- * Template is a function that given a View and a Context 
- * will provide DOM content.
+ * Template is a function that given a View
+ * will provide DOM content as well as performing 
+ * the side-effects of adding ids etc.
  */
-export interface Template<C> {
+export interface Template {
 
-    (context: C, view: View): Content
+    (view: View): Content
 
 }
 
@@ -464,7 +465,7 @@ export class AppView<C> implements View {
     groups: { [key: string]: WMLElement[] } = {};
     widgets: Widget[] = [];
     tree: Content;
-    template: Template<C>;
+    template: Template;
     _fragRoot: Node;
 
     constructor(public context: C) { }
@@ -550,7 +551,7 @@ export class AppView<C> implements View {
         this.widgets.forEach(w => w.removed());
         this.widgets = [];
         this._fragRoot = null;
-        this.tree = this.template(this.context, this);
+        this.tree = this.template(this);
         this.ids['root'] = (this.ids['root']) ? this.ids['root'] : this.tree;
 
         if (this.tree.nodeName === (document.createDocumentFragment()).nodeName)

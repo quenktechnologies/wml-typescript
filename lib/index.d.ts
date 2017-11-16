@@ -92,11 +92,12 @@ export interface Widget extends Renderable {
     removed(): void;
 }
 /**
- * Template is a function that given a View and a Context
- * will provide DOM content.
+ * Template is a function that given a View
+ * will provide DOM content as well as performing
+ * the side-effects of adding ids etc.
  */
-export interface Template<C> {
-    (context: C, view: View): Content;
+export interface Template {
+    (view: View): Content;
 }
 /**
  * ContentProvider is the type of the function fun statements return.
@@ -238,7 +239,7 @@ export declare class AppView<C> implements View {
     };
     widgets: Widget[];
     tree: Content;
-    template: Template<C>;
+    template: Template;
     _fragRoot: Node;
     constructor(context: C);
     registerWidget(w: Widget): AppView<C>;

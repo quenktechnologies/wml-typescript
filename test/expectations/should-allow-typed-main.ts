@@ -5,11 +5,11 @@ import * as ___wml from '../../src';
 
 export class Something extends ___wml.AppView < Date > {
 
-    constructor(context: Date) {
+    constructor(___context: Date) {
 
-        super(context);
+        super(___context);
 
-        this.template = (___context: Date, ___view: ___wml.AppView < Date > ) =>
+        this.template = (___view: ___wml.AppView < Date > ) =>
             ___wml.node('p', {
                 html: {},
                 wml: {}
