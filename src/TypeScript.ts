@@ -407,7 +407,7 @@ export const viewConstruction2TS = (n: nodes.ViewConstruction) =>
     `(new ${constructor2TS(n.cons)}(${args2TS(n.context)})).render()`;
 
 export const _curriedApplication = (ns: nodes.Expression[]) =>
-    (ns.length === 0) ? '()' : ns.map(e => `(${expression2TS(e)})`).join('');
+    (ns.length === 0) ? '' : ns.map(e => `(${expression2TS(e)})`).join('');
 
 /**
  * funApplication2TS converts a fun application to typescript.

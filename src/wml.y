@@ -702,7 +702,7 @@ type_arg_list
 partial_application
 
          : '(' ')'
-           { $$ = []; }
+           { $$ = [new yy.ast.UnqualifiedIdentifier('undefined', @$)]; } 
 
          | '(' expression ')'
            { $$ = [$2]; }

@@ -13,7 +13,7 @@ export class Main extends ___wml.AppView < void > {
             ___wml.node('div', {
                 html: {},
                 wml: {}
-            }, [___wml.domify(___context.action()(___view))], ___view);
+            }, [___wml.domify(___context.action(undefined)(___view))], ___view);
 
     }
 
