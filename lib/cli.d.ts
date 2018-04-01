@@ -13,4 +13,4 @@ export declare const readFile: (path: string) => Promise<any>;
 export declare const writeFile: (path: string) => (contents: string) => Promise<any>;
 export declare const getOptions: (args: Arguments) => Options;
 export declare const executeList: (path: string) => (list: string[]) => Promise<void[]>;
-export declare const compile: (path: string, options: Options) => (txt: string) => Promise<any>;
+export declare const compile: (path: string, options: Options) => (txt: string) => Promise<string>;

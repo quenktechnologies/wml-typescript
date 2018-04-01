@@ -2,7 +2,6 @@ import * as must from 'must';
 import * as fs from 'fs';
 import { parse, compile } from '../src';
 
-var input = null;
 var tests = null;
 
 function json(tree: any): string {
@@ -80,7 +79,7 @@ tests = {
     },
     'should parse parent tags with tag children (L2)': {
         input: '<panel><a href="link" onclick={{@someting.invoke()}}>' +
-        'Click Here</a><table/></panel>'
+            'Click Here</a><table/></panel>'
     },
     'should parse parent tags with tag children (L3)': {
         input: '<panel><a href="link">Click Here</a><table/><panel c="22"></panel></panel>'
@@ -88,25 +87,25 @@ tests = {
     'should do it all together now': {
 
         input: '<modal name="mymodal" x="1" y="2">' +
-        '<modal-header>My Modal</modal-header>' +
-        '<modal-body>' +
-        'Creativxity is inhibxited by greed and corruption.' +
-        '<vote-button/>' +
-        '<vote-count source={{@}}/> Votes' +
-        '<textarea wml:id="ta" disabled size=32 onchange={{@setText}}>' +
-        ' Various text' +
-        '</textarea>' +
-        '</modal-body>' +
-        '</modal>'
+            '<modal-header>My Modal</modal-header>' +
+            '<modal-body>' +
+            'Creativxity is inhibxited by greed and corruption.' +
+            '<vote-button/>' +
+            '<vote-count source={{@}}/> Votes' +
+            '<textarea wml:id="ta" disabled size=32 onchange={{@setText}}>' +
+            ' Various text' +
+            '</textarea>' +
+            '</modal-body>' +
+            '</modal>'
 
     },
     'should parse for expressions': {
 
         input: '<root>' +
-        '{% for item in list %}' +
-        '<stem>A Stem</stem>' +
-        '{% endfor %}' +
-        '</root>'
+            '{% for item in list %}' +
+            '<stem>A Stem</stem>' +
+            '{% endfor %}' +
+            '</root>'
 
     },
     'should parse if then expressions': {
@@ -332,7 +331,6 @@ describe('Parser', function() {
 
     beforeEach(function() {
 
-        input = null;
 
     });
 
