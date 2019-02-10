@@ -1,7 +1,9 @@
 import * as property from 'property-seek';
-import { Maybe } from 'afpl/lib/monad/Maybe';
-
-export { Options, parse, compile } from './Compiler';
+import {
+  Maybe, 
+  nothing,
+  fromArray,
+  fromNullable } from '@quenk/noni/lib/data/maybe';
 
 /**
  * Maybe from afpl used here as an option type.
@@ -118,7 +120,8 @@ export interface Widget extends Renderable {
     /**
      * removed is only called after the View has been invalidated. 
      *
-     * That means it is NOT called if the Widget is removed from the DOM in some other way.
+     * That means it is NOT called if the Widget is removed from the DOM 
+     * in some other way.
      */
     removed(): void;
 
@@ -228,7 +231,7 @@ export interface Groups {
  */
 export interface WidgetConstructor<A> {
 
-    new (attributes: A, children: Content[]): Widget;
+    new(attributes: A, children: Content[]): Widget;
 
 }
 
@@ -246,7 +249,7 @@ export const read = <A>(path: string, o: object, defaultValue?: A): A => {
 
     let ret = property.get<A, object>(path.split(':').join('.'), o);
 
-    return (ret != null) ? ret : defaultValue;
+    return (ret != null) ? ret : <A>defaultValue;
 
 }
 
@@ -462,11 +465,16 @@ export const map = <V>(
 export class AppView<C> implements View {
 
     ids: { [key: string]: WMLElement } = {};
+
     groups: { [key: string]: WMLElement[] } = {};
+
     widgets: Widget[] = [];
-    tree: Content;
-    template: Template;
-    _fragRoot: Node;
+
+    tree: Content = document.createElement('div');
+
+    template: Template = () => document.createElement('div');
+
+    _fragRoot: Node = document.createElement('div');
 
     constructor(public context: C) { }
 
@@ -500,18 +508,17 @@ export class AppView<C> implements View {
 
     findById<A extends WMLElement>(id: string): Maybe<A> {
 
-        return Maybe
-            .fromAny<A>(<A>this.ids[id])
+        return fromNullable<A>(<A>this.ids[id])
             .orElse(() => {
                 console.warn(`The id '${id}' is missing!`);
-                return Maybe.nothing<A>();
+                return nothing<A>();
             });
 
     }
 
     findGroupByName(name: string): Maybe<WMLElement[]> {
 
-        return Maybe.fromArray(this.groups.hasOwnProperty(name) ? this.groups[name] : []);
+        return fromArray(this.groups.hasOwnProperty(name) ? this.groups[name] : []);
 
     }
 
@@ -520,7 +527,7 @@ export class AppView<C> implements View {
         var childs;
         var realFirstChildIndex = -1;
         var tree = (this._fragRoot) ? this._fragRoot : this.tree;
-        var parent = tree.parentNode;
+        var parent = <Node>tree.parentNode;
 
         if (tree == null)
             return console.warn('invalidate(): Cannot invalidate a view that has not been rendered!');
@@ -550,12 +557,12 @@ export class AppView<C> implements View {
         this.ids = {};
         this.widgets.forEach(w => w.removed());
         this.widgets = [];
-        this._fragRoot = null;
+        this._fragRoot = <any>null;
         this.tree = this.template(this);
         this.ids['root'] = (this.ids['root']) ? this.ids['root'] : this.tree;
 
         if (this.tree.nodeName === (document.createDocumentFragment()).nodeName)
-            this._fragRoot = this.tree.firstChild;
+            this._fragRoot = <Node>this.tree.firstChild;
 
         this.widgets.forEach(w => w.rendered());
 

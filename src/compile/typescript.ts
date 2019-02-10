@@ -1,5 +1,5 @@
-import * as nodes from './AST';
-import * as afpl from 'afpl';
+import * as nodes from '../parse/ast';
+import { merge } from '@quenk/noni/lib/data/record';
 import { Options } from './';
 
 const CONTEXT = '___context';
@@ -272,7 +272,7 @@ export const attrs2String = (attrs: { [key: string]: string[] }) => '{' +
  * groupAttrs groups attributes according to their namespace.
  */
 export const groupAttrs = (ns: nodes.Attribute[]) => ns.reduce((p, c) =>
-    afpl.util.merge<any, any>(p, {
+    merge<any, any, any, any>(p, {
         [c.namespace.id || 'html']: (p[c.namespace.id || 'html'] || []).concat(
             attribute2TS(c))
     }), ({ html: [], wml: [] } as { [key: string]: string[] }));
@@ -370,7 +370,7 @@ export const expression2TS = (n: nodes.Expression): string => {
     else if (n instanceof nodes.ContextVariable)
         return contextVariable2TS(n);
     else
-        _throwNotKnown(n);
+        return _throwNotKnown(n);
 
 }
 
