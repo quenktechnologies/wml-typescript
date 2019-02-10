@@ -1,4 +1,4 @@
-import * as nodes from '../parse/ast';
+import * as nodes from '@quenk/wml-parser/lib/ast';
 import { merge } from '@quenk/noni/lib/data/record';
 import { Options } from './';
 

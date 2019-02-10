@@ -13,7 +13,7 @@ import {
 } from '@quenk/noni/lib/control/monad/future';
 import {
     isDirectory,
-    readdir,
+    listFilesRec,
     readTextFile,
     writeTextFile
 } from '@quenk/noni/lib/io/file';
@@ -30,6 +30,8 @@ export interface Arguments {
 
     '--inputExtension': string,
 
+    '--module': string,
+
     '<path>': string
 
 }
@@ -38,16 +40,32 @@ const defaultOptions: Options = {
     debug: false,
     main: 'Main',
     module: '@quenk/wml',
+    inputExtension: 'wml',
+    extension: 'ts'
 }
 
 const getFileName = (file: string) =>
     `${dirname(file)}/${basename(file, extname(file))}`;
 
-const getOptions = (args: Arguments): Options => ({
+const getOptions = (args: Arguments): Options => {
 
-    main: args['--main']
+    let o: Options = {};
 
-});
+    if (args['--main'] != null)
+        o.main = args['--main'];
+
+    if (args['--extension'] != null)
+        o.extension = args['--extension'];
+
+    if (args['--inputExtension'] != null)
+        o.inputExtension = args['--inputExtension'];
+
+    if (args['--module'] != null)
+        o.module = args['--module'];
+
+    return o;
+
+}
 
 /**
  * execute the program.
@@ -67,7 +85,7 @@ export const execute = (cwd: string, args: Arguments) => {
  * compileDir will compile each wml file found in the specified path.
  */
 export const compileDir = (path: string, opts: Options) =>
-    readdir(path)
+    listFilesRec(path)
         .map(list =>
             list
                 .map(p => resolve(path, p))
@@ -83,7 +101,7 @@ export const compileFile = (path: string, opts: Options): Future<void> => {
     let o = merge<OptionValue, Record<OptionValue>, OptionValue,
         Record<OptionValue>>(defaultOptions, opts);
 
-    if (extname(path) !== opts.inputExtension) {
+    if (extname(path) !== `.${o.inputExtension}`) {
 
         return pure(<void>undefined);
 

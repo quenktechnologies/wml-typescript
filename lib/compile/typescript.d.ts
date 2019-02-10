@@ -1,4 +1,4 @@
-import * as nodes from '../parse/ast';
+import * as nodes from '@quenk/wml-parser/lib/ast';
 import { Options } from './';
 /**
  * view template.

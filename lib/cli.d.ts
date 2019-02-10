@@ -7,6 +7,7 @@ export interface Arguments {
     '--main': string;
     '--extension': string;
     '--inputExtension': string;
+    '--module': string;
     '<path>': string;
 }
 /**
