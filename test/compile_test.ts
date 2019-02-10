@@ -1,13 +1,8 @@
 import * as must from 'must';
 import * as fs from 'fs';
-import { parse  } from '../src/parse';
-import {  compile } from '../src/compile';
+import { compile } from '../src/compile';
 
 var tests = null;
-
-function json(tree: any): string {
-    return JSON.stringify(tree);
-}
 
 function compare(tree: any, that: any): void {
 
@@ -21,23 +16,15 @@ function makeTest(test, index) {
 
     if (process.env.GENERATE) {
 
-        return parse(test.input)
-            .map(json)
-            .map(txt => { fs.writeFileSync(`./test/expectations/${file}.json`, txt); })
-            .chain(() => compile(test.input, { module: '../../src', pretty: true }))
-            .map(txt => { fs.writeFileSync(`./test/expectations/${file}.ts`, txt); })
+        return compile(test.input, { module: '../../src', pretty: true })
+        .map(txt => { fs.writeFileSync(`./test/fixtures/expectations/${file}.ts`, txt); })
             .fold(e => { throw e; }, () => { });
     }
 
     if (!test.skip) {
 
-        parse(test.input)
-            .map(json)
-            .map(txt => compare(txt, fs.readFileSync(`./test/expectations/${file}.json`, {
-                encoding: 'utf8'
-            })))
-            .chain(() => compile(test.input, { module: '../../src' }))
-            .map(txt => compare(txt, fs.readFileSync(`./test/expectations/${file}.ts`, {
+        compile(test.input, { module: '../../src' })
+        .map(txt => compare(txt, fs.readFileSync(`./test/fixtures/expectations/${file}.ts`, {
                 encoding: 'utf8'
             })))
             .fold(e => { throw e; }, () => { });
