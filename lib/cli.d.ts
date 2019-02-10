@@ -1,16 +1,24 @@
-import * as Promise from 'bluebird';
-import { Maybe } from 'afpl/lib/monad/Maybe';
-import { Options } from './';
+import { Future } from '@quenk/noni/lib/control/monad/future';
+import { Options } from './compile';
+/**
+ * Arguments passed on the command line.
+ */
 export interface Arguments {
-    '--es5': boolean;
-    '--pretty': boolean;
     '--main': string;
+    '--extension': string;
+    '--inputExtension': string;
+    '<path>': string;
 }
-export declare const stat: (path: string) => Promise<any>;
-export declare const isDirectory: (path: string) => Promise<Maybe<boolean>>;
-export declare const readdir: (path: string) => Promise<any>;
-export declare const readFile: (path: string) => Promise<any>;
-export declare const writeFile: (path: string) => (contents: string) => Promise<any>;
-export declare const getOptions: (args: Arguments) => Options;
-export declare const executeList: (path: string) => (list: string[]) => Promise<void[]>;
-export declare const compile: (path: string, options: Options) => (txt: string) => Promise<string>;
+/**
+ * execute the program.
+ */
+export declare const execute: (cwd: string, args: Arguments) => Future<void> | Future<void[]>;
+/**
+ * compileDir will compile each wml file found in the specified path.
+ */
+export declare const compileDir: (path: string, opts: Options) => Future<void[]>;
+/**
+ * compileFile will compile a single file but only if its extension
+ * is the target extension.
+ */
+export declare const compileFile: (path: string, opts: Options) => Future<void>;

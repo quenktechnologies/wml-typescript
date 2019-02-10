@@ -4,41 +4,29 @@
   "description": "Widget Markup Language",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "files": ["lib"],
   "bin": {
-    "wmlc": "./lib/cli.js"
+    "wmlc": "./lib/main.js"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha --opts mocha.opts test/parse.ts",
-    "build": "rm -R lib; mkdir -p lib; npm run -s parser; ./node_modules/.bin/tsc -p src && cp src/Parser.js lib/Parser.js",
-    "parser": "./node_modules/.bin/jison -o src/Parser.js src/wml.y",
-    "docs": "./node_modules/.bin/typedoc --mode modules --ignoreCompilerErrors --out docs  src && echo 'DO NOT DELETE!' > docs/.nojekyll"
+    "test": "./node_modules/.bin/mocha --opts mocha.opts $(find test -name *_test.ts)"
   },
-  "author": "Lasana Murray <lmurray@quenk.com> (http://quenk.com)",
+  "author": "Quenk Technologies Limited <info@quenk.com> (https://quenk.com)",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@quenk/wml-runtime": "^0.4.5",
-    "@types/bluebird": "^3.5.20",
-    "@types/js-beautify": "0.0.31",
     "@types/mocha": "^2.2.48",
-    "@types/node": "^8.10.1",
-    "bluebird": "^3.5.1",
-    "jison": "^0.4.16",
-    "jsdom": "^11.6.2",
+    "@types/node": "^10.12.24",
+    "jison-gho": "^0.6.1-215",
     "mocha": "^2.3.4",
     "must": "^0.13.1",
-    "ts-node": "^3.3.0",
-    "typescript": "^2.8.1"
+    "ts-node": "^8.0.2",
+    "typedoc": "^0.14.2",
+    "typescript": "^3.3.3"
   },
   "dependencies": {
+    "@quenk/noni": "^1.15.1",
     "@types/docopt": "^0.6.31",
-    "afpl": "^0.10.0",
     "docopt": "^0.6.2",
-    "jison-gho": "^0.6.1-215",
-    "js-beautify": "^1.7.5",
-    "jsbeautify": "^0.3.6",
-    "jsdom-global": "^3.0.2",
-    "property-seek": "^3.1.1",
-    "typedoc": "^0.9.0",
-    "typescript-formatter": "^6.1.0"
+    "property-seek": "^3.1.1"
   }
 }

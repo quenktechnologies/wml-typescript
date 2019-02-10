@@ -1,5 +1,4 @@
-import { Maybe } from 'afpl/lib/monad/Maybe';
-export { Options, parse, compile } from './Compiler';
+import { Maybe } from '@quenk/noni/lib/data/maybe';
 /**
  * Maybe from afpl used here as an option type.
  *
@@ -15,6 +14,10 @@ export declare type WMLElement = Content | Widget;
  * Content is what is actually intended to be rendered on a web page.
  */
 export declare type Content = Node | Element | HTMLElement;
+/**
+ * @private
+ */
+declare type Iterable<V> = V[] | object;
 /**
  * Renderable is an interface for providing Content.
  *
@@ -87,7 +90,8 @@ export interface Widget extends Renderable {
     /**
      * removed is only called after the View has been invalidated.
      *
-     * That means it is NOT called if the Widget is removed from the DOM in some other way.
+     * That means it is NOT called if the Widget is removed from the DOM
+     * in some other way.
      */
     removed(): void;
 }
@@ -179,7 +183,7 @@ export interface WidgetConstructor<A> {
  * @param {A} [defaultValue] - This value is returned if the value is not set.
  * @private
  */
-export declare const read: <A>(path: string, o: object, defaultValue?: A) => A;
+export declare const read: <A>(path: string, o: object, defaultValue?: A | undefined) => A;
 /**
  * @private
  */
@@ -223,7 +227,7 @@ export interface MapCallback<V> {
  * forE provides a for expression
  * @private
  */
-export declare const map: <V>(collection: object | V[], cb: MapCallback<V>, cb2: () => Content) => Content;
+export declare const map: <V>(collection: Iterable<V>, cb: MapCallback<V>, cb2: () => Content) => Content;
 /**
  * AppView is the concrete implementation of a View.
  *
@@ -250,3 +254,4 @@ export declare class AppView<C> implements View {
     invalidate(): void;
     render(): Content;
 }
+export {};
