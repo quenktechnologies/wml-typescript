@@ -1,8 +1,6 @@
 #! /usr/bin/env node
 
 import * as docopt from 'docopt';
-import { resolve } from 'path';
-import { pure } from '@quenk/noni/lib/control/monad/future';
 import { execute } from './cli';
 
 const args = docopt.docopt(`
@@ -14,13 +12,19 @@ Options:
   -h --help            Show this screen.
   --inputExtension ext The file extension used when reading files. [default: wml] 
   --extension ext      The file extension to use when writing files. [default: ts]
+  --module path        The module name or path to get wml symbols from.
   --version            Show version.
 `, {
         version: require('../package.json').version
     });
 
-execute(resolve(process.cwd(), args['<path>']), args)
-    .fork(
-        e => pure((console.error(e.stack ? e.stack : e), process.exit(255))),
-        () => process.exit(0)
-    );
+const onErr = (e: Error) => {
+
+    console.error(e.stack ? e.stack : e);
+    return process.exit(255);
+
+}
+
+const onDone = () => process.exit(0);
+
+execute(process.cwd(), args).fork(onErr, onDone);

@@ -1,6 +1,6 @@
 import * as ts from './typescript';
 import { Except } from '@quenk/noni/lib/control/error';
-import { parse } from '../parse';
+import { parse } from '@quenk/wml-parser';
 
 /**
  * OptionValue
