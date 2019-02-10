@@ -2,4 +2,4 @@
 --growl
 --reporter list
 --compilers ts:./test/register
---timeout 1000
+--timeout 10000
