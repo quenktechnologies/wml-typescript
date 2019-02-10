@@ -1,6 +1,7 @@
 import * as must from 'must';
 import * as fs from 'fs';
-import { parse, compile } from '../src';
+import { parse  } from '../src/parser';
+import {  compile } from '../src/compiler';
 
 var tests = null;
 
@@ -25,7 +26,7 @@ function makeTest(test, index) {
             .map(txt => { fs.writeFileSync(`./test/expectations/${file}.json`, txt); })
             .chain(() => compile(test.input, { module: '../../src', pretty: true }))
             .map(txt => { fs.writeFileSync(`./test/expectations/${file}.ts`, txt); })
-            .cata(e => { throw e; }, () => { });
+            .fold(e => { throw e; }, () => { });
     }
 
     if (!test.skip) {
@@ -39,7 +40,7 @@ function makeTest(test, index) {
             .map(txt => compare(txt, fs.readFileSync(`./test/expectations/${file}.ts`, {
                 encoding: 'utf8'
             })))
-            .cata(e => { throw e; }, () => { });
+            .fold(e => { throw e; }, () => { });
 
     }
 

@@ -18,8 +18,8 @@ describe('AppView', function() {
             view
                 .registerByGroup('list', document.createElement('p'))
                 .findGroupByName('list')
-                .cata(() => { throw new Error('Should be Just!'); },
-                (l: Element[]) => must(l.length).be(1));
+                .map((l: Element[]) => must(l.length).be(1))
+                .orJust(() => { throw new Error('Should be Just!'); });
 
         });
 
@@ -29,7 +29,7 @@ describe('AppView', function() {
 
             view
                 .findGroupByName('non-existent')
-                .cata(() => { }, () => { throw new Error('Should be Nothing!'); });
+                .map(() => { throw new Error('Should be Nothing!'); });
 
         });
 
