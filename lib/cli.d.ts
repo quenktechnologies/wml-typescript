@@ -1,5 +1,5 @@
 import { Future } from '@quenk/noni/lib/control/monad/future';
-import { Options } from './compile';
+import { Options } from './compiler';
 /**
  * Arguments passed on the command line.
  */

@@ -3,6 +3,10 @@
  */
 export declare type OptionValue = boolean | string | undefined;
 /**
+ * TypeScript output.
+ */
+export declare type TypeScript = string;
+/**
  * Options the compiler understands.
  */
 export interface Options {
