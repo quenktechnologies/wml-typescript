@@ -1,19 +1,27 @@
-
-import * as ___wml from '../../src';
-
+import * as __wml from '../../src';
 
 
+import {
+Maybe as __Maybe,
+fromNullable as __fromNullable,
+fromArray as __fromArray
+}
+from '@quenk/noni/lib/data/maybe;
+type NodeFunc = 
+(tag:string, attrs:__wml.AttributeMap<any>, children: __wml.Content[]) => __wml.Content;
 
-export class Main extends ___wml.AppView<void> {
+type WidgetFunc = 
+(C: __wml.WidgetConstructor<A>,attrs:__wml.AttributeMap<any>, children: __wml.Content[]) => __wml.Content;
+this.node('panel', {html : {  } ,wml : {  } }, [
 
-    constructor(___context: void) {
+        document.createTextNode(' This is my offsprings.'),
+this.node('a', {html : {  } ,wml : {  } }, [
 
-        super(___context);
+        document.createTextNode('Link')
+     ]),
+document.createTextNode('Hey now! '),
+this.widget(Input, {html : {  } ,wml : {  } }, [
 
-        this.template = (___view:___wml.AppView<void>) =>
-          ___wml.node('panel', {html : {  } ,wml : {  } }, [___wml.text(` This is my offsprings.`),___wml.node('a', {html : {  } ,wml : {  } }, [___wml.text(`Link`)], ___view) ,___wml.text(`Hey now! `),___wml.widget(Input, {html : {  } ,wml : {  } }, [], ___view)], ___view) ;
-
-       }
-
-     }
-
+        
+     ])
+     ])

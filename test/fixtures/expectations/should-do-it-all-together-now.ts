@@ -1,19 +1,38 @@
-
-import * as ___wml from '../../src';
-
+import * as __wml from '../../src';
 
 
+import {
+Maybe as __Maybe,
+fromNullable as __fromNullable,
+fromArray as __fromArray
+}
+from '@quenk/noni/lib/data/maybe;
+type NodeFunc = 
+(tag:string, attrs:__wml.AttributeMap<any>, children: __wml.Content[]) => __wml.Content;
 
-export class Main extends ___wml.AppView<void> {
+type WidgetFunc = 
+(C: __wml.WidgetConstructor<A>,attrs:__wml.AttributeMap<any>, children: __wml.Content[]) => __wml.Content;
+this.node('modal', {html : { 'name' : `mymodal` ,'x' : `1` ,'y' : `2`  } ,wml : {  } }, [
 
-    constructor(___context: void) {
+        this.node('modal-header', {html : {  } ,wml : {  } }, [
 
-        super(___context);
+        document.createTextNode('My Modal')
+     ]),
+this.node('modal-body', {html : {  } ,wml : {  } }, [
 
-        this.template = (___view:___wml.AppView<void>) =>
-          ___wml.node('modal', {html : { 'name' : `mymodal` ,'x' : `1` ,'y' : `2`  } ,wml : {  } }, [___wml.node('modal-header', {html : {  } ,wml : {  } }, [___wml.text(`My Modal`)], ___view) ,___wml.node('modal-body', {html : {  } ,wml : {  } }, [___wml.text(`Creativxity is inhibxited by greed and corruption.`),___wml.node('vote-button', {html : {  } ,wml : {  } }, [], ___view) ,___wml.node('vote-count', {html : { 'source' : ___context  } ,wml : {  } }, [], ___view) ,___wml.text(` Votes`),___wml.node('textarea', {html : { 'disabled' : true  ,'size' : 32 ,'onchange' : ___context.setText  } ,wml : { 'id' : `ta`  } }, [___wml.text(` Various text`)], ___view) ], ___view) ], ___view) ;
+        document.createTextNode('Creativxity is inhibxited by greed and corruption.'),
+this.node('vote-button', {html : {  } ,wml : {  } }, [
 
-       }
+        
+     ]),
+this.node('vote-count', {html : { 'source' : __context  } ,wml : {  } }, [
 
-     }
+        
+     ]),
+document.createTextNode(' Votes'),
+this.node('textarea', {html : { 'disabled' : true  ,'size' : 32 ,'onchange' : __context.setText  } ,wml : { 'id' : `ta`  } }, [
 
+        document.createTextNode(' Various text')
+     ])
+     ])
+     ])

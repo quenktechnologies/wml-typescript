@@ -1,6 +1,6 @@
 import * as __wml from '../../src';
 
-
+import * as lib  from 'path/to/libs'; 
 import {
 Maybe as __Maybe,
 fromNullable as __fromNullable,
@@ -12,13 +12,3 @@ type NodeFunc =
 
 type WidgetFunc = 
 (C: __wml.WidgetConstructor<A>,attrs:__wml.AttributeMap<any>, children: __wml.Content[]) => __wml.Content;
-export const vue = 
-
-<A  ,B  ,C  > (node: NodeFunc, widget:WidgetFunc) => (a: A   )=> (b: B   )=>  {
-
-   return [
-
-        ((a + b) + c)
-     ];
-
-};

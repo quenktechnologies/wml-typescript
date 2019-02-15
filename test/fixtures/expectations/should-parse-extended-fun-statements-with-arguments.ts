@@ -1,7 +1,27 @@
-
-import * as ___wml from '../../src';
-
-
-export const vue = (a )=>(b )=>(c:string   )=>(___view:___wml.View)=>___wml.widget(View, {html : { 'a' : a ,'b' : b ,'c' : c  } ,wml : {  } }, [], ___view);
+import * as __wml from '../../src';
 
 
+import {
+Maybe as __Maybe,
+fromNullable as __fromNullable,
+fromArray as __fromArray
+}
+from '@quenk/noni/lib/data/maybe;
+type NodeFunc = 
+(tag:string, attrs:__wml.AttributeMap<any>, children: __wml.Content[]) => __wml.Content;
+
+type WidgetFunc = 
+(C: __wml.WidgetConstructor<A>,attrs:__wml.AttributeMap<any>, children: __wml.Content[]) => __wml.Content;
+export const vue = 
+
+(node: NodeFunc, widget:WidgetFunc) => (a: string   )=> (b: string   )=> (c: string   )=>  {
+
+   return [
+
+        this.widget(View, {html : { 'a' : a ,'b' : b ,'c' : c  } ,wml : {  } }, [
+
+        
+     ])
+     ];
+
+};

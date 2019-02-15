@@ -1,19 +1,21 @@
-
-import * as ___wml from '../../src';
-
+import * as __wml from '../../src';
 
 
+import {
+Maybe as __Maybe,
+fromNullable as __fromNullable,
+fromArray as __fromArray
+}
+from '@quenk/noni/lib/data/maybe;
+type NodeFunc = 
+(tag:string, attrs:__wml.AttributeMap<any>, children: __wml.Content[]) => __wml.Content;
 
-export class Main extends ___wml.AppView<void> {
+type WidgetFunc = 
+(C: __wml.WidgetConstructor<A>,attrs:__wml.AttributeMap<any>, children: __wml.Content[]) => __wml.Content;
+this.widget(TextView, {html : {  } ,wml : {  } ,android : { 'thing' : {
+ 
+      'value' : 1
+     }  } }, [
 
-    constructor(___context: void) {
-
-        super(___context);
-
-        this.template = (___view:___wml.AppView<void>) =>
-          ___wml.widget(TextView, {html : {  } ,wml : {  } ,android : { 'thing' : {'value' : 1}  } }, [___wml.domify(new Person (___context.value)) ], ___view);
-
-       }
-
-     }
-
+        new Person (__context.value)
+     ])
