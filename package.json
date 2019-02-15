@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@quenk/noni": "^1.15.1",
-    "@quenk/wml-parser": "^0.17.0",
+    "@quenk/wml-parser": "^0.18.0",
     "@quenk/wml-widgets": "^1.4.7",
     "@types/docopt": "^0.6.31",
     "docopt": "^0.6.2"
