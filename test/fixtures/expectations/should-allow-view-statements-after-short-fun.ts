@@ -6,7 +6,7 @@ Maybe as __Maybe,
 fromNullable as __fromNullable,
 fromArray as __fromArray
 }
-from '@quenk/noni/lib/data/maybe;
+from '@quenk/noni/lib/data/maybe';
 type NodeFunc = 
 (tag:string, attrs:__wml.AttributeMap<any>, children: __wml.Content[]) => __wml.Content;
 
@@ -147,7 +147,7 @@ index
    }
 
 
-   widget(C: __wml.WidgetConstructor<A>,attrs:__wml.AttributeMap<any>, children: __wml.Content[]) {
+   widget<A>(C: __wml.WidgetConstructor<A>,attrs:__wml.AttributeMap<any>, children: __wml.Content[]) {
 
        let childs: __wml.Content[] = [];
        let w;

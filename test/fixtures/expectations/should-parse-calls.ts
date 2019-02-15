@@ -6,7 +6,7 @@ Maybe as __Maybe,
 fromNullable as __fromNullable,
 fromArray as __fromArray
 }
-from '@quenk/noni/lib/data/maybe;
+from '@quenk/noni/lib/data/maybe';
 type NodeFunc = 
 (tag:string, attrs:__wml.AttributeMap<any>, children: __wml.Content[]) => __wml.Content;
 
