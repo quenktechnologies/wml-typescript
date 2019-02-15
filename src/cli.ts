@@ -17,7 +17,7 @@ import {
     readTextFile,
     writeTextFile
 } from '@quenk/noni/lib/io/file';
-import { OptionValue, Options, compile } from './compile';
+import { OptionValue, Options, compile } from './compiler';
 
 /**
  * Arguments passed on the command line.
