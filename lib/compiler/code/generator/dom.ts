@@ -29,14 +29,17 @@ const NODE_PARAMS = `tag:string, attrs:${WML}.AttributeMap<any>, ` +
     `children: ${WML}.Content[]`;
 
 const WIDGET_PARAMS =
-    `C: ${WML}.WidgetConstructor<A>,` +
-    `attrs:${WML}.AttributeMap<any>, children: ${WML}.Content[]`;
+    `C: ${WML}.WidgetConstructor<${WML}.AttributeMap<A>>,` +
+    `attrs:${WML}.AttributeMap<A>, children: ${WML}.Content[]`;
 
 const REGISTER_PARAMS = `e:${WML}.WMLElement, ` +
     `attrs:${WML}.AttributeMap<any>`;
 
 const THROW_CHILD_ERR = '         throw new TypeError(`Can not adopt ' +
     'child ${c} of type \${typeof c}`);';
+
+const THROW_INVALIDATE_ERR = `       throw new Error('Cannot invalidate a view ` +
+    ` that has not been rendered!');`;
 
 /**
  * DOMGenerator targets the client side DOM.
@@ -60,10 +63,10 @@ export class DOMGenerator implements Generator {
 
         return [
 
-            `type NodeFunc = `,
+            `export type NodeFunc = `,
             `(${NODE_PARAMS}) => ${WML}.Content;`,
             ``,
-            `type WidgetFunc = `,
+            `export type WidgetFunc<A> = `,
             `(${WIDGET_PARAMS}) => ${WML}.Content;`
 
         ].join(eol(ctx));
@@ -107,7 +110,7 @@ export class DOMGenerator implements Generator {
             `   register(${REGISTER_PARAMS}) {`,
             ``,
             `       let id = (<${WML}.Attrs><any>attrs).wml.id;`,
-            `       let group = (<${WML}.Attrs><any>attrs).wml.group;`,
+            `       let group = <string>(<${WML}.Attrs><any>attrs).wml.group;`,
             ``,
             `       if(id != null) {`,
             ``,
@@ -118,7 +121,7 @@ export class DOMGenerator implements Generator {
             ``,
             `       }`,
             ``,
-            `       if(group !== null) {`,
+            `       if(group != null) {`,
             ``,
             `           this.groups[group] = this.groups[group] || [];`,
             `           this.groups[group].push(e);`,
@@ -183,14 +186,7 @@ export class DOMGenerator implements Generator {
             ``,
             `   widget<A>(${WIDGET_PARAMS}) {`,
             ``,
-            `       let childs: ${WML}.Content[] = [];`,
-            `       let w;`,
-            ``,
-            `       children.forEach(child => (child instanceof Array) ?`,
-            `           childs.push.apply(childs, child) :`,
-            `           childs.push(child));`,
-            ``,
-            `       w = new C<any>(attrs, childs);`,
+            `       let w = new C(attrs, children);`,
             ``,
             `       this.register(w, attrs);`,
             ``,
@@ -206,19 +202,17 @@ export class DOMGenerator implements Generator {
             ``,
             `   }`,
             ``,
-            `   findByGroup(name: string): ${MAYBE}<${WML}.WMLElement[]> {`,
+            `   findByGroup<E extends ${WML}.WMLElement>(name: string): ` +
+            `${MAYBE}<E[]> {`,
             ``,
             `       return ${FROM_ARRAY}(this.groups.hasOwnProperty(name) ?`,
-            `           this.groups[name] : `,
+            `           <any>this.groups[name] : `,
             `           []);`,
             ``,
             `   }`,
             ``,
             `   invalidate() : void {`,
             ``,
-            `       let childs;`,
-            ``,
-            `       let realFirstChildIndex = -1;`,
             `       let {tree} = this;`,
             `       let parent = <Node>tree.parentNode;`,
             ``,
@@ -227,10 +221,7 @@ export class DOMGenerator implements Generator {
             `       'Cannot invalidate a view that has not been rendered!');`,
             ``,
             `       if (tree.parentNode == null)`,
-            `           return console.warn('invalidate(): Attempt to '+
-                        'invalidate a view that has not been inserted to DOM!');`,
-            ``,
-            `       childs = (<Element>tree.parentNode).children;`,
+            `           ${THROW_INVALIDATE_ERR}`,
             ``,
             `       parent.replaceChild(this.render(), tree) `,
             ``,
@@ -241,7 +232,7 @@ export class DOMGenerator implements Generator {
             `       this.ids = {};`,
             `       this.widgets.forEach(w => w.removed());`,
             `       this.widgets = [];`,
-            `       this.tree = this.template();`,
+            `       this.tree = this.template(this);`,
             ``,
             `       this.ids['root'] = (this.ids['root']) ?`,
             `       this.ids['root'] : `,
@@ -267,7 +258,7 @@ export class DOMGenerator implements Generator {
 
         let params = n.parameters.map(parameter2TS).map(s => `(${s})=> `).join('');
 
-        let factory = `(node: NodeFunc, widget:WidgetFunc) => `;
+        let factory = `(node: NodeFunc<any>, widget:WidgetFunc<any>) => `;
 
         let body = children2TS(ctx, n.body);
 
@@ -324,9 +315,9 @@ export class DOMGenerator implements Generator {
 
         let alt = n.otherwise.length > 0 ? children2TS(ctx, n.otherwise) : '[]';
 
-        return `(x=>x.length > 0 ? ${eol(ctx)}
+        return `...((x=>x.length > 0 ? ${eol(ctx)}
             x.map((${params}) => (${body})) : ${eol(ctx)}
-            ${alt})(${expr})`;
+            ${alt})(${expr}))`;
 
     }
 
@@ -345,7 +336,7 @@ export class DOMGenerator implements Generator {
         let alt = n.otherwise.length > 0 ? children2TS(ctx, n.otherwise) : '[]';
 
         return [
-            `(${all} => { `,
+            `...((${all} => { `,
             ``,
             `   let $$keys = Object.keys(${all});`,
             ``,
@@ -356,7 +347,7 @@ export class DOMGenerator implements Generator {
             ``,
             `   return ${body};`,
             ``,
-            `   ${alt})(${expr})`
+            `   ${alt})(${expr}))`
 
         ].join(eol(ctx));
 

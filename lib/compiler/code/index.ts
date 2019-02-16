@@ -14,7 +14,6 @@ export interface Options {
 
     module?: string,
 
-
     EOL: '\n'
 
 }
