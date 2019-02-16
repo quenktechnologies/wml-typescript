@@ -17,7 +17,9 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@quenk/test": "^2.1.0",
-    "@quenk/wml": "^0.18.0",
+    "@quenk/wml": "^1.0.2",
+    "@quenk/wml-parser": "^0.19.0",
+    "@quenk/wml-widgets": "^1.4.7",
     "@types/mocha": "^2.2.48",
     "@types/node": "^10.12.24",
     "mocha": "^2.3.4",
@@ -27,8 +29,6 @@
   },
   "dependencies": {
     "@quenk/noni": "^1.15.1",
-    "@quenk/wml-parser": "^0.18.0",
-    "@quenk/wml-widgets": "^1.4.7",
     "@types/docopt": "^0.6.31",
     "docopt": "^0.6.2"
   }
