@@ -7,14 +7,14 @@ fromNullable as __fromNullable,
 fromArray as __fromArray
 }
 from '@quenk/noni/lib/data/maybe';
-type NodeFunc = 
+export type NodeFunc = 
 (tag:string, attrs:__wml.AttributeMap<any>, children: __wml.Content[]) => __wml.Content;
 
-type WidgetFunc = 
-(C: __wml.WidgetConstructor<A>,attrs:__wml.AttributeMap<any>, children: __wml.Content[]) => __wml.Content;
+export type WidgetFunc<A> = 
+(C: __wml.WidgetConstructor<__wml.AttributeMap<A>>,attrs:__wml.AttributeMap<A>, children: __wml.Content) => __wml.Content;
 this.node('panel', {html : {  } ,wml : {  } }, [
 
-        this.node('a', {html : { 'href' : `link` ,'onclick' : __context.someting.invoke (undefined)  } ,wml : {  } }, [
+        this.node('a', {html : { 'href' : `link` ,'onclick' : __context.someting.invoke ()  } ,wml : {  } }, [
 
         document.createTextNode('Click Here')
      ]),

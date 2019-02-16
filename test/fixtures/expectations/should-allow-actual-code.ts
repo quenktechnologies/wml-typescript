@@ -14,11 +14,11 @@ fromNullable as __fromNullable,
 fromArray as __fromArray
 }
 from '@quenk/noni/lib/data/maybe';
-type NodeFunc = 
+export type NodeFunc = 
 (tag:string, attrs:__wml.AttributeMap<any>, children: __wml.Content[]) => __wml.Content;
 
-type WidgetFunc = 
-(C: __wml.WidgetConstructor<A>,attrs:__wml.AttributeMap<any>, children: __wml.Content[]) => __wml.Content;
+export type WidgetFunc<A> = 
+(C: __wml.WidgetConstructor<__wml.AttributeMap<A>>,attrs:__wml.AttributeMap<A>, children: __wml.Content) => __wml.Content;
 export class Main  implements __wml.View {
 
    constructor(__context: TabbedPanel  ) {
@@ -35,7 +35,7 @@ export class Main  implements __wml.View {
 
         this.widget(TabBar, {html : {  } ,wml : {  } }, [
 
-        (x=>x.length > 0 ? 
+        ...((x=>x.length > 0 ? 
 
             x.map((tab ) => ([
 
@@ -45,7 +45,7 @@ export class Main  implements __wml.View {
      ])
      ])) : 
 
-            [])(__context.values.header .tabs ),
+            [])(__context.values.header .tabs )),
 (__context.values.header .additionalTabs ) ? 
 
            [
@@ -85,7 +85,7 @@ __context.children
    register(e:__wml.WMLElement, attrs:__wml.AttributeMap<any>) {
 
        let id = (<__wml.Attrs><any>attrs).wml.id;
-       let group = (<__wml.Attrs><any>attrs).wml.group;
+       let group = <string>(<__wml.Attrs><any>attrs).wml.group;
 
        if(id != null) {
 
@@ -96,7 +96,7 @@ __context.children
 
        }
 
-       if(group !== null) {
+       if(group != null) {
 
            this.groups[group] = this.groups[group] || [];
            this.groups[group].push(e);
@@ -159,16 +159,9 @@ __context.children
    }
 
 
-   widget<A>(C: __wml.WidgetConstructor<A>,attrs:__wml.AttributeMap<any>, children: __wml.Content[]) {
+   widget<A>(C: __wml.WidgetConstructor<__wml.AttributeMap<A>>,attrs:__wml.AttributeMap<A>, children: __wml.Content) {
 
-       let childs: __wml.Content[] = [];
-       let w;
-
-       children.forEach(child => (child instanceof Array) ?
-           childs.push.apply(childs, child) :
-           childs.push(child));
-
-       w = new C<any>(attrs, childs);
+       let w = new C(attrs, children);
 
        this.register(w, attrs);
 
@@ -184,19 +177,16 @@ __context.children
 
    }
 
-   findByGroup(name: string): __Maybe<__wml.WMLElement[]> {
+   findByGroup<E extends __wml.WMLElement>(name: string): __Maybe<E[]> {
 
        return __fromArray(this.groups.hasOwnProperty(name) ?
-           this.groups[name] : 
+           <any>this.groups[name] : 
            []);
 
    }
 
    invalidate() : void {
 
-       let childs;
-
-       let realFirstChildIndex = -1;
        let {tree} = this;
        let parent = <Node>tree.parentNode;
 
@@ -204,10 +194,7 @@ __context.children
            return console.warn('invalidate(): '+       'Cannot invalidate a view that has not been rendered!');
 
        if (tree.parentNode == null)
-           return console.warn('invalidate(): Attempt to '+
-                        'invalidate a view that has not been inserted to DOM!');
-
-       childs = (<Element>tree.parentNode).children;
+                  throw new Error('Cannot invalidate a view  that has not been rendered!');
 
        parent.replaceChild(this.render(), tree) 
 
@@ -218,7 +205,7 @@ __context.children
        this.ids = {};
        this.widgets.forEach(w => w.removed());
        this.widgets = [];
-       this.tree = this.template();
+       this.tree = this.template(this);
 
        this.ids['root'] = (this.ids['root']) ?
        this.ids['root'] : 
