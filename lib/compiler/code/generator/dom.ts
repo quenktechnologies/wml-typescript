@@ -29,8 +29,7 @@ const NODE_PARAMS = `tag:string, attrs:${WML}.AttributeMap<any>, ` +
     `children: ${WML}.Content[]`;
 
 const WIDGET_PARAMS =
-    `C: ${WML}.WidgetConstructor<${WML}.AttributeMap<A>>,` +
-    `attrs:${WML}.AttributeMap<A>, children: ${WML}.Content[]`;
+    `C: W, attrs:A, children: ${WML}.Content[]`;
 
 const REGISTER_PARAMS = `e:${WML}.WMLElement, ` +
     `attrs:${WML}.AttributeMap<any>`;
@@ -66,7 +65,7 @@ export class DOMGenerator implements Generator {
             `export type NodeFunc = `,
             `(${NODE_PARAMS}) => ${WML}.Content;`,
             ``,
-            `export type WidgetFunc<A> = `,
+            `export type WidgetFunc<A, W extends ${WML}.WidgetConstructor<A>> = `,
             `(${WIDGET_PARAMS}) => ${WML}.Content;`
 
         ].join(eol(ctx));
@@ -184,7 +183,8 @@ export class DOMGenerator implements Generator {
             `   }`,
             ``,
             ``,
-            `   widget<A>(${WIDGET_PARAMS}) {`,
+            `   widget<A extends ${WML}.Attrs, W extends ${WML}.`,
+            `   WidgetConstructor<A>>(${WIDGET_PARAMS}) {`,
             ``,
             `       let w = new C(attrs, children);`,
             ``,
