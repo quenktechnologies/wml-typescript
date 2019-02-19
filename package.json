@@ -1,6 +1,6 @@
 {
   "name": "@quenk/wml-typescript",
-  "version": "0.20.2",
+  "version": "0.20.3",
   "description": "Widget Markup Language",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
