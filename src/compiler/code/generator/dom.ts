@@ -25,14 +25,14 @@ const FROM_NULLABLE = '__fromNullable';
 
 const FROM_ARRAY = '__fromArray';
 
-const NODE_PARAMS = `tag:string, attrs:${WML}.AttributeMap<any>, ` +
+const NODE_PARAMS = `tag:string, attrs:${WML}.Attributes<any>, ` +
     `children: ${WML}.Content[]`;
 
 const WIDGET_PARAMS =
     `C: W, attrs:A, children: ${WML}.Content[]`;
 
 const REGISTER_PARAMS = `e:${WML}.WMLElement, ` +
-    `attrs:${WML}.AttributeMap<any>`;
+    `attrs:${WML}.Attributes<any>`;
 
 const THROW_CHILD_ERR = '         throw new TypeError(`Can not adopt ' +
     'child ${c} of type \${typeof c}`);';
@@ -65,8 +65,10 @@ export class DOMGenerator implements Generator {
             `export type NodeFunc = `,
             `(${NODE_PARAMS}) => ${WML}.Content;`,
             ``,
-            `export type WidgetFunc<A, W extends ${WML}.WidgetConstructor<A>> = `,
-            `(${WIDGET_PARAMS}) => ${WML}.Content;`
+            `export type WidgetFunc<A extends ${WML}.Attrs, W extends `,
+            `     ${WML}.WidgetConstructor<A>> = `,
+            `(${WIDGET_PARAMS}) => ${WML}.Content;`,
+            ``
 
         ].join(eol(ctx));
 
@@ -343,11 +345,13 @@ export class DOMGenerator implements Generator {
             `   return ($$keys.length > 0) ?`,
             `       $$keys.map(${key} => {`,
             ``,
-            `   ${value} = ${all}[${key}];`,
+            `   let ${value} = ${all}[${key}];`,
             ``,
             `   return ${body};`,
             ``,
-            `   ${alt})(${expr}))`
+            `     }) :`,
+            ``,
+            `   ${alt}})(${expr}))`
 
         ].join(eol(ctx));
 
