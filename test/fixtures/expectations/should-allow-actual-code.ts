@@ -15,10 +15,12 @@ fromArray as __fromArray
 }
 from '@quenk/noni/lib/data/maybe';
 export type NodeFunc = 
-(tag:string, attrs:__wml.AttributeMap<any>, children: __wml.Content[]) => __wml.Content;
+(tag:string, attrs:__wml.Attributes<any>, children: __wml.Content[]) => __wml.Content;
 
-export type WidgetFunc<A> = 
-(C: __wml.WidgetConstructor<__wml.AttributeMap<A>>,attrs:__wml.AttributeMap<A>, children: __wml.Content) => __wml.Content;
+export type WidgetFunc<A extends __wml.Attrs, W extends 
+     __wml.WidgetConstructor<A>> = 
+(C: W, attrs:A, children: __wml.Content[]) => __wml.Content;
+
 export class Main  implements __wml.View {
 
    constructor(__context: TabbedPanel  ) {
@@ -82,7 +84,7 @@ __context.children
 
    template: __wml.Template;
 
-   register(e:__wml.WMLElement, attrs:__wml.AttributeMap<any>) {
+   register(e:__wml.WMLElement, attrs:__wml.Attributes<any>) {
 
        let id = (<__wml.Attrs><any>attrs).wml.id;
        let group = <string>(<__wml.Attrs><any>attrs).wml.group;
@@ -106,7 +108,7 @@ __context.children
        return e;
 }
 
-   node(tag:string, attrs:__wml.AttributeMap<any>, children: __wml.Content[]) {
+   node(tag:string, attrs:__wml.Attributes<any>, children: __wml.Content[]) {
 
        let e = document.createElement(tag);
 
@@ -159,7 +161,8 @@ __context.children
    }
 
 
-   widget<A>(C: __wml.WidgetConstructor<__wml.AttributeMap<A>>,attrs:__wml.AttributeMap<A>, children: __wml.Content) {
+   widget<A extends __wml.Attrs, W extends __wml.
+   WidgetConstructor<A>>(C: W, attrs:A, children: __wml.Content[]) {
 
        let w = new C(attrs, children);
 

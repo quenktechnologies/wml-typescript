@@ -14,7 +14,31 @@ export type WidgetFunc<A extends __wml.Attrs, W extends
      __wml.WidgetConstructor<A>> = 
 (C: W, attrs:A, children: __wml.Content[]) => __wml.Content;
 
-this.node('bool', {html : { 'active' : true   } ,wml : {  } }, [
+this.node('root', {html : {  } ,wml : {  } }, [
 
-        (fun()) ? false  :  true 
+        ...(($all => { 
+
+   let $$keys = Object.keys($all);
+
+   return ($$keys.length > 0) ?
+       $$keys.map(key  => {
+
+   let value  = $all[key ];
+
+   return [
+
+        this.node('stem', {html : {  } ,wml : {  } }, [
+
+        key,
+document.createTextNode(' ~ '),
+value
+     ])
+     ];
+
+     }) :
+
+   []})({
+ 
+      
+     }))
      ])
