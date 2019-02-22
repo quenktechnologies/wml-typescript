@@ -14,14 +14,47 @@ export type WidgetFunc<A extends __wml.Attrs, W extends
      __wml.WidgetConstructor<A>> = 
 (C: W, attrs:A, children: __wml.Content[]) => __wml.Content;
 
+export type ForAlt = ()=> __wml.Content[]
+
+export type ForInBody<A> =(val:A, idx:number, all:A[])=>__wml.Content[]
+
+export type ForOfBody<A> = (val:A, key:string, all:object) =>__wml.Content[]
+
+export interface Record<A> {
+
+ [key:string]: A
+
+}
+
+export const $$forIn = <A>(list:A[], f:ForInBody<A>, alt:ForAlt) : __wml.Content[] => {
+
+   let ret:__wml.Content[] = [];
+
+   for(let i=0; i<list.length; i++)
+       ret = ret.concat(f(list[i], i, list));
+
+   return ret.length === 0 ? alt() : ret;
+
+}
+export const $$forOf = <A>(o:Record<A>, f:ForOfBody<A>,alt:ForAlt) : __wml.Content[] => {
+
+    let ret:__wml.Content[] = [];
+
+    for(let key in o)
+  	    if(o.hasOwnProperty(key)) 
+	        ret = ret.concat(f((o)[key], key, o));
+
+    return ret.length === 0 ? alt(): ret;
+
+}
 this.node('panel', {html : {  } ,wml : {  } }, [
 
-        document.createTextNode(' This is my offsprings.'),
+        document.createTextNode(` This is my offsprings.`),
 this.node('a', {html : {  } ,wml : {  } }, [
 
-        document.createTextNode('Link')
+        document.createTextNode(`Link`)
      ]),
-document.createTextNode('Hey now! '),
+document.createTextNode(`Hey now! `),
 this.widget(Input, {html : {  } ,wml : {  } }, [
 
         

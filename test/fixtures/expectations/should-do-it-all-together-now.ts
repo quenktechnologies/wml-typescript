@@ -14,15 +14,48 @@ export type WidgetFunc<A extends __wml.Attrs, W extends
      __wml.WidgetConstructor<A>> = 
 (C: W, attrs:A, children: __wml.Content[]) => __wml.Content;
 
+export type ForAlt = ()=> __wml.Content[]
+
+export type ForInBody<A> =(val:A, idx:number, all:A[])=>__wml.Content[]
+
+export type ForOfBody<A> = (val:A, key:string, all:object) =>__wml.Content[]
+
+export interface Record<A> {
+
+ [key:string]: A
+
+}
+
+export const $$forIn = <A>(list:A[], f:ForInBody<A>, alt:ForAlt) : __wml.Content[] => {
+
+   let ret:__wml.Content[] = [];
+
+   for(let i=0; i<list.length; i++)
+       ret = ret.concat(f(list[i], i, list));
+
+   return ret.length === 0 ? alt() : ret;
+
+}
+export const $$forOf = <A>(o:Record<A>, f:ForOfBody<A>,alt:ForAlt) : __wml.Content[] => {
+
+    let ret:__wml.Content[] = [];
+
+    for(let key in o)
+  	    if(o.hasOwnProperty(key)) 
+	        ret = ret.concat(f((o)[key], key, o));
+
+    return ret.length === 0 ? alt(): ret;
+
+}
 this.node('modal', {html : { 'name' : `mymodal` ,'x' : `1` ,'y' : `2`  } ,wml : {  } }, [
 
         this.node('modal-header', {html : {  } ,wml : {  } }, [
 
-        document.createTextNode('My Modal')
+        document.createTextNode(`My Modal`)
      ]),
 this.node('modal-body', {html : {  } ,wml : {  } }, [
 
-        document.createTextNode('Creativxity is inhibxited by greed and corruption.'),
+        document.createTextNode(`Creativxity is inhibxited by greed and corruption.`),
 this.node('vote-button', {html : {  } ,wml : {  } }, [
 
         
@@ -31,10 +64,10 @@ this.node('vote-count', {html : { 'source' : __context  } ,wml : {  } }, [
 
         
      ]),
-document.createTextNode(' Votes'),
+document.createTextNode(` Votes`),
 this.node('textarea', {html : { 'disabled' : true  ,'size' : 32 ,'onchange' : __context.setText  } ,wml : { 'id' : `ta`  } }, [
 
-        document.createTextNode(' Various text')
+        document.createTextNode(` Various text`)
      ])
      ])
      ])
