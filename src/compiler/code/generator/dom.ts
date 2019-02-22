@@ -40,6 +40,10 @@ const THROW_CHILD_ERR = '         throw new TypeError(`Can not adopt ' +
 const THROW_INVALIDATE_ERR = `       throw new Error('Cannot invalidate a view ` +
     ` that has not been rendered!');`;
 
+const FOR_OF = '$$forOf';
+
+const FOR_IN = '$$forIn';
+
 /**
  * DOMGenerator targets the client side DOM.
  */
@@ -68,7 +72,44 @@ export class DOMGenerator implements Generator {
             `export type WidgetFunc<A extends ${WML}.Attrs, W extends `,
             `     ${WML}.WidgetConstructor<A>> = `,
             `(${WIDGET_PARAMS}) => ${WML}.Content;`,
-            ``
+            ``,
+            `export type ForAlt = ()=> ${WML}.Content[]`,
+            ``,
+            `export type ForInBody<A> =(val:A, idx:number, all:A[])=>` +
+            `${WML}.Content[]`,
+            ``,
+            `export type ForOfBody<A> = (val:A, key:string, all:object) =>` +
+            `${WML}.Content[]`,
+            ``,
+            `export interface Record<A> {`,
+            ``,
+            ` [key:string]: A`,
+            ``,
+            `}`,
+            ``,
+            `export const ${FOR_IN} = <A>(list:A[], f:ForInBody<A>, alt:ForAlt) : ` +
+            `${WML}.Content[] => {`,
+            ``,
+            `   let ret:${WML}.Content[] = [];`,
+            ``,
+            `   for(let i=0; i<list.length; i++)`,
+            `       ret = ret.concat(f(list[i], i, list));`,
+            ``,
+            `   return ret.length === 0 ? alt() : ret;`,
+            ``,
+            `}`,
+            `export const ${FOR_OF} = <A>(o:Record<A>, f:ForOfBody<A>,` +
+            `alt:ForAlt) : ${WML}.Content[] => {`,
+            ``,
+            `    let ret:${WML}.Content[] = [];`,
+            ``,
+            `    for(let key in o)`,
+            `  	    if(o.hasOwnProperty(key)) `,
+            `	        ret = ret.concat(f((o)[key], key, o));`,
+            ``,
+            `    return ret.length === 0 ? alt(): ret;`,
+            ``,
+            `}`
 
         ].join(eol(ctx));
 
@@ -307,19 +348,19 @@ export class DOMGenerator implements Generator {
 
         let value = parameter2TS(n.variables[0]);
 
-        let key = n.variables.length > 1 ? parameter2TS(n.variables[1]) : '';
+        let key = n.variables.length > 1 ? parameter2TS(n.variables[1]) : '_$$i';
 
-        let all = n.variables.length > 2 ? parameter2TS(n.variables[2]) : '';
-
-        let params = [value, key, all].filter(x => x).join(',');
+        let all = n.variables.length > 2 ? parameter2TS(n.variables[2]) : '_$$all';
 
         let body = children2TS(ctx, n.body);
 
         let alt = n.otherwise.length > 0 ? children2TS(ctx, n.otherwise) : '[]';
 
-        return `...((x=>x.length > 0 ? ${eol(ctx)}
-            x.map((${params}) => (${body})) : ${eol(ctx)}
-            ${alt})(${expr}))`;
+        return [
+            `...${FOR_IN}(${expr},(${value},${key},${all})=>`,
+            `(${body}),`,
+            `()=>(${alt}))`
+        ].join(ctx.options.EOL);
 
     }
 
@@ -329,37 +370,25 @@ export class DOMGenerator implements Generator {
 
         let value = parameter2TS(n.variables[0]);
 
-        let key = n.variables.length > 1 ? parameter2TS(n.variables[1]) : '$$k';
+        let key = n.variables.length > 1 ? parameter2TS(n.variables[1]) : '_$$k';
 
-        let all = n.variables.length > 2 ? parameter2TS(n.variables[2]) : '$all';
+        let all = n.variables.length > 2 ? parameter2TS(n.variables[2]) : '_$$all';
 
         let body = children2TS(ctx, n.body);
 
         let alt = n.otherwise.length > 0 ? children2TS(ctx, n.otherwise) : '[]';
 
         return [
-            `...((${all} => { `,
-            ``,
-            `   let $$keys = Object.keys(${all});`,
-            ``,
-            `   return ($$keys.length > 0) ?`,
-            `       $$keys.map(${key} => {`,
-            ``,
-            `   let ${value} = ${all}[${key}];`,
-            ``,
-            `   return ${body};`,
-            ``,
-            `     }) :`,
-            ``,
-            `   ${alt}})(${expr}))`
-
+            `...${FOR_OF}(${expr}, (${value}, ${key}, ${all}) => `,
+            `       (${body}),`,
+            `    ()=>(${alt}))`
         ].join(eol(ctx));
 
     }
 
     text(_: Context, str: string) {
 
-        return `document.createTextNode('${str}')`;
+        return `document.createTextNode(\`${str}\`)`;
 
     }
 
