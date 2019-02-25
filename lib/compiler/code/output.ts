@@ -416,10 +416,9 @@ export const viewConstruction2TS = (ctx: Context, n: nodes.ViewConstruction) =>
  * funApplication2TS 
  */
 export const funApplication2TS = (ctx: Context, n: nodes.FunApplication) =>
-    `${expression2TS(ctx, n.target)}${typeArgs2TS(n.typeArgs)} ` +
-    `${_curriedApplication(ctx, n.args)}(${THIS})`
+    ctx.generator.funApplication(ctx, n);
 
-const _curriedApplication = (ctx: Context, ns: nodes.Expression[]) =>
+export const curriedApplication = (ctx: Context, ns: nodes.Expression[]) =>
     (ns.length === 0) ? '' : ns.map(e => `(${expression2TS(ctx, e)})`).join('');
 
 /**

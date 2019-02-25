@@ -9,9 +9,7 @@ export declare class DOMGenerator implements Generator {
     definitions(ctx: Context): string;
     view(ctx: Context, n: ast.ViewStatement): string;
     fun(ctx: Context, n: ast.FunStatement): string;
-    /**
-     * widget construction generator.
-     */
+    funApplication(ctx: Context, n: ast.FunApplication): string;
     widget(ctx: Context, w: ast.Widget): string;
     node(ctx: Context, n: ast.Node): string;
     forIn(ctx: Context, n: ast.ForInStatement): string;

@@ -12,7 +12,9 @@ import {
     parameter2TS,
     typeParameters,
     unqualifiedIdentifier2TS,
+    curriedApplication,
     type2TS,
+    typeArgs2TS,
     tag2TS,
     eol
 } from '../output';
@@ -40,9 +42,15 @@ const THROW_CHILD_ERR = '         throw new TypeError(`Can not adopt ' +
 const THROW_INVALIDATE_ERR = `       throw new Error('Cannot invalidate a view ` +
     ` that has not been rendered!');`;
 
-const FOR_OF = '$$forOf';
+const FOR_OF = '__forOf';
 
-const FOR_IN = '$$forIn';
+const FOR_IN = '__forIn';
+
+const FOR_ALT_TYPE = '__ForAlt';
+
+const FOR_IN_BODY = '__ForInBody<A>';
+
+const FOR_OF_BODY = '__ForOfBody<A>';
 
 /**
  * DOMGenerator targets the client side DOM.
@@ -66,19 +74,12 @@ export class DOMGenerator implements Generator {
 
         return [
 
-            `export type NodeFunc = `,
-            `(${NODE_PARAMS}) => ${WML}.Content;`,
+            `type ${FOR_ALT_TYPE} = ()=> ${WML}.Content[]`,
             ``,
-            `export type WidgetFunc<A extends ${WML}.Attrs, W extends `,
-            `     ${WML}.WidgetConstructor<A>> = `,
-            `(${WIDGET_PARAMS}) => ${WML}.Content;`,
-            ``,
-            `export type ForAlt = ()=> ${WML}.Content[]`,
-            ``,
-            `export type ForInBody<A> =(val:A, idx:number, all:A[])=>` +
+            `type ${FOR_IN_BODY} =(val:A, idx:number, all:A[])=>` +
             `${WML}.Content[]`,
             ``,
-            `export type ForOfBody<A> = (val:A, key:string, all:object) =>` +
+            `type ${FOR_OF_BODY} = (val:A, key:string, all:object) =>` +
             `${WML}.Content[]`,
             ``,
             `export interface Record<A> {`,
@@ -87,8 +88,8 @@ export class DOMGenerator implements Generator {
             ``,
             `}`,
             ``,
-            `export const ${FOR_IN} = <A>(list:A[], f:ForInBody<A>, alt:ForAlt) : ` +
-            `${WML}.Content[] => {`,
+            `export const ${FOR_IN} = <A>(list:A[], f:${FOR_IN_BODY}, alt:` +
+            `${FOR_ALT_TYPE}) : ${WML}.Content[] => {`,
             ``,
             `   let ret:${WML}.Content[] = [];`,
             ``,
@@ -98,8 +99,8 @@ export class DOMGenerator implements Generator {
             `   return ret.length === 0 ? alt() : ret;`,
             ``,
             `}`,
-            `export const ${FOR_OF} = <A>(o:Record<A>, f:ForOfBody<A>,` +
-            `alt:ForAlt) : ${WML}.Content[] => {`,
+            `export const ${FOR_OF} = <A>(o:Record<A>, f:${FOR_OF_BODY},` +
+            `alt:${FOR_ALT_TYPE}) : ${WML}.Content[] => {`,
             ``,
             `    let ret:${WML}.Content[] = [];`,
             ``,
@@ -301,7 +302,7 @@ export class DOMGenerator implements Generator {
 
         let params = n.parameters.map(parameter2TS).map(s => `(${s})=> `).join('');
 
-        let factory = `(node: NodeFunc<any>, widget:WidgetFunc<any>) => `;
+        let factory = `(${THIS}:${WML}.Registry) =>`;
 
         let body = children2TS(ctx, n.body);
 
@@ -309,7 +310,7 @@ export class DOMGenerator implements Generator {
 
             `export const ${id} = `,
             ``,
-            `${typeParams}${factory}${params} {`,
+            `${typeParams}${params}${factory} {`,
             ``,
             `   return ${body};`,
             ``,
@@ -319,16 +320,20 @@ export class DOMGenerator implements Generator {
 
     }
 
-    /**
-     * widget construction generator.
-     */
+    funApplication(ctx: Context, n: ast.FunApplication) {
+
+        return `${expression2TS(ctx, n.target)}${typeArgs2TS(n.typeArgs)} ` +
+            `${curriedApplication(ctx, n.args)}(${THIS})`
+
+    }
+
     widget(ctx: Context, w: ast.Widget) {
 
         let name = constructor2TS(w.open);
         let attrs = attrs2String(groupAttrs(ctx, w.attributes));
         let childs = children2TS(ctx, w.children);
 
-        return `this.widget(${name}, ${attrs}, ${childs})`;
+        return `${THIS}.widget(${name}, ${attrs}, ${childs})`;
 
     }
 
@@ -338,7 +343,7 @@ export class DOMGenerator implements Generator {
         let attrs = attrs2String(groupAttrs(ctx, n.attributes));
         let childs = children2TS(ctx, n.children);
 
-        return `this.node('${name}', ${attrs}, ${childs})`;
+        return `${THIS}.node('${name}', ${attrs}, ${childs})`;
 
     }
 

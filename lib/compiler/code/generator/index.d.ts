@@ -23,6 +23,10 @@ export interface Generator {
      */
     fun(ctx: Context, f: ast.FunStatement): Code;
     /**
+     * funApplication generator.
+     */
+    funApplication(ctx: Context, f: ast.FunApplication): Code;
+    /**
      * widget construction generator.
      */
     widget(ctx: Context, w: ast.Widget): Code;
