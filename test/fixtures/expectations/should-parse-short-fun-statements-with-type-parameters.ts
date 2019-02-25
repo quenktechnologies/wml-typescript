@@ -40,13 +40,13 @@ export const __forOf = <A>(o:Record<A>, f:ForOfBody<A>,alt:__ForAlt) : __wml.Con
     return ret.length === 0 ? alt(): ret;
 
 }
-export const action = 
+export const vue = 
 
-<A  > (s: string  [] )=> (a: A  [] )=> (__this:__wml.Registry) => {
+<A  ,B extends C   ,C  > (a: A   )=> (b: B   )=> (__this:__wml.Registry) => {
 
    return [
 
-        `${s}${a}`
+        ((a + b) + c)
      ];
 
 };

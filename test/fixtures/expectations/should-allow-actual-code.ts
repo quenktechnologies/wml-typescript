@@ -14,14 +14,7 @@ fromNullable as __fromNullable,
 fromArray as __fromArray
 }
 from '@quenk/noni/lib/data/maybe';
-export type NodeFunc = 
-(tag:string, attrs:__wml.Attributes<any>, children: __wml.Content[]) => __wml.Content;
-
-export type WidgetFunc<A extends __wml.Attrs, W extends 
-     __wml.WidgetConstructor<A>> = 
-(C: W, attrs:A, children: __wml.Content[]) => __wml.Content;
-
-export type ForAlt = ()=> __wml.Content[]
+type __ForAlt = ()=> __wml.Content[]
 
 export type ForInBody<A> =(val:A, idx:number, all:A[])=>__wml.Content[]
 
@@ -33,7 +26,7 @@ export interface Record<A> {
 
 }
 
-export const $$forIn = <A>(list:A[], f:ForInBody<A>, alt:ForAlt) : __wml.Content[] => {
+export const __forIn = <A>(list:A[], f:ForInBody<A>, alt:__ForAlt) : __wml.Content[] => {
 
    let ret:__wml.Content[] = [];
 
@@ -43,7 +36,7 @@ export const $$forIn = <A>(list:A[], f:ForInBody<A>, alt:ForAlt) : __wml.Content
    return ret.length === 0 ? alt() : ret;
 
 }
-export const $$forOf = <A>(o:Record<A>, f:ForOfBody<A>,alt:ForAlt) : __wml.Content[] => {
+export const __forOf = <A>(o:Record<A>, f:ForOfBody<A>,alt:__ForAlt) : __wml.Content[] => {
 
     let ret:__wml.Content[] = [];
 
@@ -60,20 +53,20 @@ export class Main  implements __wml.View {
 
        this.template = (__this:__wml.Registry) => {
 
-           return this.widget(Panel, {html : {  } ,wml : {  } ,ww : { 'class' : __context.values.root .class   } }, [
+           return __this.widget(Panel, {html : {  } ,wml : {  } ,ww : { 'class' : __context.values.root .class   } }, [
 
         (((__context.values.header .tabs .length  > 0) || __context.values.header .additionalTabs )) ? 
 
            [
 
-        this.widget(PanelHeader, {html : {  } ,wml : {  } }, [
+        __this.widget(PanelHeader, {html : {  } ,wml : {  } }, [
 
-        this.widget(TabBar, {html : {  } ,wml : {  } }, [
+        __this.widget(TabBar, {html : {  } ,wml : {  } }, [
 
-        ...$$forIn(__context.values.header .tabs ,(tab ,_$$i,_$$all)=>
+        ...__forIn(__context.values.header .tabs ,(tab ,_$$i,_$$all)=>
 ([
 
-        this.widget(Tab, {html : {  } ,wml : {  } ,ww : { 'name' : tab.name ,'onClick' : tab.onClick  } }, [
+        __this.widget(Tab, {html : {  } ,wml : {  } ,ww : { 'name' : tab.name ,'onClick' : tab.onClick  } }, [
 
         
      ])

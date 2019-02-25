@@ -40,46 +40,15 @@ export const __forOf = <A>(o:Record<A>, f:ForOfBody<A>,alt:__ForAlt) : __wml.Con
     return ret.length === 0 ? alt(): ret;
 
 }
-export const template = 
+export class Main <A  ,B  >  implements __wml.View {
 
-<A  > (d: Date <A  >   )=> (o: A   )=> (_: string   )=> (__: A  [] )=> (__this:__wml.Registry) => {
-
-   return [
-
-        new String (o)
-     ];
-
-};;
-export class Results <A  >  implements __wml.View {
-
-   constructor(__context: Date <A  >  ) {
+   constructor(__context: Context <A  ,B  >  ) {
 
        this.template = (__this:__wml.Registry) => {
 
-           return __this.node('ul', {html : {  } ,wml : {  } }, [
+           return __this.node('p', {html : {  } ,wml : {  } }, [
 
-        ...__forIn([
-
-            1,
-3,
-4
-            ],(option ,index ,_$$all)=>
-([
-
-        __this.node('li', {html : {  } ,wml : {  } }, [
-
-        option,
-document.createTextNode(`and`),
-index
-     ])
-     ]),
-()=>([
-
-        __this.node('p', {html : {  } ,wml : {  } }, [
-
-        document.createTextNode(`De nada!`)
-     ])
-     ]))
+        __context.values
      ]);
 
        }

@@ -7,14 +7,7 @@ fromNullable as __fromNullable,
 fromArray as __fromArray
 }
 from '@quenk/noni/lib/data/maybe';
-export type NodeFunc = 
-(tag:string, attrs:__wml.Attributes<any>, children: __wml.Content[]) => __wml.Content;
-
-export type WidgetFunc<A extends __wml.Attrs, W extends 
-     __wml.WidgetConstructor<A>> = 
-(C: W, attrs:A, children: __wml.Content[]) => __wml.Content;
-
-export type ForAlt = ()=> __wml.Content[]
+type __ForAlt = ()=> __wml.Content[]
 
 export type ForInBody<A> =(val:A, idx:number, all:A[])=>__wml.Content[]
 
@@ -26,7 +19,7 @@ export interface Record<A> {
 
 }
 
-export const $$forIn = <A>(list:A[], f:ForInBody<A>, alt:ForAlt) : __wml.Content[] => {
+export const __forIn = <A>(list:A[], f:ForInBody<A>, alt:__ForAlt) : __wml.Content[] => {
 
    let ret:__wml.Content[] = [];
 
@@ -36,7 +29,7 @@ export const $$forIn = <A>(list:A[], f:ForInBody<A>, alt:ForAlt) : __wml.Content
    return ret.length === 0 ? alt() : ret;
 
 }
-export const $$forOf = <A>(o:Record<A>, f:ForOfBody<A>,alt:ForAlt) : __wml.Content[] => {
+export const __forOf = <A>(o:Record<A>, f:ForOfBody<A>,alt:__ForAlt) : __wml.Content[] => {
 
     let ret:__wml.Content[] = [];
 
@@ -47,25 +40,25 @@ export const $$forOf = <A>(o:Record<A>, f:ForOfBody<A>,alt:ForAlt) : __wml.Conte
     return ret.length === 0 ? alt(): ret;
 
 }
-this.node('modal', {html : { 'name' : `mymodal` ,'x' : `1` ,'y' : `2`  } ,wml : {  } }, [
+__this.node('modal', {html : { 'name' : `mymodal` ,'x' : `1` ,'y' : `2`  } ,wml : {  } }, [
 
-        this.node('modal-header', {html : {  } ,wml : {  } }, [
+        __this.node('modal-header', {html : {  } ,wml : {  } }, [
 
         document.createTextNode(`My Modal`)
      ]),
-this.node('modal-body', {html : {  } ,wml : {  } }, [
+__this.node('modal-body', {html : {  } ,wml : {  } }, [
 
         document.createTextNode(`Creativxity is inhibxited by greed and corruption.`),
-this.node('vote-button', {html : {  } ,wml : {  } }, [
+__this.node('vote-button', {html : {  } ,wml : {  } }, [
 
         
      ]),
-this.node('vote-count', {html : { 'source' : __context  } ,wml : {  } }, [
+__this.node('vote-count', {html : { 'source' : __context  } ,wml : {  } }, [
 
         
      ]),
 document.createTextNode(` Votes`),
-this.node('textarea', {html : { 'disabled' : true  ,'size' : 32 ,'onchange' : __context.setText  } ,wml : { 'id' : `ta`  } }, [
+__this.node('textarea', {html : { 'disabled' : true  ,'size' : 32 ,'onchange' : __context.setText  } ,wml : { 'id' : `ta`  } }, [
 
         document.createTextNode(` Various text`)
      ])

@@ -40,13 +40,13 @@ export const __forOf = <A>(o:Record<A>, f:ForOfBody<A>,alt:__ForAlt) : __wml.Con
     return ret.length === 0 ? alt(): ret;
 
 }
-export const action = 
+export const test = 
 
-<A  > (s: string  [] )=> (a: A  [] )=> (__this:__wml.Registry) => {
+<A extends string   > (a: A   )=> (__this:__wml.Registry) => {
 
    return [
 
-        `${s}${a}`
+        A
      ];
 
 };
