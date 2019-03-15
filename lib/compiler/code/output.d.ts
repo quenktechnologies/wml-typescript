@@ -151,7 +151,7 @@ export declare const viewConstruction2TS: (ctx: Context, n: nodes.ViewConstructi
  * funApplication2TS
  */
 export declare const funApplication2TS: (ctx: Context, n: nodes.FunApplication) => string;
-export declare const curriedApplication: (ctx: Context, ns: nodes.Expression[]) => string;
+export declare const partialApplication2TS: (ctx: Context, ns: nodes.Expression[]) => string;
 /**
  * constructExpression2TS
  */

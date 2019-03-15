@@ -35,6 +35,10 @@ export interface Generator {
      */
     node(ctx: Context, n: ast.Node): Code;
     /**
+     * ifelse statement generator.
+     */
+    ifelse(ctx: Context, n: ast.IfStatement): Code;
+    /**
      * forIn statement generator.
      */
     forIn(ctx: Context, n: ast.ForInStatement): Code;
