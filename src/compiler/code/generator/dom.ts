@@ -12,10 +12,11 @@ import {
     parameter2TS,
     typeParameters,
     unqualifiedIdentifier2TS,
-    curriedApplication,
+    partialApplication2TS,
     type2TS,
     typeArgs2TS,
     tag2TS,
+    ifStatement2TS,
     eol
 } from '../output';
 import { Context } from '../';
@@ -42,6 +43,14 @@ const THROW_CHILD_ERR = '         throw new TypeError(`Can not adopt ' +
 const THROW_INVALIDATE_ERR = `       throw new Error('Cannot invalidate a view ` +
     ` that has not been rendered!');`;
 
+const IGNORE_UNUSED = '//@ts-ignore:6192';
+
+const RECORD = '__Record<A>';
+
+const IF = '__if';
+
+const IFARG = `__IfArg`;
+
 const FOR_OF = '__forOf';
 
 const FOR_IN = '__forIn';
@@ -60,6 +69,7 @@ export class DOMGenerator implements Generator {
     imports(ctx: Context) {
 
         return [
+            `//@ts-ignore: 6192`,
             `import {`,
             `Maybe as ${MAYBE},`,
             `fromNullable as ${FROM_NULLABLE},`,
@@ -73,22 +83,34 @@ export class DOMGenerator implements Generator {
     definitions(ctx: Context) {
 
         return [
-
+            `${IGNORE_UNUSED}`,
+            `type ${IFARG} = ()=>${WML}.Content[]`,
+            ``,
+            `${IGNORE_UNUSED}`,
             `type ${FOR_ALT_TYPE} = ()=> ${WML}.Content[]`,
             ``,
+            `${IGNORE_UNUSED}`,
             `type ${FOR_IN_BODY} =(val:A, idx:number, all:A[])=>` +
             `${WML}.Content[]`,
             ``,
+            `${IGNORE_UNUSED}`,
             `type ${FOR_OF_BODY} = (val:A, key:string, all:object) =>` +
             `${WML}.Content[]`,
             ``,
-            `export interface Record<A> {`,
+            `${IGNORE_UNUSED}`,
+          `interface ${RECORD} {`,
             ``,
             ` [key:string]: A`,
             ``,
             `}`,
             ``,
-            `export const ${FOR_IN} = <A>(list:A[], f:${FOR_IN_BODY}, alt:` +
+            `${IGNORE_UNUSED}`,
+            `const ${IF} = (__expr:boolean, __conseq:${IFARG},__alt:${IFARG}) ` +
+            `: Content[]=>`,
+            `(__expr) ? __conseq() :  __alt();`,
+            ``,
+            `${IGNORE_UNUSED}`,
+            `const ${FOR_IN} = <A>(list:A[], f:${FOR_IN_BODY}, alt:` +
             `${FOR_ALT_TYPE}) : ${WML}.Content[] => {`,
             ``,
             `   let ret:${WML}.Content[] = [];`,
@@ -99,7 +121,8 @@ export class DOMGenerator implements Generator {
             `   return ret.length === 0 ? alt() : ret;`,
             ``,
             `}`,
-            `export const ${FOR_OF} = <A>(o:Record<A>, f:${FOR_OF_BODY},` +
+            `${IGNORE_UNUSED}`,
+          `const ${FOR_OF} = <A>(o:${RECORD}, f:${FOR_OF_BODY},` +
             `alt:${FOR_ALT_TYPE}) : ${WML}.Content[] => {`,
             ``,
             `    let ret:${WML}.Content[] = [];`,
@@ -300,9 +323,10 @@ export class DOMGenerator implements Generator {
 
         let typeParams = typeParameters(n.typeParameters);
 
-        let params = n.parameters.map(parameter2TS).map(s => `(${s})=> `).join('');
+        let params = (n.parameters.length === 0) ? '() =>' :
+            n.parameters.map(parameter2TS).map(s => `(${s})=> `).join('');
 
-        let factory = `(${THIS}:${WML}.Registry) =>`;
+        let factory = `(${THIS}:${WML}.Registry) : ${WML}.Content[] =>`;
 
         let body = children2TS(ctx, n.body);
 
@@ -323,7 +347,7 @@ export class DOMGenerator implements Generator {
     funApplication(ctx: Context, n: ast.FunApplication) {
 
         return `${expression2TS(ctx, n.target)}${typeArgs2TS(n.typeArgs)} ` +
-            `${curriedApplication(ctx, n.args)}(${THIS})`
+            `${partialApplication2TS(ctx, n.args)}(${THIS})`
 
     }
 
@@ -347,6 +371,23 @@ export class DOMGenerator implements Generator {
 
     }
 
+    ifelse(ctx: Context, n: ast.IfStatement) {
+
+        let condition = expression2TS(ctx, n.condition);
+        let conseq = children2TS(ctx, n.then);
+
+        let alt = ((n.elseClause instanceof ast.ElseIfClause)) ?
+            `[${ifStatement2TS(ctx, n.elseClause)}]` :
+            children2TS(ctx, n.elseClause.children);
+
+        return [
+            `...(${IF}(${condition},`,
+            `   ()=> (${conseq}),`,
+            `   ()=> (${alt}))) `,
+        ].join(ctx.options.EOL);
+
+    }
+
     forIn(ctx: Context, n: ast.ForInStatement) {
 
         let expr = expression2TS(ctx, n.expression);
@@ -362,9 +403,9 @@ export class DOMGenerator implements Generator {
         let alt = n.otherwise.length > 0 ? children2TS(ctx, n.otherwise) : '[]';
 
         return [
-            `...${FOR_IN}(${expr},(${value},${key},${all})=>`,
-            `(${body}),`,
-            `()=>(${alt}))`
+            `...${FOR_IN} (${expr}, (${value}, ${key}, ${all})=> `,
+            `(${body}), `,
+            `()=> (${alt}))`
         ].join(ctx.options.EOL);
 
     }
@@ -384,9 +425,9 @@ export class DOMGenerator implements Generator {
         let alt = n.otherwise.length > 0 ? children2TS(ctx, n.otherwise) : '[]';
 
         return [
-            `...${FOR_OF}(${expr}, (${value}, ${key}, ${all}) => `,
-            `       (${body}),`,
-            `    ()=>(${alt}))`
+            `...${FOR_OF} (${expr}, (${value}, ${key}, ${all}) => `,
+            `       (${body}), `,
+            `    ()=> (${alt}))`
         ].join(eol(ctx));
 
     }

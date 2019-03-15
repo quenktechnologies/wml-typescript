@@ -41,7 +41,12 @@ export interface Generator {
     /**
      * node (DOM) generator.
      */
-    node(ctx: Context, n: ast.Node): Code
+  node(ctx: Context, n: ast.Node): Code
+
+  /**
+   * ifelse statement generator.
+   */
+  ifelse(ctx:Context, n:ast.IfStatement): Code
 
     /**
      * forIn statement generator.

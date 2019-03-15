@@ -14,8 +14,6 @@ export const THIS = '__this';
 
 type Ifs = nodes.IfStatement | nodes.ElseIfClause;
 
-type Elses = nodes.ElseClause | nodes.ElseIfClause;
-
 const prims = [
     'String',
     'Boolean',
@@ -280,28 +278,8 @@ export const interpolation2TS = (ctx: Context, n: nodes.Interpolation) =>
 /**
  * ifStatementTS
  */
-export const ifStatement2TS = (ctx: Context, n: Ifs) => {
-
-    let condition = expression2TS(ctx, n.condition);
-    let conseq = children2TS(ctx, n.then);
-    let alt = n.elseClause ? else2TS(ctx, n.elseClause) : 'function(){}';
-
-    return `(${condition}) ? ${ctx.options.EOL}
-           ${conseq} : ${ctx.options.EOL}
-           ${alt}`;
-
-}
-
-const else2TS = (ctx: Context, n: Elses): Code => {
-
-    if (n instanceof nodes.ElseClause)
-        return children2TS(ctx, n.children)
-    else if (n instanceof nodes.ElseIfClause)
-        return ifStatement2TS(ctx, n);
-    else
-        return '';
-
-}
+export const ifStatement2TS = (ctx: Context, n: Ifs) =>
+    ctx.generator.ifelse(ctx, n);
 
 /**
  * forInStatement2TS
@@ -418,8 +396,8 @@ export const viewConstruction2TS = (ctx: Context, n: nodes.ViewConstruction) =>
 export const funApplication2TS = (ctx: Context, n: nodes.FunApplication) =>
     ctx.generator.funApplication(ctx, n);
 
-export const curriedApplication = (ctx: Context, ns: nodes.Expression[]) =>
-    (ns.length === 0) ? '' : ns.map(e => `(${expression2TS(ctx, e)})`).join('');
+export const partialApplication2TS = (ctx: Context, ns: nodes.Expression[]) =>
+    (ns.length === 0) ? '()' : ns.map(e => `(${expression2TS(ctx, e)})`).join('');
 
 /**
  * constructExpression2TS 
@@ -434,9 +412,9 @@ export const callExpression2TS = (ctx: Context, n: nodes.CallExpression) => {
 
     let target = expression2TS(ctx, n.target);
     let typeArgs = typeArgs2TS(n.typeArgs);
-    let args = args2TS(ctx, n.args);
+    let args = partialApplication2TS(ctx, n.args);
 
-    return `${target}${typeArgs}(${args})`;
+    return `${target}${typeArgs}${args}`;
 
 }
 
