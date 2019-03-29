@@ -60,7 +60,7 @@ export const template =
 
    return [
 
-        (o)
+        String(o)
      ];
 
 };;

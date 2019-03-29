@@ -59,5 +59,5 @@ __this.widget(TextView, {html : {  } ,wml : {  } ,android : { 'thing' : {
       'value' : 1
      }  } }, [
 
-        new(__context.value)
+        new Person(__context.value)
      ])

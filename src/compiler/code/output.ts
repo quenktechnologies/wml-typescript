@@ -410,7 +410,7 @@ export const constructExpression2TS =
     let cons = constructor2TS(n.cons);
 
     return ((casters.indexOf(cons) === -1) ?
-                'new' : '')+`(${args2TS(ctx, n.args)})`;
+      'new ' : '')+`${cons}(${args2TS(ctx, n.args)})`;
 
   }
 
