@@ -26,6 +26,8 @@ const prims = [
     'Any'
 ];
 
+const casters = [ 'String', 'Boolean', 'Number', 'Object' ];
+
 const operators: { [key: string]: string } = {
 
     '==': '===',
@@ -402,8 +404,15 @@ export const partialApplication2TS = (ctx: Context, ns: nodes.Expression[]) =>
 /**
  * constructExpression2TS 
  */
-export const constructExpression2TS = (ctx: Context, n: nodes.ConstructExpression) =>
-    `new ${constructor2TS(n.cons)} (${args2TS(ctx, n.args)})`;
+export const constructExpression2TS =
+  (ctx: Context, n: nodes.ConstructExpression) => {
+
+    let cons = constructor2TS(n.cons);
+
+    return ((casters.indexOf(cons) === -1) ?
+                'new' : '')+`(${args2TS(ctx, n.args)})`;
+
+  }
 
 /**
  * callExpression2TS 

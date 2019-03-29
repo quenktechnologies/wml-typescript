@@ -1,25 +1,38 @@
 import * as __wml from '../../src';
 
 import * as lib  from 'path/to/libs'; 
+//@ts-ignore: 6192
 import {
 Maybe as __Maybe,
 fromNullable as __fromNullable,
 fromArray as __fromArray
 }
 from '@quenk/noni/lib/data/maybe';
+//@ts-ignore:6192
+type __IfArg = ()=>__wml.Content[]
+
+//@ts-ignore:6192
 type __ForAlt = ()=> __wml.Content[]
 
-export type ForInBody<A> =(val:A, idx:number, all:A[])=>__wml.Content[]
+//@ts-ignore:6192
+type __ForInBody<A> =(val:A, idx:number, all:A[])=>__wml.Content[]
 
-export type ForOfBody<A> = (val:A, key:string, all:object) =>__wml.Content[]
+//@ts-ignore:6192
+type __ForOfBody<A> = (val:A, key:string, all:object) =>__wml.Content[]
 
-export interface Record<A> {
+//@ts-ignore:6192
+interface __Record<A> {
 
  [key:string]: A
 
 }
 
-export const __forIn = <A>(list:A[], f:ForInBody<A>, alt:__ForAlt) : __wml.Content[] => {
+//@ts-ignore:6192
+const __if = (__expr:boolean, __conseq:__IfArg,__alt:__IfArg) : Content[]=>
+(__expr) ? __conseq() :  __alt();
+
+//@ts-ignore:6192
+const __forIn = <A>(list:A[], f:__ForInBody<A>, alt:__ForAlt) : __wml.Content[] => {
 
    let ret:__wml.Content[] = [];
 
@@ -29,7 +42,8 @@ export const __forIn = <A>(list:A[], f:ForInBody<A>, alt:__ForAlt) : __wml.Conte
    return ret.length === 0 ? alt() : ret;
 
 }
-export const __forOf = <A>(o:Record<A>, f:ForOfBody<A>,alt:__ForAlt) : __wml.Content[] => {
+//@ts-ignore:6192
+const __forOf = <A>(o:__Record<A>, f:__ForOfBody<A>,alt:__ForAlt) : __wml.Content[] => {
 
     let ret:__wml.Content[] = [];
 
