@@ -192,7 +192,7 @@ export class Main  implements __wml.View {
            return console.warn('invalidate(): '+       'Cannot invalidate a view that has not been rendered!');
 
        if (tree.parentNode == null)
-                  throw new Error('Cannot invalidate a view  that has not been rendered!');
+           return console.warn('invalidate(): '+         'This view has not been attached to any DOM!
 
        parent.replaceChild(this.render(), tree) 
 

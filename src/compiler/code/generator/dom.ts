@@ -40,9 +40,6 @@ const REGISTER_PARAMS = `e:${WML}.WMLElement, ` +
 const THROW_CHILD_ERR = '         throw new TypeError(`Can not adopt ' +
     'child ${c} of type \${typeof c}`);';
 
-const THROW_INVALIDATE_ERR = `       throw new Error('Cannot invalidate a view ` +
-    ` that has not been rendered!');`;
-
 const IGNORE_UNUSED = '//@ts-ignore:6192';
 
 const RECORD = '__Record<A>';
@@ -98,7 +95,7 @@ export class DOMGenerator implements Generator {
             `${WML}.Content[]`,
             ``,
             `${IGNORE_UNUSED}`,
-          `interface ${RECORD} {`,
+            `interface ${RECORD} {`,
             ``,
             ` [key:string]: A`,
             ``,
@@ -122,7 +119,7 @@ export class DOMGenerator implements Generator {
             ``,
             `}`,
             `${IGNORE_UNUSED}`,
-          `const ${FOR_OF} = <A>(o:${RECORD}, f:${FOR_OF_BODY},` +
+            `const ${FOR_OF} = <A>(o:${RECORD}, f:${FOR_OF_BODY},` +
             `alt:${FOR_ALT_TYPE}) : ${WML}.Content[] => {`,
             ``,
             `    let ret:${WML}.Content[] = [];`,
@@ -288,7 +285,8 @@ export class DOMGenerator implements Generator {
             `       'Cannot invalidate a view that has not been rendered!');`,
             ``,
             `       if (tree.parentNode == null)`,
-            `           ${THROW_INVALIDATE_ERR}`,
+            `           return console.warn('invalidate(): '+` +
+            `         'This view has not been attached to any DOM!`,
             ``,
             `       parent.replaceChild(this.render(), tree) `,
             ``,
