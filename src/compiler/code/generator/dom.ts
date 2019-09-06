@@ -40,6 +40,9 @@ const REGISTER_PARAMS = `e:${WML}.WMLElement, ` +
 const THROW_CHILD_ERR = '         throw new TypeError(`Can not adopt ' +
     'child ${c} of type \${typeof c}`);';
 
+const THROW_INVALIDATE_ERR = `       throw new Error('invalidate(): cannot ` +
+    `invalidate this view, it has no parent node!');`;
+
 const IGNORE_UNUSED = '//@ts-ignore:6192';
 
 const RECORD = '__Record<A>';
@@ -282,11 +285,10 @@ export class DOMGenerator implements Generator {
             ``,
             `       if (tree == null)`,
             `           return console.warn('invalidate(): '+` +
-            `       'Cannot invalidate a view that has not been rendered!');`,
+            `       'Missing DOM tree!');`,
             ``,
             `       if (tree.parentNode == null)`,
-            `           return console.warn('invalidate(): '+` +
-            `         'This view has not been attached to any DOM!');`,
+            `           ${THROW_INVALIDATE_ERR}`,
             ``,
             `       parent.replaceChild(this.render(), tree) `,
             ``,
