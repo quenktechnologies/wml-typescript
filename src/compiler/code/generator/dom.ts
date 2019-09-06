@@ -286,7 +286,7 @@ export class DOMGenerator implements Generator {
             ``,
             `       if (tree.parentNode == null)`,
             `           return console.warn('invalidate(): '+` +
-            `         'This view has not been attached to any DOM!'`,
+            `         'This view has not been attached to any DOM!');`,
             ``,
             `       parent.replaceChild(this.render(), tree) `,
             ``,
